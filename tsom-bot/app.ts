@@ -1,5 +1,5 @@
-import { GuildData } from "./ticket-tracker/FetchGuildData.js";
+import { FetchGuildData } from "./ticket-tracker/FetchGuildData.js";
 
-const guildData = new GuildData();
+const guildData = new FetchGuildData();
 
 console.log(guildData.fetchGuildData());

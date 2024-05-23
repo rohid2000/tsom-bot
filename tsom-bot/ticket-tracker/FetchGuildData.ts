@@ -1,4 +1,4 @@
-export class GuildData {
+export class FetchGuildData {
 
     public async fetchGuildData(): Promise<Response> {
         const url = "http:// 172.25.144.1:3000/guild";

@@ -1,8 +1,8 @@
 export class FetchGuildData {
 
     public async fetchGuildData(): Promise<Response> {
-        // const url = "http:// 172.25.144.1:3000/guild";// ip Syntess
-        const url = "http://172.26.0.1:3000/guild";// ip thuis
+        const url = "http://172.25.144.1:3000/guild";// ip Syntess
+        //const url = "http://172.26.0.1:3000/guild";// ip thuis
 
         const body = {
             payload: {

@@ -16,15 +16,19 @@ export class FetchGuildData {
         requestHeaders.set('content-type', 'application/json; charset=utf-8');
         requestHeaders.set('Origin', 'http://localhost:5500');
 
+        let result;
 
-        const result = await fetch(url, {
-            method: 'POST',
-            headers: requestHeaders,
-            body: JSON.stringify(body),
-        })
+        try {
+            result = await fetch(url, {
+                method: 'POST',
+                headers: requestHeaders,
+                body: JSON.stringify(body),
+            })
+        } catch (error) {
+            console.log(error);
+        }
         return await result.json();
     }
-
     constructor() {
         console.log();
     }

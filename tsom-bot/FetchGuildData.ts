@@ -1,7 +1,7 @@
 export class FetchGuildData {
 
     public async fetchGuildData(): Promise<Response> {
-        const url = "http://localhost:3000/guild";
+        const url = "http://172.26.0.1:3000/guild";
 
         const body = {
             "payload": {
@@ -15,16 +15,18 @@ export class FetchGuildData {
         let result;
 
         const headers = new Headers();
-        headers.append("Content-Type", "application/json");
+        headers.append("Access-Control-Allow-Origin", "*");
+        headers.append("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+        headers.append("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
 
         try {
             result = await fetch(url, {
                 method: 'POST',
+                headers: headers,
                 // headers: {
                 // "content-type": "application/json; charset=utf-8",
                 // "Origin": "http://localhost:5000"
                 // },
-                headers: headers,
                 body: JSON.stringify(body),
             })
         } catch (error) {

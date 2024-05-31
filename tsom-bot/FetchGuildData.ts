@@ -1,7 +1,8 @@
 export class FetchGuildData {
 
     public async fetchGuildData(): Promise<Response> {
-        const url = "http://172.26.0.1:3000/guild";
+        const url = "http://localhost:3000/guild";
+        //home-ip 172.26.0.1
 
         const body = {
             "payload": {

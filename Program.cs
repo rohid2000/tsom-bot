@@ -19,6 +19,8 @@ static async Task ProcessRepositoriesAsync()
 
     var response = await client.PostAsync("https://swgoh-comlink-latest-nfw1.onrender.com/guild", jsonContent);
     var responseString = await response.Content.ReadAsStringAsync();
+
+    Console.WriteLine(responseString);
 }
 
 interface IGuild

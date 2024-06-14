@@ -1,9 +1,8 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "tsom-bot", "tsom-bot\tsom-bot.esproj", "{3AF97CBC-346E-417A-9E03-2374EEE14EF7}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "tsom-bot", "tsom-bot.csproj", "{3AF97CBC-346E-417A-9E03-2374EEE14EF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

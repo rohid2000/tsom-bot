@@ -2,6 +2,6 @@
 
 public interface IGuild
     {
-        IMember[] members { get; }
+        IMember[] Members { get; }
         IRecentRaidResult[] RaidMembers { get; }
     }

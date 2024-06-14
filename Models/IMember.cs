@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-    public interface IMember
+using tsom_bot.Models;
+public interface IMember
     {
         public string PlayerId { get; }
-        public int[] MemberContribution { get; }
+        public IMemberContribution MemberContribution { get; }
         public string PlayerName { get; }
         public int PlayerLevel { get; }
         public string LastActivityTime { get; }

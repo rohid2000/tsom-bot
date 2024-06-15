@@ -1,11 +1,12 @@
 ﻿using tsom_bot.Models;
 
-public interface IGuild
+public class IGuild
     {
-        IMember[] Members { get; }
-        IRecentRaidResult[] RaidMembers { get; }
-        IRecentTerritoryWarResult[] RecentTerritoryWarResult { get; }
-        ILastRaidPointsSummary[] LastRaidPointsSummaries { get; }
-        public IProfile Profile { get; }
-        public string NextChallengesRefresh { get; }
+        public IGuild() {}
+        public IMember[]? Members { get; set; }
+        public IRecentRaidResult[]? RaidMembers { get; set; }
+        public IRecentTerritoryWarResult[]? RecentTerritoryWarResult { get; set; }
+        public ILastRaidPointsSummary[]? LastRaidPointsSummaries { get; set; }
+        public IProfile? Profile { get; set; }
+        public string? nextChallengesRefresh { get; set; }
     }

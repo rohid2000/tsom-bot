@@ -1,10 +1,10 @@
 namespace tsom_bot.Models;
 
-public interface IRecentTerritoryWarResult
+public class IRecentTerritoryWarResult
 {
-    public string TerritoryWarId { get; }
-    public string Score { get; }
-    public string Power { get; }
-    public string OpponentScore { get; }
-    public string EndTimeSeconds { get; }
+    public string? TerritoryWarId { get; set; }
+    public string? Score { get; set; }
+    public string? Power { get; set; }
+    public string? OpponentScore { get; set; }
+    public string? EndTimeSeconds { get; set; }
 }

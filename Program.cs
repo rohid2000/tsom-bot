@@ -4,21 +4,7 @@ await ProcessRepositoriesAsync();
 
 static async Task ProcessRepositoriesAsync()
 {
-    HttpClient client = new HttpClient();
+    var a = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true);
 
-    var jsonContent = JsonContent.Create(new
-    {
-        payload = new
-        {
-            guildId = "l943tTO8QQ-_IwWHfwyJuQ",
-            includeRecentGuildActivityInfo = true
-        },
-        enums = false
-    });
-
-
-    var response = await client.PostAsync("https://swgoh-comlink-latest-nfw1.onrender.com/guild", jsonContent);
-    var responseString = await response.Content.ReadAsStringAsync();
-
-    Console.WriteLine(responseString);
+    Console.WriteLine(a);
 }

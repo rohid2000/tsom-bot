@@ -1,20 +1,20 @@
 ﻿using tsom_bot.Models;
-public interface IMember
+public class IMember
 {
-    public string PlayerId { get; }
-    public IMemberContribution[] MemberContribution { get; }
-    public string PlayerName { get; }
-    public int PlayerLevel { get; }
-    public int MemberLevel { get; }
-    public int GuildXp { get; }
-    public string LastActivityTime { get; }
-    public int SquadPower { get; }
-    public string GuildJoinTime { get; }
-    public string GalacticPower { get; }
-    public string PlayerTitle { get; }
-    public string PlayerPortrait { get; }
-    public string LeagueId { get; }
-    public string ShipGalacticPower { get; }
-    public string CharacterGalacticPower { get; }
-    public string NucleusId { get; }
+    public string? PlayerId { get; set; }
+    public IMemberContribution[]? MemberContribution { get; set; }
+    public string? PlayerName { get; set; }
+    public int? PlayerLevel { get; set; }
+    public int? MemberLevel { get; set; }
+    public int? GuildXp { get; set; }
+    public string? LastActivityTime { get; set; }
+    public int? SquadPower { get; set; }
+    public string? GuildJoinTime { get; set; }
+    public string? GalacticPower { get; set; }
+    public string? PlayerTitle { get; set; }
+    public string? PlayerPortrait { get; set; }
+    public string? LeagueId { get; set; }
+    public string? ShipGalacticPower { get; set; }
+    public string? CharacterGalacticPower { get; set; }
+    public string? NucleusId { get; set; }
 }

@@ -1,9 +1,9 @@
 namespace tsom_bot.Models;
 
-public interface IRaidMembers
+public class IRaidMembers
 {
-    public string PlayerId { get; }
-    public string MemberProgress { get; }
-    public int MemberRank { get; }
-    public int MemberAttempts { get; }
+    public string? PlayerId { get; set; }
+    public string? MemberProgress { get; set; }
+    public int? MemberRank { get; set; }
+    public int? MemberAttempts { get; set; }
 }

@@ -1,10 +1,10 @@
 namespace tsom_bot.Models;
 
-public interface ILastRaidPointsSummaryIndentifier
+public class ILastRaidPointsSummaryIndentifier
 {
-    public string CampaignId { get; }
-    public string CampaignMapId { get; }
-    public string CampaignNodeId { get; }
-    public string CampaignNodeDifficulty { get; }
-    public string CampaignMissionId { get; }
+    public string? CampaignId { get; set; }
+    public string? CampaignMapId { get; set; }
+    public string? CampaignNodeId { get; set; }
+    public string? CampaignNodeDifficulty { get; set; }
+    public string? CampaignMissionId { get; set; }
 }

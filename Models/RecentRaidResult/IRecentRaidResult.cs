@@ -1,10 +1,10 @@
 namespace tsom_bot.Models;
 
-public interface IRecentRaidResult
+public class IRecentRaidResult
 {
-    public IRaidMembers[] RaidMembers { get; }
-    public string RaidId { get; }
-    public string Duration { get; }
-    public string EndTime { get; }
-    public string GuildRewardScore { get; }
+    public IRaidMembers[]? RaidMembers { get; set; }
+    public string? RaidId { get; set; }
+    public string? Duration { get; set; }
+    public string? EndTime { get; set; }
+    public string? GuildRewardScore { get; set; }
 }

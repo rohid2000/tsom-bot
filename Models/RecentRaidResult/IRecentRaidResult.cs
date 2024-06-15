@@ -2,9 +2,9 @@ namespace tsom_bot.Models;
 
 public class IRecentRaidResult
 {
-    public IRaidMembers[]? RaidMembers { get; set; }
-    public string? RaidId { get; set; }
-    public string? Duration { get; set; }
-    public string? EndTime { get; set; }
-    public string? GuildRewardScore { get; set; }
+    public IRaidMembers[]? raidMember { get; set; }
+    public string? raidId { get; set; }
+    public string? duration { get; set; }
+    public string? endTime { get; set; }
+    public string? guildRewardScore { get; set; }
 }

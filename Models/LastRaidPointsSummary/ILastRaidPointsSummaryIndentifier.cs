@@ -2,9 +2,9 @@ namespace tsom_bot.Models;
 
 public class ILastRaidPointsSummaryIndentifier
 {
-    public string? CampaignId { get; set; }
-    public string? CampaignMapId { get; set; }
-    public string? CampaignNodeId { get; set; }
-    public string? CampaignNodeDifficulty { get; set; }
-    public string? CampaignMissionId { get; set; }
+    public string? campaignId { get; set; }
+    public string? campaignMapId { get; set; }
+    public string? campaignNodeId { get; set; }
+    public string? campaignNodeDifficulty { get; set; }
+    public string? campaignMissionId { get; set; }
 }

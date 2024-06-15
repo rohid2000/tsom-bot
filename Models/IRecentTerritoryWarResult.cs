@@ -2,9 +2,9 @@ namespace tsom_bot.Models;
 
 public class IRecentTerritoryWarResult
 {
-    public string? TerritoryWarId { get; set; }
-    public string? Score { get; set; }
-    public string? Power { get; set; }
-    public string? OpponentScore { get; set; }
-    public string? EndTimeSeconds { get; set; }
+    public string? territoryWarId { get; set; }
+    public string? score { get; set; }
+    public string? power { get; set; }
+    public string? opponentScore { get; set; }
+    public string? endTimeSeconds { get; set; }
 }

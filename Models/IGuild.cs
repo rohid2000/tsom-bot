@@ -3,10 +3,10 @@
 public class IGuild
     {
         public IGuild() {}
-        public IMember[]? Members { get; set; }
-        public IRecentRaidResult[]? RaidMembers { get; set; }
-        public IRecentTerritoryWarResult[]? RecentTerritoryWarResult { get; set; }
-        public ILastRaidPointsSummary[]? LastRaidPointsSummaries { get; set; }
-        public IProfile? Profile { get; set; }
+        public IMember[]? member { get; set; }
+        public IRecentRaidResult[]? recentRaidResult { get; set; }
+        public IRecentTerritoryWarResult[]? recentTerritoryWarResult { get; set; }
+        public ILastRaidPointsSummary[]? lastRaidPointsSummary { get; set; }
+        public IProfile? profile { get; set; }
         public string? nextChallengesRefresh { get; set; }
     }

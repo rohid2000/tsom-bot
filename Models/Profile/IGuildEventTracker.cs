@@ -2,7 +2,7 @@ namespace tsom_bot.Models.Profile;
 
 public class IGuildEventTracker
 {
-    public string? DefinitionId { get; set; }
-    public string? CompletedStars { get; set; }
-    public string? EndTime { get; set; }
+    public string? definitionId { get; set; }
+    public string? completedStars { get; set; }
+    public string? endTime { get; set; }
 }

@@ -4,7 +4,11 @@ await ProcessRepositoriesAsync();
 
 static async Task ProcessRepositoriesAsync()
 {
-    var a = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true);
+    HttpClient client = new();
 
-    Console.WriteLine(a);
+    IGuild? guildData = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true, client);
+
+    DateTime nextChallengesRefresh = FetchTypeHelper.ConvertStringToDateTime(guildData.nextChallengesRefresh);
+
+    Console.WriteLine(nextChallengesRefresh.ToString());
 }

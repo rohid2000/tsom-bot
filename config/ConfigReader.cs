@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace tsombot.config
+namespace tsom_bot.config
 {
     public class ConfigReader
     {

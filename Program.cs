@@ -1,7 +1,8 @@
 using System.Net.Http.Json;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using tsombot.config;
+using tsom_bot.config;
+using tsom_bot.Commands;
 
 internal class Program
 {
@@ -26,10 +27,24 @@ internal class Program
 
         client.Ready += Client_Ready;
 
-        await client.ConnectAsync();
-
         Task apiTask = Task.Run(ProcessRepositoriesAsync);
 
+        var commandsConfig = new CommandsNextConfiguration()
+        {
+            StringPrefixes = new string[] { configReader.prefix },
+            EnableMentionPrefix = true,
+            EnableDefaultHelp = false,
+        };
+
+        commands = client.UseCommandsNext(commandsConfig);
+
+        //Initialize commands here
+        commands.RegisterCommands<commandTemplate>();
+
+        //Make connection
+        await client.ConnectAsync();
+
+        //Keep bot running
         await Task.Delay(-1);
     }
 
@@ -51,7 +66,7 @@ internal class Program
         var response = await client.PostAsync("https://swgoh-comlink-latest-nfw1.onrender.com/guild", jsonContent);
         var responseString = await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine(responseString);
+        Console.WriteLine("API ACTIVATED");
     }
 
     private static Task Client_Ready(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs args)

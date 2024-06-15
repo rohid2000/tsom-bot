@@ -22,13 +22,3 @@ static async Task ProcessRepositoriesAsync()
 
     Console.WriteLine(responseString);
 }
-
-interface IGuild
-{
-    IMember[] members { get; }
-}
-
-interface IMember
-{
-    int playerId { get; }
-}

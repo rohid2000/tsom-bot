@@ -8,9 +8,8 @@ using tsom_bot.Models;
 public static class GuildFetcher 
 {
     private static readonly string url = "https://swgoh-comlink-latest-nfw1.onrender.com/guild";
-    private static readonly HttpClient client = new();
 
-    public static async Task<IGuild?> GetGuildById(string guildId, bool includeRecentGuildActivityInfo)
+    public static async Task<IGuild?> GetGuildById(string guildId, bool includeRecentGuildActivityInfo, HttpClient client)
     {
         var bodyContent = new {
             payload = new
@@ -26,16 +25,18 @@ public static class GuildFetcher
 
         var contentStream = await response.Content.ReadAsStreamAsync();
 
-        Console.WriteLine(await response.Content.ReadAsStringAsync());
+        using (StreamReader sr = new StreamReader(contentStream))
+        {
+            string json = await sr.ReadToEndAsync();
+            Guild? data = JsonConvert.DeserializeObject<Guild>(json);
 
-        using var streamReader = new StreamReader(contentStream);
-        var json = await streamReader.ReadToEndAsync();
-
-        IGuild data = JsonConvert.DeserializeObject<IGuild>(json);
-
-        Console.WriteLine(data);
-
-        return null;
+            return data?.guild;
+        }
     }
 
+}
+
+public class Guild
+{
+    public IGuild guild;
 }

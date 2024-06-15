@@ -1,5 +1,3 @@
-using System.Net.Http.Json;
-
 await ProcessRepositoriesAsync();
 
 static async Task ProcessRepositoriesAsync()

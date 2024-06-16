@@ -33,8 +33,14 @@ namespace tsom_bot.Commands.Helpers
                 {
                     ContributionReached contributionReached = IsTicketGoalReached(int.Parse(contribution.currentValue));
 
-                    ResultListString += $"{ member.playerName } | { contribution.currentValue } | { ConvertContributionReachedToString(contributionReached) } \n";
+                    /* ConvertContributionReachedToString(contributionReached) */
+                    ResultListString += $"{ member.playerName } | { member?.memberContribution?[0].currentValue } | { member?.memberContribution?[1].currentValue } | { member?.memberContribution?[2].currentValue } \n";
                 }
+            }
+
+            if(ResultListString.Length >= 2000)
+            {
+                ResultListString = ResultListString.Substring(0, 2000);
             }
 
             return ResultListString;

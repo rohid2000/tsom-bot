@@ -27,8 +27,6 @@ internal class Program
 
         client.Ready += Client_Ready;
 
-        Task apiTask = Task.Run(ProcessRepositoriesAsync);
-
         var commandsConfig = new CommandsNextConfiguration()
         {
             StringPrefixes = new string[] { configReader.prefix },
@@ -40,6 +38,7 @@ internal class Program
 
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
+        commands.RegisterCommands<TicketTrackerCommand>();
 
         //Make connection
         await client.ConnectAsync();
@@ -62,14 +61,12 @@ internal class Program
             enums = false
         });
 
-    DateTime nextChallengesRefresh = FetchTypeHelper.ConvertStringToDateTime(guildData.nextChallengesRefresh);
+        IGuild? guildData = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true, client);
 
-    Console.WriteLine(nextChallengesRefresh.ToString());
+        DateTime nextChallengesRefresh = FetchTypeHelper.ConvertStringToDateTime(guildData.nextChallengesRefresh);
 
-    HttpClient Hclient = new();
-
-    IGuild? guildData = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true, Hclient);
-}
+        Console.WriteLine(nextChallengesRefresh.ToString());
+    }
 
     private static Task Client_Ready(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs args)
     {

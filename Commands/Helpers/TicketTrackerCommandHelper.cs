@@ -27,7 +27,7 @@ namespace tsom_bot.Commands.Helpers
             for(int i = 0; i < GuildData.member.Length; i++)
             {
                 IMember member = GuildData.member[i];
-                IMemberContribution? contribution = member?.memberContribution?[0];
+                IMemberContribution? contribution = member?.memberContribution?[1];
                 
                 if(contribution != null)
                 {

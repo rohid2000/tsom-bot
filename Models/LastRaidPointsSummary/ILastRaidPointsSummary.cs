@@ -1,7 +1,7 @@
 namespace tsom_bot.Models;
 
-public interface ILastRaidPointsSummary
+public class ILastRaidPointsSummary
 {
-    public ILastRaidPointsSummaryIndentifier Identifiers { get; }
-    public string TotalPoints { get; }
+    public ILastRaidPointsSummaryIndentifier? identifier { get; set; }
+    public string? totalPoints { get; set; }
 }

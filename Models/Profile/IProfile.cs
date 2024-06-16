@@ -2,26 +2,26 @@ using tsom_bot.Models.Profile;
 
 namespace tsom_bot.Models;
 
-public interface IProfile
+public class IProfile
 {
-    public IGuildEventTracker[] GuildEventTracker { get; }
-    public string Id { get; }
-    public string Name { get; }
-    public string ExternalMessageKey { get; }
-    public string LogoBackground { get; }
-    public int EnrollmentStatus { get; }
-    public int Trophy { get; }
-    public int MemberCount { get; }
-    public int MemberMax { get; }
-    public int Level { get; }
-    public int Rank { get; }
-    public int LevelRequirement { get; }
-    public int RaidWin { get; }
-    public string LeaderboardScore { get; }
-    public string BannerColorId { get; }
-    public string BannerLogoId { get; }
-    public string GuildGalacticPower { get; }
-    public string ChatChannelId { get; }
-    public string GuildType { get; }
-    public string GuildGalacticPowerForRequirement { get; }
+    public IGuildEventTracker[]? guildEventTracker { get; set; }
+    public string? id { get; set; }
+    public string? name { get; set; }
+    public string? externalMessageKey { get; set; }
+    public string? logoBackground { get; set; }
+    public int? enrollmentStatus { get; set; }
+    public int? trophy { get; set; }
+    public int? memberCount { get; set; }
+    public int? memberMax { get; set; }
+    public int? level { get; set; }
+    public int? rank { get; set; }
+    public int? levelRequirement { get; set; }
+    public int? raidWin { get; set; }
+    public string? leaderboardScore { get; set; }
+    public string? bannerColorId { get; set; }
+    public string? bannerLogoId { get; set; }
+    public string? guildGalacticPower { get; set; }
+    public string? chatChannelId { get; set; }
+    public string? guildType { get; set; }
+    public string? guildGalacticPowerForRequirement { get; set; }
 }

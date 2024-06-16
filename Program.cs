@@ -1,24 +1,75 @@
 using System.Net.Http.Json;
+using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using tsom_bot.config;
+using tsom_bot.Commands;
 
-await ProcessRepositoriesAsync();
-
-static async Task ProcessRepositoriesAsync()
+internal class Program
 {
-    HttpClient client = new HttpClient();
+    private static DiscordClient client { get; set; }
+    private static CommandsNextExtension commands { get; set; }
 
-    var jsonContent = JsonContent.Create(new
+    private static async Task Main(string[] args)
     {
-        payload = new
+        //Initialize Discord Bot
+        var configReader = new ConfigReader();
+        await configReader.readConfig();
+
+        var discordConfig = new DiscordConfiguration()
         {
-            guildId = "l943tTO8QQ-_IwWHfwyJuQ",
-            includeRecentGuildActivityInfo = true
-        },
-        enums = false
-    });
+            Intents = DiscordIntents.All,
+            Token = configReader.token,
+            TokenType = TokenType.Bot,
+            AutoReconnect = true,
+        };
 
+        client = new DiscordClient(discordConfig);
 
-    var response = await client.PostAsync("https://swgoh-comlink-latest-nfw1.onrender.com/guild", jsonContent);
-    var responseString = await response.Content.ReadAsStringAsync();
+        client.Ready += Client_Ready;
 
-    Console.WriteLine(responseString);
+        var commandsConfig = new CommandsNextConfiguration()
+        {
+            StringPrefixes = new string[] { configReader.prefix },
+            EnableMentionPrefix = true,
+            EnableDefaultHelp = false,
+        };
+
+        commands = client.UseCommandsNext(commandsConfig);
+
+        //Initialize commands here
+        commands.RegisterCommands<commandTemplate>();
+        commands.RegisterCommands<TicketTrackerCommand>();
+
+        //Make connection
+        await client.ConnectAsync();
+
+        //Keep bot running
+        await Task.Delay(-1);
+    }
+
+    static async Task ProcessRepositoriesAsync()
+    {   
+        HttpClient client = new HttpClient();
+
+        var jsonContent = JsonContent.Create(new
+        {
+            payload = new
+            {
+                guildId = "l943tTO8QQ-_IwWHfwyJuQ",
+                includeRecentGuildActivityInfo = true
+            },
+            enums = false
+        });
+
+        IGuild? guildData = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true, client);
+
+        DateTime nextChallengesRefresh = FetchTypeHelper.ConvertStringToDateTime(guildData.nextChallengesRefresh);
+
+        Console.WriteLine(nextChallengesRefresh.ToString());
+    }
+
+    private static Task Client_Ready(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs args)
+    {
+        return Task.CompletedTask;
+    }
 }

@@ -1,8 +1,8 @@
 namespace tsom_bot.Models;
 
-public interface IMemberContribution
+public class IMemberContribution
 {
-    public int Type { get; }
-    public string CurrentValue { get; }
-    public string LifetimeValue { get; }
+    public int? type { get; set; }
+    public string? currentValue { get; set; }
+    public string? lifetimeValue { get; set; }
 }

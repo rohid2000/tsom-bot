@@ -20,6 +20,6 @@ public class IMember
 
     public IMemberContribution? GetRaidTicketContribution()
     {
-        return this.memberContribution?[1];
+        return this.memberContribution?[2];
     }
 }

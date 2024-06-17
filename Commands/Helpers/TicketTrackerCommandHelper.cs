@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using ClosedXML.Excel;
 using tsom_bot.Models;
 
 namespace tsom_bot.Commands.Helpers
@@ -6,9 +7,18 @@ namespace tsom_bot.Commands.Helpers
     public class TicketTrackerCommandHelper {
         public string message;
         private int minimalTicketValue;
+        private ExcelHelper? excel;
 
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
+            try {
+                this.excel = new ExcelHelper(guildData, minimalTicketValue);
+            } 
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
             this.minimalTicketValue = minimalTicketValue;
             this.message = this.GetMemberTicketResultList(guildData);
         }
@@ -21,20 +31,23 @@ namespace tsom_bot.Commands.Helpers
             return new TicketTrackerCommandHelper(guildData[0], 600);
         }   
 
+        public FileStream? GetExcelFile()
+        {
+            return this.excel?.GetGeneratedFile();
+        }
+
         private string GetMemberTicketResultList(IGuild GuildData)
         {
             string ResultListString = "";
             for(int i = 0; i < GuildData.member.Length; i++)
             {
                 IMember member = GuildData.member[i];
-                IMemberContribution? contribution = member?.memberContribution?[1];
+                IMemberContribution? contribution = member.GetRaidTicketContribution();
                 
                 if(contribution != null)
                 {
-                    ContributionReached contributionReached = IsTicketGoalReached(int.Parse(contribution.currentValue));
-
-                    /* ConvertContributionReachedToString(contributionReached) */
-                    ResultListString += $"{ member.playerName } | { member?.memberContribution?[0].currentValue } | { member?.memberContribution?[1].currentValue } | { member?.memberContribution?[2].currentValue } \n";
+                    ContributionReached contributionReached = ExcelHelper.IsTicketGoalReached(int.Parse(contribution.currentValue), this.minimalTicketValue);
+                    ResultListString += $"{ member.playerName } | { ExcelHelper.ConvertContributionReachedToString(contributionReached) } \n";
                 }
             }
 
@@ -45,10 +58,47 @@ namespace tsom_bot.Commands.Helpers
 
             return ResultListString;
         }
+    }
 
-        private ContributionReached IsTicketGoalReached(int contributionValue)
+    enum ContributionReached
+    {
+        Yes, No, NVT
+    }
+
+    internal class ExcelHelper {
+        internal readonly string fileName = "excelguilddata.xlsx";
+
+        public ExcelHelper(IGuild guildData, int minimalTicketValue)
         {
-            if(contributionValue >= this.minimalTicketValue)
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Sample Sheet");
+
+                for(int i = 0; i < guildData.member.Length; i++)
+                {
+                    IMember member = guildData.member[i];
+                    IMemberContribution? contribution = member.GetRaidTicketContribution();
+                    ContributionReached memberTicketGoalReached = IsTicketGoalReached(int.Parse(contribution.currentValue), minimalTicketValue);
+                    if(contribution != null && (memberTicketGoalReached != ContributionReached.Yes || memberTicketGoalReached != ContributionReached.NVT))
+                    {
+                        worksheet.Cell("A"+(i+2)).Value = member.playerName;
+                        worksheet.Cell("B"+(i+2)).Value = contribution.currentValue;
+                        worksheet.Cell("C"+(i+2)).Value = ConvertContributionReachedToString(memberTicketGoalReached);
+                    }
+                }
+
+                workbook.SaveAs(fileName);
+            }
+        }
+
+        internal FileStream GetGeneratedFile()
+        {
+            return new FileStream(fileName, FileMode.Open, FileAccess.Read);
+        }
+
+        internal static ContributionReached IsTicketGoalReached(int contributionValue, int minimalTicketValue)
+        {
+            if(contributionValue >= minimalTicketValue)
             {
                 return ContributionReached.Yes;
             } else {
@@ -56,7 +106,7 @@ namespace tsom_bot.Commands.Helpers
             }
         }
 
-        private string ConvertContributionReachedToString(ContributionReached contributionReached)
+        internal static string ConvertContributionReachedToString(ContributionReached contributionReached)
         {
             switch(contributionReached)
             {
@@ -70,10 +120,5 @@ namespace tsom_bot.Commands.Helpers
                 return "";
             }
         }
-    }
-
-    enum ContributionReached
-    {
-        Yes, No, NVT
     }
 }

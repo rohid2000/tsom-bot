@@ -1,5 +1,6 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using tsom_bot.Commands.Helpers;
 
 namespace tsom_bot.Commands
@@ -7,16 +8,35 @@ namespace tsom_bot.Commands
     public class TicketTrackerCommand : BaseCommandModule
     {
         [Command("tickettrack")]
-        public async Task templateCommand(CommandContext ctx)
+        public async Task templateCommand(CommandContext ctx, string param = "")
         {
             string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
             TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
 
-            try {
-                await ctx.Channel.SendMessageAsync(helper.message);
-            } catch (Exception ex)
+            if(param == "excel")
             {
-                Console.WriteLine(ex.Message);
+                try {
+                    await new DiscordMessageBuilder()
+                        .WithContent("this is your file")
+                        .AddFile(helper.GetExcelFile())
+                        .SendAsync(ctx.Channel);
+                } 
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            } 
+            else 
+            {
+                try {
+                    await new DiscordMessageBuilder()
+                        .WithContent(helper.message)
+                        .SendAsync(ctx.Channel);
+                } 
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

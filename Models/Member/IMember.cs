@@ -17,4 +17,9 @@ public class IMember
     public string? shipGalacticPower { get; set; }
     public string? characterGalacticPower { get; set; }
     public string? nucleusId { get; set; }
+
+    public IMemberContribution? GetRaidTicketContribution()
+    {
+        return this.memberContribution?[1];
+    }
 }

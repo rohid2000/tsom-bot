@@ -7,7 +7,7 @@ namespace tsom_bot.Commands
 {
     public class TicketTrackerCommand : BaseCommandModule
     {
-        [Command("tickettrack")]
+        [Command("tickets")]
         public async Task templateCommand(CommandContext ctx, string param = "")
         {
             string guildId = "l943tTO8QQ-_IwWHfwyJuQ";

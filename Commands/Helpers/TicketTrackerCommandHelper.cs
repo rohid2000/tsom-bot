@@ -28,7 +28,7 @@ namespace tsom_bot.Commands.Helpers
             ObservableCollection<IGuild> guildData = new();
             guildData.Add(await GuildFetcher.GetGuildById(guildId, true, new()));
             
-            return new TicketTrackerCommandHelper(guildData[0], 600);
+            return new TicketTrackerCommandHelper(guildData[0], 400);
         }   
 
         public FileStream? GetExcelFile()
@@ -43,12 +43,6 @@ namespace tsom_bot.Commands.Helpers
             {
                 IMember member = GuildData.member[i];
                 IMemberContribution? contribution = member.GetRaidTicketContribution();
-                
-                if(contribution != null)
-                {
-                    ContributionReached contributionReached = ExcelHelper.IsTicketGoalReached(int.Parse(contribution.currentValue), this.minimalTicketValue);
-                    ResultListString += $"{ member.playerName } | { ExcelHelper.ConvertContributionReachedToString(contributionReached) } \n";
-                }
             }
 
             if(ResultListString.Length >= 2000)
@@ -60,65 +54,71 @@ namespace tsom_bot.Commands.Helpers
         }
     }
 
-    enum ContributionReached
-    {
-        Yes, No, NVT
-    }
-
     internal class ExcelHelper {
-        internal readonly string fileName = "excelguilddata.xlsx";
+        internal readonly string fileName = "strike-list.xlsx";
 
         public ExcelHelper(IGuild guildData, int minimalTicketValue)
         {
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Sample Sheet");
+                var strikes = 0;
+                int heightIndex = 5;
 
-                for(int i = 0; i < guildData.member.Length; i++)
+                worksheet.Cell("A1").Value = "Strike reason";
+                worksheet.Cell("B1").Value = "Missing 400 tickets";
+                worksheet.Cell("C1").Value = "TB (0 TB Points in a Phase)";
+                worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
+                worksheet.Cell("E1").Value = "Raids (0 attempts)";
+                worksheet.Cell("F1").Value = "Total strikes";
+
+                worksheet.Cell("A3").Value = "Member name";
+
+                IMember[] members = guildData.GetNoReachedTicketMembers(minimalTicketValue);
+
+                for (int i = 0; i < members.Length; i++)
                 {
-                    IMember member = guildData.member[i];
+                    IMember member = members[i];
                     IMemberContribution? contribution = member.GetRaidTicketContribution();
-                    ContributionReached memberTicketGoalReached = IsTicketGoalReached(int.Parse(contribution.currentValue), minimalTicketValue);
-                    if(contribution != null && (memberTicketGoalReached != ContributionReached.Yes || memberTicketGoalReached != ContributionReached.NVT))
+                    ContributionReached memberTicketGoalReached = member.IsTicketGoalReached(minimalTicketValue);
+                    if(contribution != null && memberTicketGoalReached != ContributionReached.Yes && memberTicketGoalReached != ContributionReached.NVT)
                     {
-                        worksheet.Cell("A"+(i+2)).Value = member.playerName;
-                        worksheet.Cell("B"+(i+2)).Value = contribution.currentValue;
-                        worksheet.Cell("C"+(i+2)).Value = ConvertContributionReachedToString(memberTicketGoalReached);
+                        //worksheet.Cell("A"+(i+2)).Value = member.playerName;
+                        //worksheet.Cell("B"+(i+2)).Value = contribution.currentValue;
+                        //worksheet.Cell("C"+(i+2)).Value = ConvertContributionReachedToString(memberTicketGoalReached);
+
+                        worksheet.Cell("A"+(i+heightIndex)).Value = member.playerName;
+                        worksheet.Cell("F"+(i+heightIndex)).Value = strikes + 1;
+
+                        if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 1))
+                        {
+                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Gray;
+                        }
+                        else if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 2))
+                        {
+                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Orange;
+                        }
+                        else if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 3))
+                        {
+                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
+                        }
                     }
                 }
+                try
+                {
 
                 workbook.SaveAs(fileName);
+                }
+                catch (Exception ex)
+                {
+                  Console.WriteLine(ex.Message);
+                }
             }
         }
 
         internal FileStream GetGeneratedFile()
         {
             return new FileStream(fileName, FileMode.Open, FileAccess.Read);
-        }
-
-        internal static ContributionReached IsTicketGoalReached(int contributionValue, int minimalTicketValue)
-        {
-            if(contributionValue >= minimalTicketValue)
-            {
-                return ContributionReached.Yes;
-            } else {
-                return ContributionReached.No;
-            }
-        }
-
-        internal static string ConvertContributionReachedToString(ContributionReached contributionReached)
-        {
-            switch(contributionReached)
-            {
-                case ContributionReached.No:
-                    return "Bad!";
-                case ContributionReached.Yes:
-                    return "Good!!";
-                case ContributionReached.NVT:
-                    return "This player doesnt take part in this event yet";
-                default:
-                return "";
-            }
         }
     }
 }

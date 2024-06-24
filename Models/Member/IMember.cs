@@ -1,4 +1,5 @@
-﻿using tsom_bot.Models;
+﻿using tsom_bot.Commands.Helpers;
+using tsom_bot.Models;
 public class IMember
 {
     public string? playerId { get; set; }
@@ -20,6 +21,40 @@ public class IMember
 
     public IMemberContribution? GetRaidTicketContribution()
     {
-        return this.memberContribution?[2];
+        return this.memberContribution?.Where(i => i.type == 2).ToArray()[0];
     }
+
+    public ContributionReached IsTicketGoalReached(int minimalTicketValue)
+    {
+        if (int.Parse(GetRaidTicketContribution().currentValue) >= minimalTicketValue)
+        {
+            return ContributionReached.Yes;
+        }
+        else
+        {
+            return ContributionReached.No;
+        }
+    }
+
+    public string ConvertContributionReachedToString(ContributionReached contributionReached)
+    {
+        switch (contributionReached)
+        {
+            case ContributionReached.No:
+                return "Bad!";
+            case ContributionReached.Yes:
+                return "Good!!";
+            case ContributionReached.NVT:
+                return "This player doesnt take part in this event yet";
+            default:
+                return "";
+        }
+    }
+}
+
+public enum ContributionReached
+{
+    Yes,
+    No,
+    NVT
 }

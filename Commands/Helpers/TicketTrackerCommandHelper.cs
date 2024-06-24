@@ -11,7 +11,8 @@ namespace tsom_bot.Commands.Helpers
 
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
-            try {
+            try 
+            {
                 this.excel = new ExcelHelper(guildData, minimalTicketValue);
             } 
             catch(Exception ex)
@@ -61,16 +62,15 @@ namespace tsom_bot.Commands.Helpers
         {
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Sample Sheet");
+                var worksheet = workbook.Worksheets.Add("Missed tickets only");
                 var strikes = 0;
                 int heightIndex = 5;
 
+                worksheet.ColumnWidth = 12;
+
                 worksheet.Cell("A1").Value = "Strike reason";
                 worksheet.Cell("B1").Value = "Missing 400 tickets";
-                worksheet.Cell("C1").Value = "TB (0 TB Points in a Phase)";
-                worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
-                worksheet.Cell("E1").Value = "Raids (0 attempts)";
-                worksheet.Cell("F1").Value = "Total strikes";
+                worksheet.Cell("C1").Value = "Total strikes";
 
                 worksheet.Cell("A3").Value = "Member name";
 
@@ -83,31 +83,27 @@ namespace tsom_bot.Commands.Helpers
                     ContributionReached memberTicketGoalReached = member.IsTicketGoalReached(minimalTicketValue);
                     if(contribution != null && memberTicketGoalReached != ContributionReached.Yes && memberTicketGoalReached != ContributionReached.NVT)
                     {
-                        //worksheet.Cell("A"+(i+2)).Value = member.playerName;
-                        //worksheet.Cell("B"+(i+2)).Value = contribution.currentValue;
-                        //worksheet.Cell("C"+(i+2)).Value = ConvertContributionReachedToString(memberTicketGoalReached);
-
                         worksheet.Cell("A"+(i+heightIndex)).Value = member.playerName;
-                        worksheet.Cell("F"+(i+heightIndex)).Value = strikes + 1;
+                        worksheet.Cell("B"+(i+heightIndex)).Value = contribution.currentValue;
+                        worksheet.Cell("C"+(i+heightIndex)).Value = strikes + 1;
 
-                        if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 1))
+                        if ((worksheet.Cell("C"+(i+heightIndex)).GetValue<int>() == 1))
                         {
-                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Gray;
+                            worksheet.Cell("C"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Gray;
                         }
-                        else if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 2))
+                        else if ((worksheet.Cell("C" +(i+heightIndex)).GetValue<int>() == 2))
                         {
-                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Orange;
+                            worksheet.Cell("C" +(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Orange;
                         }
-                        else if ((worksheet.Cell("F"+(i+heightIndex)).GetValue<int>() == 3))
+                        else if ((worksheet.Cell("C" +(i+heightIndex)).GetValue<int>() == 3))
                         {
-                            worksheet.Cell("F"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
+                            worksheet.Cell("C" +(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
                         }
                     }
                 }
                 try
                 {
-
-                workbook.SaveAs(fileName);
+                    workbook.SaveAs(fileName);
                 }
                 catch (Exception ex)
                 {

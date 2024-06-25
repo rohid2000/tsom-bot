@@ -3,6 +3,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using tsom_bot.config;
 using tsom_bot.Commands;
+using tsom_bot.Fetcher.database;
 
 internal class Program
 {
@@ -42,6 +43,8 @@ internal class Program
 
         //Make connection
         await client.ConnectAsync();
+
+        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dicsordbot\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
 
         //Keep bot running
         await Task.Delay(-1);

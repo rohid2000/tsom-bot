@@ -11,17 +11,7 @@ namespace tsom_bot.Commands.Helpers
 
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
-            try 
-            {
-                this.excel = new ExcelHelper(guildData, minimalTicketValue);
-            } 
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            this.minimalTicketValue = minimalTicketValue;
-            this.message = this.GetMemberTicketResultList(guildData);
+            TicketTrackerSaveCommandHelper saveHelper = new TicketTrackerSaveCommandHelper(guildData, minimalTicketValue);
         }
 
         async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId)  

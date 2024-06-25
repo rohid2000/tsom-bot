@@ -85,19 +85,22 @@ namespace tsom_bot.Commands.Helpers
                     {
                         worksheet.Cell("A"+(i+heightIndex)).Value = member.playerName;
                         worksheet.Cell("B"+(i+heightIndex)).Value = contribution.currentValue;
-                        worksheet.Cell("C"+(i+heightIndex)).Value = strikes + 1;
 
-                        if ((worksheet.Cell("C"+(i+heightIndex)).GetValue<int>() == 1))
+                        var strikesCell = worksheet.Cell("C"+(i+heightIndex));
+
+                        strikesCell.Value = strikes + 1;
+
+                        if (strikesCell.GetValue<int>() == 1)
                         {
-                            worksheet.Cell("C"+(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Gray;
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
                         }
-                        else if ((worksheet.Cell("C" +(i+heightIndex)).GetValue<int>() == 2))
+                        else if (strikesCell.GetValue<int>() == 2)
                         {
-                            worksheet.Cell("C" +(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Orange;
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
                         }
-                        else if ((worksheet.Cell("C" +(i+heightIndex)).GetValue<int>() == 3))
+                        else if (strikesCell.GetValue<int>() == 3)
                         {
-                            worksheet.Cell("C" +(i+heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
                         }
                     }
                 }

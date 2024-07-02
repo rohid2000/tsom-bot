@@ -1,6 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Data;
 using ClosedXML.Excel;
+using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
+using tsom_bot.Models.Member;
 
 namespace tsom_bot.Commands.Helpers
 {
@@ -12,6 +15,7 @@ namespace tsom_bot.Commands.Helpers
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
             TicketTrackerSaveCommandHelper saveHelper = new TicketTrackerSaveCommandHelper(guildData, minimalTicketValue);
+            this.excel = new ExcelHelper(guildData, minimalTicketValue);
         }
 
         async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId)  
@@ -53,7 +57,6 @@ namespace tsom_bot.Commands.Helpers
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Missed tickets only");
-                var strikes = 0;
                 int heightIndex = 5;
 
                 worksheet.ColumnWidth = 12;
@@ -64,35 +67,39 @@ namespace tsom_bot.Commands.Helpers
 
                 worksheet.Cell("A3").Value = "Member name";
 
-                IMember[] members = guildData.GetNoReachedTicketMembers(minimalTicketValue);
+                int memberIndex = 0;
+                DataTable dataToday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = {DateTime.Now.ToString("yyyy-MM-dd")}");
+                DataTable dataYesterday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = {DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")}"); ;
 
-                for (int i = 0; i < members.Length; i++)
+                foreach (IMemberTicketResult memberResult in dataToday.Rows)
                 {
-                    IMember member = members[i];
-                    IMemberContribution? contribution = member.GetRaidTicketContribution();
-                    ContributionReached memberTicketGoalReached = member.IsTicketGoalReached(minimalTicketValue);
-                    if(contribution != null && memberTicketGoalReached != ContributionReached.Yes && memberTicketGoalReached != ContributionReached.NVT)
+                    int ticketAmount = memberResult.ticketAmount + dataYesterday.Rows[memberIndex].Field<int>("ticketAmount");
+
+                    worksheet.Cell("A" + (memberIndex + heightIndex)).Value = memberResult.playerName;
+                    worksheet.Cell("B" + (memberIndex + heightIndex)).Value = ticketAmount >= 1 ? "X" : "";
+
+                    if(memberResult.ticketAmount >= 1)
                     {
-                        worksheet.Cell("A"+(i+heightIndex)).Value = member.playerName;
-                        worksheet.Cell("B"+(i+heightIndex)).Value = contribution.currentValue;
-
-                        var strikesCell = worksheet.Cell("C"+(i+heightIndex));
-
-                        strikesCell.Value = strikes + 1;
-
-                        if (strikesCell.GetValue<int>() == 1)
-                        {
-                            strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
-                        }
-                        else if (strikesCell.GetValue<int>() == 2)
-                        {
-                            strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
-                        }
-                        else if (strikesCell.GetValue<int>() == 3)
-                        {
-                            strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
-                        }
+                        worksheet.Cell("B" + (memberIndex + heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
                     }
+
+                    var strikesCell = worksheet.Cell("C"+(memberIndex + heightIndex));
+
+                    strikesCell.Value = ticketAmount;
+
+                    if (strikesCell.GetValue<int>() == 1)
+                    {
+                        strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
+                    }
+                    else if (strikesCell.GetValue<int>() == 2)
+                    {
+                        strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
+                    }
+                    else if (strikesCell.GetValue<int>() == 3)
+                    {
+                        strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
+                    }
+                    memberIndex++;
                 }
                 try
                 {

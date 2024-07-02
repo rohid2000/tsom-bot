@@ -1,5 +1,8 @@
-﻿using tsom_bot.Commands.Helpers;
+﻿using System.Data;
+using tsom_bot.Commands.Helpers;
+using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
+using tsom_bot.Models.Member;
 public class IMember
 {
     public string? playerId { get; set; }
@@ -22,6 +25,17 @@ public class IMember
     public IMemberContribution? GetRaidTicketContribution()
     {
         return this.memberContribution?.Where(i => i.type == 2).ToArray()[0];
+    }
+
+    public IMemberTicketResult GetPreviousTicketResult()
+    {
+        string sql = $"SELECT * FROM TicketResults WHERE playerName = '{this.playerName}'";
+        DataTable table = Database.SendSqlPull(sql);
+
+        IMemberTicketResult memberResult = new IMemberTicketResult();
+        memberResult.playerName = this.playerName;
+        memberResult.ticketAmount = table.Rows[0].Field<int>("ticketAmount");
+        return memberResult;
     }
 
     public ContributionReached IsTicketGoalReached(int minimalTicketValue)

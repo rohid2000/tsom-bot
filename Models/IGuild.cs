@@ -1,4 +1,5 @@
 ﻿using tsom_bot.Models;
+using tsom_bot.Models.Member;
 
 public class IGuild
 {
@@ -10,8 +11,20 @@ public class IGuild
     public IProfile? profile { get; set; }
     public string? nextChallengesRefresh { get; set; }
 
-    public IMember[] GetNoReachedTicketMembers(int minimalTicketValue)
+    public List<IMemberTicketResult> GetNoReachedTicketMembers(int minimalTicketValue)
     {
-        return this.member.Where(i => i.IsTicketGoalReached(minimalTicketValue) == ContributionReached.No).ToArray();
+        IMember[] members = this.member.Where(i => i.IsTicketGoalReached(minimalTicketValue) == ContributionReached.No).ToArray();
+        List<IMemberTicketResult> memberResults = new List<IMemberTicketResult>();
+
+        for(int i = 0; i < members.Length; i++)
+        {
+            IMember member = members[i];
+            IMemberTicketResult memberResult = new IMemberTicketResult();
+            memberResult.playerName = member.playerName;
+            memberResult.ticketAmount = 1;
+            memberResults.Add(memberResult);
+        }
+
+        return memberResults;
     }
 }

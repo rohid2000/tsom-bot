@@ -1,10 +1,9 @@
-using System.Net.Http.Json;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using tsom_bot.config;
 using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
-using DocumentFormat.OpenXml.Bibliography;
+using tsom_bot.Commands.Helpers;
 
 internal class Program
 {
@@ -21,7 +20,7 @@ internal class Program
         {
             Intents = DiscordIntents.All,
             Token = configReader.token,
-            TokenType = TokenType.Bot,
+            TokenType = DSharpPlus.TokenType.Bot,
             AutoReconnect = true,
         };
 
@@ -45,31 +44,12 @@ internal class Program
         //Make connection
         await client.ConnectAsync();
 
-        Database.Init("Data Source = (LocalDB)\\MSSQLLocalDB; AttachDbFilename = 'C:\\Users\\yanni\\OneDrive\\Bureaublad\\swgoh bot\\tsom-bot-real\\rohid2000\\tsom-bot\\Fetcher\\database\\Database1.mdf'; Integrated Security = True");
+        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dicsordbot\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
+        TimerHelperTicketTracker timer = new(client, 5); // 24h = 60 * 60 * 24
+        timer.Restart(); // this starts the automatic timer for the ticket tracker command
 
         //Keep bot running
         await Task.Delay(-1);
-    }
-
-    static async Task ProcessRepositoriesAsync()
-    {   
-        HttpClient client = new HttpClient();
-
-        var jsonContent = JsonContent.Create(new
-        {
-            payload = new
-            {
-                guildId = "l943tTO8QQ-_IwWHfwyJuQ",
-                includeRecentGuildActivityInfo = true
-            },
-            enums = false
-        });
-
-        IGuild? guildData = await GuildFetcher.GetGuildById("l943tTO8QQ-_IwWHfwyJuQ", true, client);
-
-        DateTime nextChallengesRefresh = FetchTypeHelper.ConvertStringToDateTime(guildData.nextChallengesRefresh);
-
-        Console.WriteLine(nextChallengesRefresh.ToString());
     }
 
     private static Task Client_Ready(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs args)

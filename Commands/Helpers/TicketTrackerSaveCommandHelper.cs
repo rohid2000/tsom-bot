@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using tsom_bot.Fetcher.database;
-using tsom_bot.Models;
+﻿using tsom_bot.Fetcher.database;
 using tsom_bot.Models.Member;
 
 namespace tsom_bot.Commands.Helpers
@@ -15,7 +7,7 @@ namespace tsom_bot.Commands.Helpers
     {
         public TicketTrackerSaveCommandHelper(IGuild guildData, int minimalTicketValue) 
         {
-            SaveTicketTrackerResultsInDatabase(guildData.GetNoReachedTicketMembers(minimalTicketValue));
+            SaveTicketTrackerResultsInDatabase(guildData.GetTicketResults(minimalTicketValue));
         }
 
         private void SaveTicketTrackerResultsInDatabase(List<IMemberTicketResult> members)
@@ -24,7 +16,13 @@ namespace tsom_bot.Commands.Helpers
 
             foreach(IMemberTicketResult member in members)
             {
-                string sql = $"INSERT INTO TicketResults (playerName, ticketAmount, date) VALUES ('{member.playerName}', {member.ticketAmount}, '{sqlFormattedDate}')";
+                byte missingTickets = (byte) (member.missingTickets ? 1 : 0);
+                byte TerritoryBattle = (byte) (member.TerritoryBattle ? 1 : 0);
+                byte TerritoryWar = (byte) (member.TerritoryWar ? 1 : 0);
+                byte RaidAttempts = (byte) (member.RaidAttempts ? 1 : 0);
+
+                string sql = $"INSERT INTO TicketResults (playerName, missingTickets, TerritoryBattle, TerritoryWar, RaidAttempts, date) VALUES ('{member.playerName}', {missingTickets}, {TerritoryBattle}, {TerritoryWar}, {RaidAttempts}, '{sqlFormattedDate}')";
+                Console.WriteLine(sql);
                 Database.SendSqlSave(sql);
             }
         }

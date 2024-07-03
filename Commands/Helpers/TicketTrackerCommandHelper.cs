@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Data;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
 using tsom_bot.Models.Member;
@@ -9,11 +10,11 @@ namespace tsom_bot.Commands.Helpers
 {
     public class TicketTrackerCommandHelper {
         public string message;
-        private int minimalTicketValue;
         private ExcelHelper? excel;
 
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
+            
             TicketTrackerSaveCommandHelper saveHelper = new TicketTrackerSaveCommandHelper(guildData, minimalTicketValue);
             this.excel = new ExcelHelper(guildData, minimalTicketValue);
         }
@@ -61,55 +62,136 @@ namespace tsom_bot.Commands.Helpers
 
                 worksheet.ColumnWidth = 16;
 
+                // fill excel headers
                 worksheet.Cell("A1").Value = "Strike reason";
                 worksheet.Cell("B1").Value = "Missing 400 tickets";
-                worksheet.Cell("C1").Value = "Total strikes";
-
+                worksheet.Cell("C1").Value = "TB (0 TB Points in a Phase)";
+                worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
+                worksheet.Cell("E1").Value = "Raids (0 attempts)";
+                worksheet.Cell("F1").Value = "Total strikes";
                 worksheet.Cell("A3").Value = "Member name";
 
+                // pull data from database
                 int memberIndex = 0;
-                DataTable dataToday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = {DateTime.Now.ToString("yyyy-MM-dd")}");
-                DataTable dataYesterday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = {DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")}"); ;
+                DataTable dataToday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}'");
 
-                foreach (IMemberTicketResult memberResult in dataToday.Rows)
+                for (int i = 0; i < dataToday.Rows.Count; i++)
                 {
-                    int ticketAmount = memberResult.ticketAmount + dataYesterday.Rows[memberIndex].Field<int>("ticketAmount");
-
-                    worksheet.Cell("A" + (memberIndex + heightIndex)).Value = memberResult.playerName;
-                    worksheet.Cell("B" + (memberIndex + heightIndex)).Value = ticketAmount >= 1 ? "X" : "";
-
-                    if(memberResult.ticketAmount >= 1)
+                    IMemberTicketResult memberResult = new IMemberTicketResult()
                     {
-                        worksheet.Cell("B" + (memberIndex + heightIndex)).Style.Fill.BackgroundColor = XLColor.Red;
-                    }
+                        playerName = dataToday.Rows[i].Field<string>("playerName"),
+                        missingTickets = dataToday.Rows[i].Field<byte>("missingTickets") == 1,
+                        RaidAttempts = dataToday.Rows[i].Field<byte>("RaidAttempts") == 1,
+                        TerritoryWar = dataToday.Rows[i].Field<byte>("TerritoryWar") == 1, 
+                        TerritoryBattle = dataToday.Rows[i].Field<byte>("TerritoryBattle") == 1,
+                        date = dataToday.Rows[i].Field<DateTime>("date"),
+                    };
 
-                    var strikesCell = worksheet.Cell("C"+(memberIndex + heightIndex));
+                    DataTable isExcludedData = Database.SendSqlPull($"SELECT * FROM ExcludeFromTickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                    // if the player is found in this database it means they should not be included in the tickettracker
+                    if(isExcludedData.Rows.Count == 0)
+                    {
+                        // get tickets for player this month
+                        DateTime now = DateTime.Now;
+                        DataTable memberResultDataThisMonth = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
 
-                    strikesCell.Value = ticketAmount;
+                        worksheet.Cell("A" + (memberIndex + heightIndex)).Value = memberResult.playerName;
 
-                    if (strikesCell.GetValue<int>() == 1)
-                    {
-                        strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
+                        if (memberResult.missingTickets)
+                        {
+                            var cell = worksheet.Cell("B" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if(memberResult.RaidAttempts)
+                        {
+                            var cell = worksheet.Cell("C" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if (memberResult.TerritoryWar)
+                        {
+                            var cell = worksheet.Cell("D" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if (memberResult.TerritoryBattle)
+                        {
+                            var cell = worksheet.Cell("E" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+
+                        int ticketAmount = 0;
+                        int ticketMaxReached = 0;
+                        if (memberResultDataThisMonth.Rows.Count >= 1)
+                        {
+                            for (int j = 0; j < memberResultDataThisMonth.Rows.Count; j++)
+                            {
+                                ticketAmount += new IMemberTicketResult()
+                                {
+                                    RaidAttempts = memberResultDataThisMonth.Rows[j].Field<byte>("RaidAttempts") == 1,
+                                    TerritoryBattle = memberResultDataThisMonth.Rows[j].Field<byte>("TerritoryBattle") == 1,
+                                    TerritoryWar = memberResultDataThisMonth.Rows[j].Field<byte>("TerritoryWar") == 1,
+                                    missingTickets = memberResultDataThisMonth.Rows[j].Field<byte>("missingTickets") == 1,
+                                }.GetTotalStrikes();
+                            }
+                        }
+
+                        ticketMaxReached = (int)MathF.Floor(ticketAmount / 3);
+                        ticketAmount = ticketAmount % 3;
+                        if (ticketAmount == 0)
+                        {
+                            ticketAmount = 3;
+                            worksheet.Cell("G" + (memberIndex + heightIndex)).Value = "3rd ticket reached";
+                            Database.SendSqlSave($"INSERT INTO ExcludeFromTickets (playerName, date) VALUES ('{memberResult.playerName}', '{DateTime.Now.AddDays(2).ToString("yyyy-MM-dd")}')");
+                        }
+
+                        var strikesCell = worksheet.Cell("F" + (memberIndex + heightIndex));
+
+                        strikesCell.Value = ticketAmount;
+
+                        if (strikesCell.GetValue<int>() == 1)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
+                        }
+                        else if (strikesCell.GetValue<int>() == 2)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
+                        }
+                        else if (strikesCell.GetValue<int>() == 3)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
+                        }
+                        PaintBorders(strikesCell);
+                        memberIndex++;
                     }
-                    else if (strikesCell.GetValue<int>() == 2)
+                    try
                     {
-                        strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
+                        workbook.SaveAs(fileName);
                     }
-                    else if (strikesCell.GetValue<int>() == 3)
+                    catch (Exception ex)
                     {
-                        strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
+                        Console.WriteLine(ex.Message);
                     }
-                    memberIndex++;
                 }
-                try
-                {
-                    workbook.SaveAs(fileName);
-                }
-                catch (Exception ex)
-                {
-                  Console.WriteLine(ex.Message);
-                }
+
+
             }
+        }
+
+        internal void PaintBorders(IXLCell cell)
+        {
+            // Default color is black
+           cell.Style
+                .Border.SetTopBorder(XLBorderStyleValues.Medium)
+                .Border.SetRightBorder(XLBorderStyleValues.Medium)
+                .Border.SetBottomBorder(XLBorderStyleValues.Medium)
+                .Border.SetLeftBorder(XLBorderStyleValues.Medium);
         }
 
         internal FileStream GetGeneratedFile()

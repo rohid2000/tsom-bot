@@ -11,20 +11,28 @@ public class IGuild
     public IProfile? profile { get; set; }
     public string? nextChallengesRefresh { get; set; }
 
-    public List<IMemberTicketResult> GetNoReachedTicketMembers(int minimalTicketValue)
+    public List<IMemberTicketResult> GetTicketResults(int minimalTicketValue)
     {
-        IMember[] members = this.member.Where(i => i.IsTicketGoalReached(minimalTicketValue) == ContributionReached.No).ToArray();
         List<IMemberTicketResult> memberResults = new List<IMemberTicketResult>();
-
-        for(int i = 0; i < members.Length; i++)
+        foreach (IMember singleMember in member)
         {
-            IMember member = members[i];
-            IMemberTicketResult memberResult = new IMemberTicketResult();
-            memberResult.playerName = member.playerName;
-            memberResult.ticketAmount = 1;
-            memberResults.Add(memberResult);
+            if(
+                singleMember.IsTicketGoalReached(minimalTicketValue) == ContributionReached.No ||
+                singleMember.IsTerritoryBattleGoalReached() ||
+                singleMember.IsTerritoryWarGoalReached() ||
+                singleMember.IsRaidAttemptGoalReached()
+            )
+            {
+                memberResults.Add(new()
+                {
+                    missingTickets = singleMember.IsTicketGoalReached(minimalTicketValue) == ContributionReached.No,
+                    RaidAttempts = singleMember.IsRaidAttemptGoalReached(),
+                    TerritoryBattle = singleMember.IsTerritoryBattleGoalReached(),
+                    TerritoryWar = singleMember.IsTerritoryWarGoalReached(),
+                    playerName = singleMember.playerName
+                });
+            }
         }
-
         return memberResults;
     }
 }

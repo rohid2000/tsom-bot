@@ -27,17 +27,6 @@ public class IMember
         return this.memberContribution?.Where(i => i.type == 2).ToArray()[0];
     }
 
-    public IMemberTicketResult GetPreviousTicketResult()
-    {
-        string sql = $"SELECT * FROM TicketResults WHERE playerName = '{this.playerName}'";
-        DataTable table = Database.SendSqlPull(sql);
-
-        IMemberTicketResult memberResult = new IMemberTicketResult();
-        memberResult.playerName = this.playerName;
-        memberResult.ticketAmount = table.Rows[0].Field<int>("ticketAmount");
-        return memberResult;
-    }
-
     public ContributionReached IsTicketGoalReached(int minimalTicketValue)
     {
         if (int.Parse(GetRaidTicketContribution().currentValue) >= minimalTicketValue)
@@ -48,6 +37,21 @@ public class IMember
         {
             return ContributionReached.No;
         }
+    }
+
+    public bool IsTerritoryWarGoalReached()
+    {
+        return false;
+    }
+
+    public bool IsTerritoryBattleGoalReached()
+    {
+        return false;
+    }
+
+    public bool IsRaidAttemptGoalReached()
+    {
+        return false;
     }
 
     public string ConvertContributionReachedToString(ContributionReached contributionReached)

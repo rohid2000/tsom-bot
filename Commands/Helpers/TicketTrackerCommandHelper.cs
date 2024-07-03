@@ -179,14 +179,12 @@ namespace tsom_bot.Commands.Helpers
                         Console.WriteLine(ex.Message);
                     }
                 }
-
-
             }
         }
 
         internal void PaintBorders(IXLCell cell)
         {
-            // Default color is black
+           // Default color is black
            cell.Style
                 .Border.SetTopBorder(XLBorderStyleValues.Medium)
                 .Border.SetRightBorder(XLBorderStyleValues.Medium)

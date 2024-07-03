@@ -59,7 +59,7 @@ namespace tsom_bot.Commands.Helpers
                 var worksheet = workbook.Worksheets.Add("Missed tickets only");
                 int heightIndex = 5;
 
-                worksheet.ColumnWidth = 12;
+                worksheet.ColumnWidth = 16;
 
                 worksheet.Cell("A1").Value = "Strike reason";
                 worksheet.Cell("B1").Value = "Missing 400 tickets";

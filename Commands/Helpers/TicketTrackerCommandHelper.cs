@@ -1,26 +1,22 @@
 using System.Collections.ObjectModel;
+using System.Data;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
+using tsom_bot.Models.Member;
 
 namespace tsom_bot.Commands.Helpers
 {
     public class TicketTrackerCommandHelper {
         public string message;
-        private int minimalTicketValue;
         private ExcelHelper? excel;
 
         public TicketTrackerCommandHelper(IGuild guildData, int minimalTicketValue)
         {
-            try {
-                this.excel = new ExcelHelper(guildData, minimalTicketValue);
-            } 
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            this.minimalTicketValue = minimalTicketValue;
-            this.message = this.GetMemberTicketResultList(guildData);
+            
+            TicketTrackerSaveCommandHelper saveHelper = new TicketTrackerSaveCommandHelper(guildData, minimalTicketValue);
+            this.excel = new ExcelHelper(guildData, minimalTicketValue);
         }
 
         async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId)  
@@ -28,7 +24,7 @@ namespace tsom_bot.Commands.Helpers
             ObservableCollection<IGuild> guildData = new();
             guildData.Add(await GuildFetcher.GetGuildById(guildId, true, new()));
             
-            return new TicketTrackerCommandHelper(guildData[0], 600);
+            return new TicketTrackerCommandHelper(guildData[0], 400);
         }   
 
         public FileStream? GetExcelFile()
@@ -43,12 +39,6 @@ namespace tsom_bot.Commands.Helpers
             {
                 IMember member = GuildData.member[i];
                 IMemberContribution? contribution = member.GetRaidTicketContribution();
-                
-                if(contribution != null)
-                {
-                    ContributionReached contributionReached = ExcelHelper.IsTicketGoalReached(int.Parse(contribution.currentValue), this.minimalTicketValue);
-                    ResultListString += $"{ member.playerName } | { ExcelHelper.ConvertContributionReachedToString(contributionReached) } \n";
-                }
             }
 
             if(ResultListString.Length >= 2000)
@@ -60,65 +50,149 @@ namespace tsom_bot.Commands.Helpers
         }
     }
 
-    enum ContributionReached
-    {
-        Yes, No, NVT
-    }
-
     internal class ExcelHelper {
-        internal readonly string fileName = "excelguilddata.xlsx";
+        internal readonly string fileName = "strike-list.xlsx";
 
         public ExcelHelper(IGuild guildData, int minimalTicketValue)
         {
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Sample Sheet");
+                var worksheet = workbook.Worksheets.Add("Missed tickets only");
+                int heightIndex = 5;
+                worksheet.ColumnWidth = 16;
 
-                for(int i = 0; i < guildData.member.Length; i++)
+                // fill excel headers
+                worksheet.Cell("A1").Value = "Strike reason";
+                worksheet.Cell("B1").Value = "Missing 400 tickets";
+                worksheet.Cell("C1").Value = "TB (0 TB Points in a Phase)";
+                worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
+                worksheet.Cell("E1").Value = "Raids (0 attempts)";
+                worksheet.Cell("F1").Value = "Total strikes";
+                worksheet.Cell("A3").Value = "Member name";
+
+                // pull data from database
+                int memberIndex = 0;
+                DataTable dataToday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}'");
+
+                for (int i = 0; i < dataToday.Rows.Count; i++)
                 {
-                    IMember member = guildData.member[i];
-                    IMemberContribution? contribution = member.GetRaidTicketContribution();
-                    ContributionReached memberTicketGoalReached = IsTicketGoalReached(int.Parse(contribution.currentValue), minimalTicketValue);
-                    if(contribution != null && (memberTicketGoalReached != ContributionReached.Yes || memberTicketGoalReached != ContributionReached.NVT))
+                    IMemberTicketResult memberResult = new IMemberTicketResult()
                     {
-                        worksheet.Cell("A"+(i+2)).Value = member.playerName;
-                        worksheet.Cell("B"+(i+2)).Value = contribution.currentValue;
-                        worksheet.Cell("C"+(i+2)).Value = ConvertContributionReachedToString(memberTicketGoalReached);
+                        playerName = dataToday.Rows[i].Field<string>("playerName"),
+                        missingTickets = dataToday.Rows[i].Field<byte>("missingTickets") == 1,
+                        RaidAttempts = dataToday.Rows[i].Field<byte>("RaidAttempts") == 1,
+                        TerritoryWar = dataToday.Rows[i].Field<byte>("TerritoryWar") == 1, 
+                        TerritoryBattle = dataToday.Rows[i].Field<byte>("TerritoryBattle") == 1,
+                        date = dataToday.Rows[i].Field<DateTime>("date"),
+                    };
+
+                    DataTable isExcludedData = Database.SendSqlPull($"SELECT * FROM ExcludeFromTickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                    // if the player is found in this database it means they should not be included in the tickettracker
+                    if(isExcludedData.Rows.Count == 0)
+                    {
+                        // get tickets for player this month
+                        DateTime now = DateTime.Now;
+                        DataTable memberResultDataThisMonth = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+
+                        worksheet.Cell("A" + (memberIndex + heightIndex)).Value = memberResult.playerName;
+
+                        if (memberResult.missingTickets)
+                        {
+                            var cell = worksheet.Cell("B" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if(memberResult.RaidAttempts)
+                        {
+                            var cell = worksheet.Cell("C" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if (memberResult.TerritoryWar)
+                        {
+                            var cell = worksheet.Cell("D" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        if (memberResult.TerritoryBattle)
+                        {
+                            var cell = worksheet.Cell("E" + (memberIndex + heightIndex));
+                            cell.Style.Fill.BackgroundColor = XLColor.Red;
+                            PaintBorders(cell);
+                        }
+
+                        int ticketAmount = 0;
+                        int ticketMaxReached = 0;
+                        if (memberResultDataThisMonth.Rows.Count >= 1)
+                        {
+                            for (int j = 0; j < memberResultDataThisMonth.Rows.Count; j++)
+                            {
+                                ticketAmount += new IMemberTicketResult()
+                                {
+                                    RaidAttempts = memberResultDataThisMonth.Rows[j].Field<byte>("RaidAttempts") == 1,
+                                    TerritoryBattle = memberResultDataThisMonth.Rows[j].Field<byte>("TerritoryBattle") == 1,
+                                    TerritoryWar = memberResultDataThisMonth.Rows[j].Field<byte>("TerritoryWar") == 1,
+                                    missingTickets = memberResultDataThisMonth.Rows[j].Field<byte>("missingTickets") == 1,
+                                }.GetTotalStrikes();
+                            }
+                        }
+
+                        ticketMaxReached = (int)MathF.Floor(ticketAmount / 3);
+                        ticketAmount = ticketAmount % 3;
+                        if (ticketAmount == 0)
+                        {
+                            ticketAmount = 3;
+                            worksheet.Cell("G" + (memberIndex + heightIndex)).Value = "3rd ticket reached";
+                            Database.SendSqlSave($"INSERT INTO ExcludeFromTickets (playerName, date) VALUES ('{memberResult.playerName}', '{DateTime.Now.AddDays(2).ToString("yyyy-MM-dd")}')");
+                        }
+
+                        var strikesCell = worksheet.Cell("F" + (memberIndex + heightIndex));
+
+                        strikesCell.Value = ticketAmount;
+
+                        if (strikesCell.GetValue<int>() == 1)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Gray;
+                        }
+                        else if (strikesCell.GetValue<int>() == 2)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Orange;
+                        }
+                        else if (strikesCell.GetValue<int>() == 3)
+                        {
+                            strikesCell.Style.Fill.BackgroundColor = XLColor.Red;
+                        }
+                        PaintBorders(strikesCell);
+                        memberIndex++;
+                    }
+                    try
+                    {
+                        workbook.SaveAs(fileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
                     }
                 }
-
-                workbook.SaveAs(fileName);
             }
+        }
+
+        internal void PaintBorders(IXLCell cell)
+        {
+           // Default color is black
+           cell.Style
+                .Border.SetTopBorder(XLBorderStyleValues.Medium)
+                .Border.SetRightBorder(XLBorderStyleValues.Medium)
+                .Border.SetBottomBorder(XLBorderStyleValues.Medium)
+                .Border.SetLeftBorder(XLBorderStyleValues.Medium);
         }
 
         internal FileStream GetGeneratedFile()
         {
             return new FileStream(fileName, FileMode.Open, FileAccess.Read);
-        }
-
-        internal static ContributionReached IsTicketGoalReached(int contributionValue, int minimalTicketValue)
-        {
-            if(contributionValue >= minimalTicketValue)
-            {
-                return ContributionReached.Yes;
-            } else {
-                return ContributionReached.No;
-            }
-        }
-
-        internal static string ConvertContributionReachedToString(ContributionReached contributionReached)
-        {
-            switch(contributionReached)
-            {
-                case ContributionReached.No:
-                    return "Bad!";
-                case ContributionReached.Yes:
-                    return "Good!!";
-                case ContributionReached.NVT:
-                    return "This player doesnt take part in this event yet";
-                default:
-                return "";
-            }
         }
     }
 }

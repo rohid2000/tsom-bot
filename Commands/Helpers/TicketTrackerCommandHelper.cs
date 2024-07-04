@@ -59,7 +59,6 @@ namespace tsom_bot.Commands.Helpers
             {
                 var worksheet = workbook.Worksheets.Add("Missed tickets only");
                 int heightIndex = 5;
-
                 worksheet.ColumnWidth = 16;
 
                 // fill excel headers
@@ -124,7 +123,6 @@ namespace tsom_bot.Commands.Helpers
                             cell.Style.Fill.BackgroundColor = XLColor.Red;
                             PaintBorders(cell);
                         }
-
 
                         int ticketAmount = 0;
                         int ticketMaxReached = 0;

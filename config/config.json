@@ -1,4 +1,10 @@
 {
   "token": "token",
-  "prefix":  "/"
+  "prefix": "/",
+  "roleids": {
+    "acolyte": 1258349351034421401,
+    "apprentice": 1258349165189136414,
+    "mandalorian": 1231176181391294555,
+    "sithlord": 1241332248578363463,
+  }
 }

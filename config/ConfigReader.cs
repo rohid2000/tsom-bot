@@ -6,6 +6,7 @@ namespace tsom_bot.config
     {
         public string token { get; set; }
         public string prefix { get; set; }
+        public ConfigStructureRoleId roleids { get; set; }
 
         public async Task readConfig()
         {
@@ -18,14 +19,24 @@ namespace tsom_bot.config
                 {
                     this.token = data.token;
                     this.prefix = data.prefix;
+                    this.roleids = data.roleids;
                 }
             }
         }
     }
 
-    internal sealed class ConfigStructure
+    internal class ConfigStructure
     {
         public string token { get; set; }
         public string prefix { get; set; }
+        public ConfigStructureRoleId roleids { get; set; }
+    }
+
+    public class ConfigStructureRoleId
+    {
+        public ulong acolyte { get; set; }
+        public ulong apprentice { get; set; }
+        public ulong mandalorian { get; set; }
+        public ulong sithlord { get; set; }
     }
 }

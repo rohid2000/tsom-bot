@@ -2,6 +2,7 @@
 using DSharpPlus;
 using DSharpPlus.Entities;
 using System;
+using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
 
 namespace tsom_bot.Commands.Helpers
@@ -18,6 +19,7 @@ namespace tsom_bot.Commands.Helpers
             {
                 ClientManager.time++;
                 SendTicktTrackerCommand(client);
+                SendCheckPromotionCommand(client);
             },
             null,
             0,  // 4) Time that message should fire after the timer is created
@@ -33,6 +35,41 @@ namespace tsom_bot.Commands.Helpers
         {
             _timer.Change(0, _interval);
         }
+
+        public async void SendCheckPromotionCommand(DiscordClient client)
+        {
+            int commandCycleCooldown = 24 * 60;
+            if (ClientManager.time == commandCycleCooldown)
+            {
+                string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                ConfigReader reader = new();
+                await reader.readConfig();
+                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[1247909896331198575].Members)
+                {
+                    DiscordMember dcMember = member.Value;
+                    int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
+                    RolePromotionHelper helper = new RolePromotionHelper();
+
+                    if (totalDays >= reader.rolePromotionDays.sithlord)
+                    {
+                        helper.GiveRole(client, Role.SithLord, dcMember);
+                    }
+                    else if(totalDays >= reader.rolePromotionDays.mandalorian)
+                    {
+                        helper.GiveRole(client, Role.Mandalorian, dcMember);
+                    }
+                    else if (totalDays >= reader.rolePromotionDays.apprentice)
+                    {
+                        helper.GiveRole(client, Role.Apprentice, dcMember);
+                    }
+                    else if (totalDays >= reader.rolePromotionDays.acolyte)
+                    {
+                        helper.GiveRole(client, Role.Acolyte, dcMember);
+                    }
+                }
+            }
+        }
+
         public async void SendTicktTrackerCommand(DiscordClient client)
         {
             int commandCycleCooldown = 60 * 24; //24h cooldown if bot sends interval every 60s

@@ -6,8 +6,10 @@ namespace tsom_bot.config
     {
         public string token { get; set; }
         public string prefix { get; set; }
+        public ulong server_id { get; set; }
         public ChannelIds channelIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
+        public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
 
         public async Task readConfig()
         {
@@ -20,8 +22,10 @@ namespace tsom_bot.config
                 {
                     this.token = data.token;
                     this.prefix = data.prefix;
+                    this.server_id = data.server_id;
                     this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;  
+                    this.rolePromotionDays = data.rolePromotionDays;
                 }
             }
         }
@@ -31,8 +35,10 @@ namespace tsom_bot.config
     {
         public string token { get; set; }
         public string prefix { get; set; }
+        public ulong server_id { get; set; }
         public ChannelIds channelIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
+        public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
     }
 
     public sealed class ChannelIds
@@ -40,6 +46,7 @@ namespace tsom_bot.config
         public ulong tsomBotTesting { get; set; }
         public ulong strikeSystem { get; set; }
         public ulong strikeList { get; set; }
+        public ulong promotions { get; set; }
     }
 
     public class ConfigStructureRoleId
@@ -48,5 +55,13 @@ namespace tsom_bot.config
         public ulong apprentice { get; set; }
         public ulong mandalorian { get; set; }
         public ulong sithlord { get; set; }
+    }
+
+    public class ConfigStructureRolePromotionDays
+    {
+        public int acolyte { get; set; }
+        public int apprentice { get; set; }
+        public int mandalorian { get; set; }
+        public int sithlord { get; set; }
     }
 }

@@ -45,7 +45,7 @@ internal class Program
         await client.ConnectAsync();
 
         Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dev\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
-        TimerHelper timer = new(client, 60);
+        TimerHelper timer = new(client, 1);
         //Keep bot running
         await Task.Delay(-1);
     }

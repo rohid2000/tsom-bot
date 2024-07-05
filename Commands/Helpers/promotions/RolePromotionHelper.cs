@@ -48,8 +48,6 @@ namespace tsom_bot.Commands.Helpers.promotions
                     break;
             }
 
-
-
             if (!dcMember.Roles.Contains(dcRole) && dcRole != null)
             {
                 await dcMember.GrantRoleAsync(dcRole);

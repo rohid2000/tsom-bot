@@ -4,7 +4,6 @@ using tsom_bot.config;
 using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
-using tsom_bot;
 
 internal class Program
 {

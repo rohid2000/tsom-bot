@@ -6,6 +6,7 @@ namespace tsom_bot.config
     {
         public string token { get; set; }
         public string prefix { get; set; }
+        public ChannelIds channelIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
 
         public async Task readConfig()
@@ -19,7 +20,8 @@ namespace tsom_bot.config
                 {
                     this.token = data.token;
                     this.prefix = data.prefix;
-                    this.roleIds = data.roleids;
+                    this.roleIds = data.roleIds;
+                    this.channelIds = data.channelIds;  
                 }
             }
         }
@@ -29,7 +31,15 @@ namespace tsom_bot.config
     {
         public string token { get; set; }
         public string prefix { get; set; }
-        public ConfigStructureRoleId roleids { get; set; }
+        public ChannelIds channelIds { get; set; }
+        public ConfigStructureRoleId roleIds { get; set; }
+    }
+
+    public sealed class ChannelIds
+    {
+        public ulong tsomBotTesting { get; set; }
+        public ulong strikeSystem { get; set; }
+        public ulong strikeList { get; set; }
     }
 
     public class ConfigStructureRoleId

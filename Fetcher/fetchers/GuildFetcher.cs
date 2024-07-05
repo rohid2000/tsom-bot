@@ -16,18 +16,25 @@ public static class GuildFetcher
             enums = false
         };
 
-
-        var response = await client.PostAsync(url, JsonContent.Create(bodyContent));
-
-        var contentStream = await response.Content.ReadAsStreamAsync();
-
-        using (StreamReader sr = new StreamReader(contentStream))
+        try
         {
-            string json = await sr.ReadToEndAsync();
-            Guild? data = JsonConvert.DeserializeObject<Guild>(json);
+            var response = await client.PostAsync(url, JsonContent.Create(bodyContent));
 
-            return data?.guild;
+            var contentStream = await response.Content.ReadAsStreamAsync();
+
+            using (StreamReader sr = new StreamReader(contentStream))
+            {
+                string json = await sr.ReadToEndAsync();
+                Guild? data = JsonConvert.DeserializeObject<Guild>(json);
+
+                return data?.guild;
+            }
         }
+        catch (Exception ex) 
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return null;
     }
 
 }

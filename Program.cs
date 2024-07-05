@@ -5,6 +5,7 @@ using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
 using tsom_bot;
+using DocumentFormat.OpenXml.Bibliography;
 
 internal class Program
 {
@@ -41,11 +42,12 @@ internal class Program
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
         commands.RegisterCommands<TicketTrackerCommand>();
+        commands.RegisterCommands<DiscordNameSync>();
 
         //Make connection
         await client.ConnectAsync();
 
-        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dev\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
+        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dicsordbot\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
         TimerHelper timer = new(client, 60);
         //Keep bot running
         await Task.Delay(-1);

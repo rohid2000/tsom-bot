@@ -20,7 +20,7 @@ namespace tsom_bot.config
                 {
                     this.token = data.token;
                     this.prefix = data.prefix;
-                    this.roleIds = data.roleids;
+                    this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;  
                 }
             }
@@ -40,7 +40,6 @@ namespace tsom_bot.config
         public ulong tsomBotTesting { get; set; }
         public ulong strikeSystem { get; set; }
         public ulong strikeList { get; set; }
-        public ConfigStructureRoleId roleids { get; set; }
     }
 
     public class ConfigStructureRoleId

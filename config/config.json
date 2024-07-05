@@ -1,4 +1,13 @@
 {
   "token": "token",
-  "prefix":  "/"
+  "prefix": "/",
+  "channelIds": [
+    {
+      "tsomBotTesting": "1251847453947203625",
+      "strikeSystem": "1246384866535407638",
+      "strikeList": "1247294847673696266"
+    }
+  ]
 }
+
+

@@ -2,6 +2,7 @@
 using DSharpPlus;
 using DSharpPlus.Entities;
 using System;
+using tsom_bot.config;
 
 namespace tsom_bot.Commands.Helpers
 {
@@ -9,6 +10,7 @@ namespace tsom_bot.Commands.Helpers
     {
         private readonly Timer _timer;
         private readonly int _interval;
+        private ConfigReader configReader;
         public TimerHelper(DiscordClient client, int intervalInSec)
         {
             _interval = intervalInSec * 1000;
@@ -36,7 +38,8 @@ namespace tsom_bot.Commands.Helpers
             int commandCycleCooldown = 60 * 24; //24h cooldown if bot sends interval every 60s
             if (ClientManager.time == commandCycleCooldown)
             {
-                var chan = await client.GetChannelAsync(1251847453947203625);
+                var channelId = configReader.channelIds.tsomBotTesting;
+                var chan = await client.GetChannelAsync(channelId);
 
                 if (chan != null)
                 {

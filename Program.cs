@@ -46,8 +46,7 @@ internal class Program
         await client.ConnectAsync();
 
         Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dev\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
-        TimerHelper timer = new(client, 2);
-        timer.Restart(); // this starts the automatic timer for the ticket tracker command
+        TimerHelper timer = new(client, 60);
         //Keep bot running
         await Task.Delay(-1);
     }

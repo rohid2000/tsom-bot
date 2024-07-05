@@ -40,7 +40,7 @@ namespace tsom_bot.Commands
                 } else
                 {
                     await new DiscordMessageBuilder()
-                    .WithContent("You did'nt provide a name | Usage: `/sync name {name}`")
+                    .WithContent("You didn't provide a name | Usage: `/sync name {name}`")
                     .SendAsync(ctx.Channel);
                 }
             }
@@ -84,7 +84,7 @@ namespace tsom_bot.Commands
             {
                 if(!dcMember.IsBot) 
                 {
-                    message += $"{dcMember.Mention}, his Discord name and in game name differ. \n";
+                    message += $"{dcMember.Mention}, Discord name and ingame name differ. \n";
                 }
             }
 

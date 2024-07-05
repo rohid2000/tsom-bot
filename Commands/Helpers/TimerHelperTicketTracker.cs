@@ -38,7 +38,7 @@ namespace tsom_bot.Commands.Helpers
 
         public async void SendCheckPromotionCommand(DiscordClient client)
         {
-            int commandCycleCooldown = 12;
+            int commandCycleCooldown = 24 * 60;
             if (ClientManager.time == commandCycleCooldown)
             {
                 string guildId = "l943tTO8QQ-_IwWHfwyJuQ";

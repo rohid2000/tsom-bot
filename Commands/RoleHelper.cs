@@ -66,13 +66,13 @@ namespace tsom_bot.Commands
             switch (role) 
             {
                 case Role.Acolyte:
-                    return configReader.roleids.acolyte;
+                    return configReader.roleIds.acolyte;
                 case Role.Apprentice:
-                    return configReader.roleids.apprentice;
+                    return configReader.roleIds.apprentice;
                 case Role.Mandalorian:
-                    return configReader.roleids.mandalorian;
+                    return configReader.roleIds.mandalorian;
                 case Role.SithLord:
-                    return configReader.roleids.sithlord;
+                    return configReader.roleIds.sithlord;
             }
 
             return 1;

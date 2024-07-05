@@ -66,7 +66,6 @@ namespace tsom_bot.Commands
                     }
                     else
                     {
-                        Console.WriteLine($"{results[0].Field<string>("playerName").ToLower()} - {dcMember.DisplayName.ToLower()}");
                         if (results[0].Field<string>("playerName").ToLower() != dcMember.DisplayName.ToLower())
                         {
                             noSyncList.Add(dcMember);

@@ -1,11 +1,17 @@
 {
   "token": "token",
   "prefix": "/",
+  "roleIds": {
+    "acolyte": "roleId",
+    "apprentice": "roleId",
+    "mandalorian": "roleId",
+    "sithlord": "roleId"
+  },
   "channelIds": {
-      "tsomBotTesting": "channelId",
-      "strikeSystem": "channelId",
-      "strikeList": "channelId"
-    }
+    "tsomBotTesting": "channelId",
+    "strikeSystem": "channelId",
+    "strikeList": "channelId"
+  }
 }
 
 

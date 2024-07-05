@@ -10,34 +10,52 @@ namespace tsom_bot.Commands
         [Command("tickets")]
         public async Task templateCommand(CommandContext ctx, string param = "")
         {
-            string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-            TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
+            if(await RoleHelper.hasRole(Role.Acolyte, ctx.Member))
+            {
+                string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
 
-            if(param == "excel")
-            {
-                try {
-                    await new DiscordMessageBuilder()
-                        .WithContent("this is your file")
-                        .AddFile(helper.GetExcelFile())
-                        .SendAsync(ctx.Channel);
-                } 
-                catch (Exception ex)
+                if (param == "excel")
                 {
-                    Console.WriteLine(ex.Message);
+                    try
+                    {
+                        await new DiscordMessageBuilder()
+                            .WithContent("this is your file")
+                            .AddFile(helper.GetExcelFile())
+                            .SendAsync(ctx.Channel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
-            } 
-            else 
-            {
-                try {
-                    await new DiscordMessageBuilder()
-                        .WithContent(helper.message)
-                        .SendAsync(ctx.Channel);
-                } 
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine(ex.Message);
+                    try
+                    {
+                        await new DiscordMessageBuilder()
+                            .WithContent(helper.message)
+                            .SendAsync(ctx.Channel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
             }
+            else
+            {
+                try
+                {
+                    await new DiscordMessageBuilder()
+                        .WithContent(RoleHelper.noRoleMessage)
+                        .SendAsync(ctx.Channel);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }  
         }
     }
 }

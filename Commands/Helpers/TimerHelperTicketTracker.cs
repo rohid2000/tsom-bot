@@ -1,33 +1,25 @@
 ﻿
 using DSharpPlus;
 using DSharpPlus.Entities;
+using System;
 
 namespace tsom_bot.Commands.Helpers
 {
-    internal class TimerHelperTicketTracker
+    public class TimerHelper
     {
         private readonly Timer _timer;
         private readonly int _interval;
-        public TimerHelperTicketTracker(DiscordClient client, int interval)
+        public TimerHelper(DiscordClient client, int intervalInSec)
         {
-            _interval = interval;
+            _interval = intervalInSec * 1000;
             _timer = new Timer(async _ =>
             {
-                string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
-                // 3) Any code you want to periodically run goes here, for example:
-                var chan = await client.GetChannelAsync(1251847453947203625);
-                if (chan != null)
-                {
-                    await new DiscordMessageBuilder()
-                    .WithContent("this is your file")
-                    .AddFile(helper.GetExcelFile())
-                    .SendAsync(chan);
-                }
+                ClientManager.time++;
+                SendTicktTrackerCommand(client);
             },
             null,
-            interval,  // 4) Time that message should fire after the timer is created
-            Timeout.Infinite); // 5) Time after which message should repeat (use `Timeout.Infinite` for no repeat)
+            0,  // 4) Time that message should fire after the timer is created
+            _interval); // 5) Time after which message should repeat (use `Timeout.Infinite` for no repeat)
         }
 
         public void Stop() // 6) Example to make the timer stop running
@@ -37,7 +29,32 @@ namespace tsom_bot.Commands.Helpers
 
         public void Restart() // 7) Example to restart the timer
         {
-            _timer.Change(_interval, Timeout.Infinite);
+            _timer.Change(0, _interval);
+        }
+        public async void SendTicktTrackerCommand(DiscordClient client)
+        {
+            int commandCycleCooldown = 60 * 24; //24h cooldown if bot sends interval every 60s
+            if (ClientManager.time == commandCycleCooldown)
+            {
+                var chan = await client.GetChannelAsync(1251847453947203625);
+
+                if (chan != null)
+                {
+                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
+                    try
+                    {
+                        await new DiscordMessageBuilder()
+                        .WithContent("this is your file")
+                        .AddFile(helper.GetExcelFile())
+                        .SendAsync(chan);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
         }
     }
 }

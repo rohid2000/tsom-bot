@@ -4,6 +4,7 @@ using tsom_bot.config;
 using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
+using tsom_bot;
 
 internal class Program
 {
@@ -44,10 +45,8 @@ internal class Program
         //Make connection
         await client.ConnectAsync();
 
-        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dicsordbot\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
-        TimerHelperTicketTracker timer = new(client, 5); // 24h = 60 * 60 * 24
-        timer.Restart(); // this starts the automatic timer for the ticket tracker command
-
+        Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dev\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
+        TimerHelper timer = new(client, 60);
         //Keep bot running
         await Task.Delay(-1);
     }

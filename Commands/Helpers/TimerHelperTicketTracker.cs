@@ -54,7 +54,6 @@ namespace tsom_bot.Commands.Helpers
                         Console.WriteLine(ex.Message);
                     }
                 }
-
             }
         }
     }

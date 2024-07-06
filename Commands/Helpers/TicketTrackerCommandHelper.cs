@@ -16,7 +16,8 @@ namespace tsom_bot.Commands.Helpers
         {
             
             TicketTrackerSaveCommandHelper saveHelper = new TicketTrackerSaveCommandHelper(guildData, minimalTicketValue);
-            this.excel = new ExcelHelper(guildData, minimalTicketValue);
+            this.excel = new ExcelHelper();
+            this.message = GetMemberTicketResultList(guildData, minimalTicketValue);
         }
 
         async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId)  
@@ -32,28 +33,63 @@ namespace tsom_bot.Commands.Helpers
             return this.excel?.GetGeneratedFile();
         }
 
-        private string GetMemberTicketResultList(IGuild GuildData)
+        private string GetMemberTicketResultList(IGuild GuildData, int minimalTicketValue)
         {
-            string ResultListString = "";
-            for(int i = 0; i < GuildData.member.Length; i++)
+            // pull data from database
+            string resultString = "";
+            int memberIndex = 0;
+            DataTable dataToday = Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}'");
+
+            for (int i = 0; i < dataToday.Rows.Count; i++)
             {
-                IMember member = GuildData.member[i];
-                IMemberContribution? contribution = member.GetRaidTicketContribution();
+                IMemberTicketResult memberResult = new IMemberTicketResult()
+                {
+                    playerName = dataToday.Rows[i].Field<string>("playerName"),
+                    missingTickets = dataToday.Rows[i].Field<byte>("missingTickets") == 1,
+                    RaidAttempts = dataToday.Rows[i].Field<byte>("RaidAttempts") == 1,
+                    TerritoryWar = dataToday.Rows[i].Field<byte>("TerritoryWar") == 1,
+                    TerritoryBattle = dataToday.Rows[i].Field<byte>("TerritoryBattle") == 1,
+                    date = dataToday.Rows[i].Field<DateTime>("date"),
+                };
+
+                if(memberResult.GetTotalStrikes() > 0)
+                {
+                    resultString += $"- {memberResult.playerName} +{memberResult.GetTotalStrikes()} ticket(s) today \n";
+
+                    if(memberResult.missingTickets)
+                    {
+                        resultString += $"  - did not reach the minimal ticket requirement of {minimalTicketValue}";
+                    }
+                    if(memberResult.RaidAttempts)
+                    {
+                        resultString += $"  - did not attempt the raid";
+                    }
+                    if(memberResult.TerritoryWar) 
+                    {
+                        resultString += $"  - failed on TW";
+                    }
+                    if (memberResult.TerritoryBattle)
+                    {
+                        resultString += $"  - failed on TB";
+                    }
+
+                    resultString += "\n\n";
+                }
             }
 
-            if(ResultListString.Length >= 2000)
+            if(resultString.Length > 2000)
             {
-                ResultListString = ResultListString.Substring(0, 2000);
+                resultString = resultString.Substring(0, 2000);
             }
 
-            return ResultListString;
+            return resultString;
         }
     }
 
     internal class ExcelHelper {
         internal readonly string fileName = "strike-list.xlsx";
 
-        public ExcelHelper(IGuild guildData, int minimalTicketValue)
+        public ExcelHelper()
         {
             using (var workbook = new XLWorkbook())
             {

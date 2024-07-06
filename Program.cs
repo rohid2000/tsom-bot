@@ -4,6 +4,7 @@ using tsom_bot.config;
 using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
+using tsom_bot;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -46,6 +47,7 @@ internal class Program
 
         Database.Init("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\dicsordbot\\tsom-bot\\Fetcher\\database\\Database1.mdf;Integrated Security=True");
         TimerHelper timer = new(client, 60);
+        ClientManager.timerStartTime = DateTime.Now;
         //Keep bot running
         await Task.Delay(-1);
     }

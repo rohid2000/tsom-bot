@@ -10,5 +10,6 @@ namespace tsom_bot
     public static class ClientManager
     {
         public static int time;
+        public static DateTime timerStartTime;
     }
 }

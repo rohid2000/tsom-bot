@@ -15,18 +15,25 @@ namespace tsom_bot.Fetcher.database
         public static DataTable SendSqlPull(string sql) 
         {
             DataTable table = new DataTable();
-            using (conn = new SqlConnection(connectString))
-            using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+            try
             {
-                try
+                using (conn = new SqlConnection(connectString))
+                using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
                 {
-                    adapter.Fill(table);
-                    Console.WriteLine("Data Filled");
+                    try
+                    {
+                        adapter.Fill(table);
+                        Console.WriteLine("Data Filled");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                } 
+            } 
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
 
             return table;
@@ -34,18 +41,25 @@ namespace tsom_bot.Fetcher.database
 
         public static void SendSqlSave(string sql)
         {
-            using (conn = new SqlConnection(connectString))
-            using (SqlCommand command = new SqlCommand(sql, conn))
+            try
             {
-                try
+                using (conn = new SqlConnection(connectString))
+                using (SqlCommand command = new SqlCommand(sql, conn))
                 {
-                    conn.Open();
-                    command.ExecuteScalar();
+                    try
+                    {
+                        conn.Open();
+                        command.ExecuteScalar();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
-                catch (Exception e) 
-                {
-                    Console.WriteLine(e.Message);
-                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
     }

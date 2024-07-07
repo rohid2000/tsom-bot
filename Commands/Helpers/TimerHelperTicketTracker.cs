@@ -18,7 +18,6 @@ namespace tsom_bot.Commands.Helpers
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;
-                Console.WriteLine(ClientManager.time);
                 SyncTicketTrackCommand(client);
                 SendCheckPromotionCommand(client);
             },

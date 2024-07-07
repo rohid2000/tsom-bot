@@ -7,6 +7,7 @@ namespace tsom_bot.config
         public string token { get; set; }
         public string prefix { get; set; }
         public ulong server_id { get; set; }
+        public string connectionString { get; set; }
         public ChannelIds channelIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
@@ -23,6 +24,7 @@ namespace tsom_bot.config
                     this.token = data.token;
                     this.prefix = data.prefix;
                     this.server_id = data.server_id;
+                    this.connectionString = data.connectionString;
                     this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;  
                     this.rolePromotionDays = data.rolePromotionDays;
@@ -36,6 +38,7 @@ namespace tsom_bot.config
         public string token { get; set; }
         public string prefix { get; set; }
         public ulong server_id { get; set; }
+        public string connectionString { get; set; }
         public ChannelIds channelIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }

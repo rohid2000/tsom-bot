@@ -45,7 +45,7 @@ internal class Program
         //Make connection
         await client.ConnectAsync();
 
-        Database.Init(configReader.connectionString);
+        await Database.Init(configReader.connectionString);
         TimerHelper timer = new(client, 60);
         ClientManager.timerStartTime = DateTime.Now;
         //Keep bot running

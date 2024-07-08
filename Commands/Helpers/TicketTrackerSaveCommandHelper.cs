@@ -5,12 +5,7 @@ namespace tsom_bot.Commands.Helpers
 {
     public class TicketTrackerSaveCommandHelper
     {
-        public TicketTrackerSaveCommandHelper(IGuild guildData, int minimalTicketValue) 
-        {
-            SaveTicketTrackerResultsInDatabase(guildData.GetTicketResults(minimalTicketValue));
-        }
-
-        private void SaveTicketTrackerResultsInDatabase(List<IMemberTicketResult> members)
+        public async Task SaveTicketTrackerResultsInDatabase(List<IMemberTicketResult> members)
         {;
             string sqlFormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -23,7 +18,7 @@ namespace tsom_bot.Commands.Helpers
 
                 string sql = $"INSERT INTO TicketResults (playerName, missingTickets, TerritoryBattle, TerritoryWar, RaidAttempts, date) VALUES ('{member.playerName}', {missingTickets}, {TerritoryBattle}, {TerritoryWar}, {RaidAttempts}, '{sqlFormattedDate}')";
                 Console.WriteLine(sql);
-                Database.SendSqlSave(sql);
+                await Database.SendSqlSave(sql);
             }
         }
     }

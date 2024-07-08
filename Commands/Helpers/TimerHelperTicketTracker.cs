@@ -108,7 +108,7 @@ namespace tsom_bot.Commands.Helpers
                 if (chan != null)
                 {
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400);
                     try
                     {
                         await new DiscordMessageBuilder()

@@ -13,7 +13,7 @@ namespace tsom_bot.Commands
             if(await RoleHelper.hasRole(Role.Acolyte, ctx.Member))
             {
                 string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId);
+                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400);
 
                 if (param == "excel")
                 {

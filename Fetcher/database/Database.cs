@@ -1,59 +1,65 @@
 ﻿using System.Data.SqlClient;
 using System.Data;
+using MySql.Data.MySqlClient;
+using System.Runtime.CompilerServices;
+using System.Data.Common;
 
 namespace tsom_bot.Fetcher.database
 {
     public static class Database
     {
         private static string connectString = "";
-        private static SqlConnection conn;
-        public static void Init(string connectionString)
+        public async static Task Init(string connectionString)
         {
             connectString = connectionString;
         }
 
-        public static DataTable SendSqlPull(string sql) 
+        public async static Task<DataTable> SendSqlPull(string sql) 
         {
-            DataTable table = new DataTable();
+            DataSet ds = new();
+            DataTable dt = new();
+            string tableName = "TicketResults";
+            MySqlConnection? conn = null;
             try
             {
-                using (conn = new SqlConnection(connectString))
-                using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+                using (conn = new MySqlConnection(connectString))
                 {
-                    try
+                    await conn.OpenAsync();
+                    using (var command = new MySqlCommand(sql, conn))
                     {
-                        adapter.Fill(table);
-                        Console.WriteLine("Data Filled");
+                        using (var adapter = new MySqlDataAdapter(command))
+                        {    
+                            int results = await adapter.FillAsync(ds, tableName);
+                            dt = ds.Tables[tableName];
+                            Console.WriteLine(results);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+
                 }
-            } 
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
 
-            return table;
+            await conn?.CloseAsync();
+
+            return dt;
         }
 
-        public static void SendSqlSave(string sql)
+        public async static Task SendSqlSave(string sql)
         {
+            DataTable table = new DataTable();
+            MySqlConnection? conn = null;
             try
             {
-                using (conn = new SqlConnection(connectString))
-                using (SqlCommand command = new SqlCommand(sql, conn))
+                using (conn = new MySqlConnection(connectString))
                 {
-                    try
+                    await conn.OpenAsync();
+                    using (var command = new MySqlCommand(sql, conn))
                     {
-                        conn.Open();
-                        command.ExecuteScalar();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
+                        var result = await command.ExecuteScalarAsync();
+                        Console.WriteLine("Command send success!");
                     }
                 }
             }
@@ -61,6 +67,8 @@ namespace tsom_bot.Fetcher.database
             {
                 Console.WriteLine(e.Message);
             }
+           
+            await conn?.CloseAsync();
         }
     }
 }

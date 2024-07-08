@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Data.Common;
 using System.Numerics;
 using tsom_bot.Commands.Helpers;
 using tsom_bot.Fetcher.database;
@@ -52,7 +53,7 @@ namespace tsom_bot.Commands
 
         private async Task SendNoSyncList(CommandContext ctx, List<DiscordMember> dcMembers)
         {
-            DataTable resultSync = Database.SendSqlPull("SELECT * FROM Sync");
+            DataTable resultSync = await Database.SendSqlPull("SELECT * FROM Sync");
             List<DiscordMember> noSyncList = new();
 
             foreach(DiscordMember dcMember in dcMembers) 
@@ -97,8 +98,8 @@ namespace tsom_bot.Commands
         {
             if(overide)
             {
-                Database.SendSqlSave($"DELETE FROM Sync WHERE discordId = {ctx.Member.Id}");
-                Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+                await Database.SendSqlSave($"DELETE FROM Sync WHERE discordId = {ctx.Member.Id}");
+                await Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
                 await new DiscordMessageBuilder()
                 .WithContent("Synced your name with override")
@@ -107,10 +108,10 @@ namespace tsom_bot.Commands
             else
             {
 
-                DataTable result = Database.SendSqlPull($"SELECT * FROM Sync WHERE discordId = '{ctx.Member.Id}'");
+                DataTable result = await Database.SendSqlPull($"SELECT * FROM Sync WHERE discordId = '{ctx.Member.Id}'");
                 if (result.Rows.Count == 0)
                 {
-                    Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+                    await Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
                     await new DiscordMessageBuilder()
                     .WithContent("Synced your name")

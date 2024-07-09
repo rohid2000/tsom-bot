@@ -102,7 +102,7 @@ namespace tsom_bot.Commands.Helpers
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.tsomBotTesting;
+                var channelId = reader.channelIds.strikeList;
                 var chan = await client.GetChannelAsync(channelId);
 
                 if (chan != null)

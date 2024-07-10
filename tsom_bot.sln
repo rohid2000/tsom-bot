@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tsom_bot", "tsom_bot.csproj", "{94227CC0-06DF-466D-9AA1-BFDE0E9C09BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tsom_bot", "tsom_bot.csproj", "{94227CC0-06DF-466D-9AA1-BFDE0E9C09BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{7018BF8A-3555-481E-9A52-8BA5D99A905A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{44ED410A-E1B1-4E5D-B62D-B2426E218457}"
+	ProjectSection(SolutionItems) = preProject
+		auto-pull-master.yaml = auto-pull-master.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +25,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44ED410A-E1B1-4E5D-B62D-B2426E218457} = {7018BF8A-3555-481E-9A52-8BA5D99A905A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7450920-D762-4B9F-92E1-07AB0898712E}

@@ -69,7 +69,7 @@ namespace tsom_bot.Commands.Helpers
                 string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
                 ConfigReader reader = new();
                 await reader.readConfig();
-                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[1247909896331198575].Members)
+                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
                 {
                     DiscordMember dcMember = member.Value;
                     int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);

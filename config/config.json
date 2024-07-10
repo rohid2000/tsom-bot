@@ -12,7 +12,9 @@
     "tsomBotTesting": "channelId",
     "strikeSystem": "channelId",
     "strikeList": "channelId",
-    "promotions": "channelId"
+    "promotions": "channelId",
+    "botCommandsStaff": "channelId",
+    "botCommandsAlliance": "channelId"
   },
   "rolePromotionDays": {
     "acolyte": 30,

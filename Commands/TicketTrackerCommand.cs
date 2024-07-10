@@ -21,7 +21,7 @@ namespace tsom_bot.Commands
                     {
                         await new DiscordMessageBuilder()
                             .WithContent("this is your file")
-                            .AddFile(helper.GetExcelFile())
+                            .AddFile(await helper.GetExcelFile())
                             .SendAsync(ctx.Channel);
                     }
                     catch (Exception ex)
@@ -34,7 +34,7 @@ namespace tsom_bot.Commands
                     try
                     {
                         await new DiscordMessageBuilder()
-                            .WithContent(helper.message)
+                            .WithContent(await helper.GetMessage())
                             .SendAsync(ctx.Channel);
                     }
                     catch (Exception ex)

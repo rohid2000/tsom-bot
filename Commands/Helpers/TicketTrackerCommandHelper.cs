@@ -10,35 +10,40 @@ using tsom_bot.Models.Member;
 namespace tsom_bot.Commands.Helpers
 {
     public class TicketTrackerCommandHelper {
-        public string message;
-        private ExcelHelper? excel;
-
+        private int minimalTicketValue;
+        private string guildId;
         async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId, int minimalTicketValue)  
         {       
+            TicketTrackerCommandHelper helper =  new TicketTrackerCommandHelper();
+            helper.guildId = guildId;
+            helper.minimalTicketValue = minimalTicketValue;
+            return helper;
+        }
+        
+        public async Task SaveGuildData()
+        {
             ObservableCollection<IGuild> guildData = new();
-            guildData.Add(await GuildFetcher.GetGuildById(guildId, true, new()));
+            guildData.Add(await GuildFetcher.GetGuildById(this.guildId, true, new()));
             TicketTrackerSaveCommandHelper saveHelper = new();
             await saveHelper.SaveTicketTrackerResultsInDatabase(guildData[0].GetTicketResults(minimalTicketValue));
-            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
-
-            TicketTrackerCommandHelper helper =  new TicketTrackerCommandHelper();
-            helper.excel = new ExcelHelper();
-            await helper.excel.BuildExcel(dataToday);
-
-            helper.message = await helper.GetMemberTicketResultList(guildData[0], minimalTicketValue, dataToday);
-            return helper;
-        }   
-
-        public FileStream? GetExcelFile()
-        {
-            return this.excel?.GetGeneratedFile();
         }
 
-        private async Task<string> GetMemberTicketResultList(IGuild GuildData, int minimalTicketValue, DataTable dataToday)
+        public async Task<FileStream> GetExcelFile()
+        {
+            ExcelHelper excel = new();
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
+            await excel.BuildExcel(dataToday);
+
+            return excel.GetGeneratedFile();
+        }
+
+        public async Task<string> GetMessage()
         {
             // pull data from database
             string resultString = "";
             int memberIndex = 0;
+
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
 
             for (int i = 0; i < dataToday.Rows.Count; i++)
             {
@@ -58,7 +63,7 @@ namespace tsom_bot.Commands.Helpers
 
                     if(memberResult.missingTickets)
                     {
-                        resultString += $"  - did not reach the minimal ticket requirement of {minimalTicketValue}";
+                        resultString += $"  - did not reach the minimal ticket requirement of {this.minimalTicketValue}";
                     }
                     if(memberResult.RaidAttempts)
                     {

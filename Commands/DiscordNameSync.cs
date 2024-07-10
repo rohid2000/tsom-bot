@@ -72,7 +72,6 @@ namespace tsom_bot.Commands
                             noSyncList.Add(dcMember);
                         }
                     }
-                        
                 } catch (Exception ex) 
                 {
                     Console.WriteLine(ex.Message);

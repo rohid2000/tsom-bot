@@ -18,7 +18,7 @@ namespace tsom_bot.Commands.Helpers
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;
-                SyncTicketTrackCommand(client);
+                SyncGuildSaveCommand(client);
                 SendCheckPromotionCommand(client);
             },
             null,
@@ -48,16 +48,16 @@ namespace tsom_bot.Commands.Helpers
             return (ClientManager.time - adjustedInterval) % cycleCooldown == 0;
         }
 
-        private void SyncTicketTrackCommand(DiscordClient client)
+        private void SyncGuildSaveCommand(DiscordClient client)
         {
             DateTime now = DateTime.Now;
             DateTime syncTime = new(now.Year, now.Month, now.Day, 19, 28, 0); // 0, 0, 0, 19, 28, 0 preferred time
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 
-            if(ClientManager.time >= differenceInMin) 
+            if (ClientManager.time >= differenceInMin) 
             {
-                SendTicktTrackerCommand(client, differenceInMin);
+                SendSaveGuildData(client, differenceInMin);
             }
         }
 
@@ -69,7 +69,7 @@ namespace tsom_bot.Commands.Helpers
                 string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
                 ConfigReader reader = new();
                 await reader.readConfig();
-                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[1247909896331198575].Members)
+                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
                 {
                     DiscordMember dcMember = member.Value;
                     int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
@@ -95,41 +95,26 @@ namespace tsom_bot.Commands.Helpers
             }
         }
 
-        public async void SendTicktTrackerCommand(DiscordClient client, int adjustedInterval)
+        public async void SendSaveGuildData(DiscordClient client, int adjustedInterval)
         {
-            int commandCycleCooldown = 24* 60; //24h cooldown if bot sends interval every 60s
+            int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
             if (IsInCycle(commandCycleCooldown, adjustedInterval))
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.tsomBotTesting;
+                var channelId = reader.channelIds.strikeList;
                 var chan = await client.GetChannelAsync(channelId);
 
                 if (chan != null)
                 {
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400);
-                    try
-                    {
-                        await new DiscordMessageBuilder()
-                        .WithContent("this is your file")
-                        .AddFile(helper.GetExcelFile())
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                    await helper.SaveGuildData();
+
+                    await new DiscordMessageBuilder()
+                        .WithContent("Synced strike data with latest data, here is the latest excel file...")
+                        .AddFile(await helper.GetExcelFile())
                         .SendAsync(chan);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    try
-                    {
-                        await new DiscordMessageBuilder()
-                        .WithContent(helper.message)
-                        .SendAsync(chan);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
                 }
             }
         }

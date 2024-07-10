@@ -33,7 +33,7 @@ namespace tsom_bot.Commands.Helpers
             await saveHelper.SaveTicketTrackerResultsInDatabase(guildData[0].GetTicketResults(minimalTicketValue));
         }   
 
-        public FileStream? GetExcelFile()
+        public async Task<FileStream?> GetExcelFile()
         {
             ExcelHelper excel = new();
             DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';");

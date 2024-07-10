@@ -31,7 +31,15 @@ namespace tsom_bot.Commands.Helpers
 
         public FileStream? GetExcelFile()
         {
+<<<<<<< Updated upstream
             return this.excel?.GetGeneratedFile();
+=======
+            ExcelHelper excel = new();
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';");
+            await excel.BuildExcel(dataToday);
+
+            return excel.GetGeneratedFile();
+>>>>>>> Stashed changes
         }
 
         private async Task<string> GetMemberTicketResultList(IGuild GuildData, int minimalTicketValue, DataTable dataToday)
@@ -52,13 +60,74 @@ namespace tsom_bot.Commands.Helpers
                     date = dataToday.Rows[i].Field<DateTime>("date"),
                 };
 
+<<<<<<< Updated upstream
                 if (memberResult.GetTotalStrikes() > 0)
+=======
+                DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM excludefromtickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                // if the player is found in this database it means they should not be included in the tickettracker
+                if (isExcludedData.Rows.Count == 0)
+>>>>>>> Stashed changes
                 {
                     resultString += $"- {memberResult.playerName} +{memberResult.GetTotalStrikes()} ticket(s) today \n";
 
                     if(memberResult.missingTickets)
                     {
+<<<<<<< Updated upstream
                         resultString += $"  - did not reach the minimal ticket requirement of {minimalTicketValue}";
+=======
+                        ConfigReader reader = new();
+                        await reader.readConfig();
+                        DiscordMember? dcMember = await DiscordUserHelper.GetDiscordUserFromIngameName(memberResult.playerName, client.Guilds[reader.server_id].Members);
+                        if(dcMember != null)
+                        {
+                            resultString += $"- {dcMember.Mention} \n";
+                        }
+                        else
+                        {
+                            resultString += $"- {memberResult.playerName} *please sync your name with `/sync name (swgoh name)`*\n";
+                        }
+        
+                        DateTime now = DateTime.Now;
+                        DataTable memberResultDataThisMonth = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+
+                        int ticketAmount = 0;
+                        if (memberResultDataThisMonth.Rows.Count >= 1)
+                        {
+                            for (int j = 0; j < memberResultDataThisMonth.Rows.Count; j++)
+                            {
+                                ticketAmount += new IMemberTicketResult()
+                                {
+                                    RaidAttempts = memberResultDataThisMonth.Rows[j].Field<sbyte>("RaidAttempts") == 1,
+                                    TerritoryBattle = memberResultDataThisMonth.Rows[j].Field<sbyte>("TerritoryBattle") == 1,
+                                    TerritoryWar = memberResultDataThisMonth.Rows[j].Field<sbyte>("TerritoryWar") == 1,
+                                    missingTickets = memberResultDataThisMonth.Rows[j].Field<sbyte>("missingTickets") == 1,
+                                }.GetTotalStrikes();
+                            }
+                        }
+
+                        ticketAmount = ticketAmount % 3;
+
+                        resultString += $" - +{memberResult.GetTotalStrikes()} strike(s) | Total {ticketAmount} \n";
+
+                        if (memberResult.missingTickets)
+                        {
+                            resultString += $"   - ticket requirement not reached";
+                        }
+                        if (memberResult.RaidAttempts)
+                        {
+                            resultString += $"   - did not attempt the raid";
+                        }
+                        if (memberResult.TerritoryWar)
+                        {
+                            resultString += $"   - failed on TW";
+                        }
+                        if (memberResult.TerritoryBattle)
+                        {
+                            resultString += $"   - failed on TB";
+                        }
+
+                        resultString += "\n";
+>>>>>>> Stashed changes
                     }
                     if(memberResult.RaidAttempts)
                     {
@@ -119,13 +188,13 @@ namespace tsom_bot.Commands.Helpers
                         date = dataToday.Rows[i].Field<DateTime>("date"),
                     };
 
-                    DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM ExcludeFromTickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                    DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM excludefromtickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
                     // if the player is found in this database it means they should not be included in the tickettracker
                     if (isExcludedData.Rows.Count == 0)
                     {
                         // get tickets for player this month
                         DateTime now = DateTime.Now;
-                        DataTable memberResultDataThisMonth = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                        DataTable memberResultDataThisMonth = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
 
                         worksheet.Cell("A" + (memberIndex + heightIndex)).Value = memberResult.playerName;
 

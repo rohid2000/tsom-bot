@@ -53,7 +53,7 @@ namespace tsom_bot.Commands
 
         private async Task SendNoSyncList(CommandContext ctx, List<DiscordMember> dcMembers)
         {
-            DataTable resultSync = await Database.SendSqlPull("SELECT * FROM Sync");
+            DataTable resultSync = await Database.SendSqlPull("SELECT * FROM sync");
             List<DiscordMember> noSyncList = new();
 
             foreach(DiscordMember dcMember in dcMembers) 
@@ -98,8 +98,8 @@ namespace tsom_bot.Commands
         {
             if(overide)
             {
-                await Database.SendSqlSave($"DELETE FROM Sync WHERE discordId = {ctx.Member.Id}");
-                await Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+                await Database.SendSqlSave($"DELETE FROM sync WHERE discordId = {ctx.Member.Id}");
+                await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
                 await new DiscordMessageBuilder()
                 .WithContent("Synced your name with override")
@@ -108,10 +108,10 @@ namespace tsom_bot.Commands
             else
             {
 
-                DataTable result = await Database.SendSqlPull($"SELECT * FROM Sync WHERE discordId = '{ctx.Member.Id}'");
+                DataTable result = await Database.SendSqlPull($"SELECT * FROM sync WHERE discordId = '{ctx.Member.Id}'");
                 if (result.Rows.Count == 0)
                 {
-                    await Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+                    await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
                     await new DiscordMessageBuilder()
                     .WithContent("Synced your name")
@@ -128,7 +128,7 @@ namespace tsom_bot.Commands
 
         private async Task SyncDatabase(CommandContext ctx, IGuild guildData, List<DiscordMember> dcMembers)
         {
-            Database.SendSqlSave("DELETE FROM Sync"); // clear table
+            Database.SendSqlSave("DELETE FROM sync"); // clear table
             foreach (IMember member in guildData.member)
             {
                 List<DiscordMember> resultList = dcMembers.Where(i => i.DisplayName.ToLower() == member.playerName.ToLower()).ToList();
@@ -137,7 +137,7 @@ namespace tsom_bot.Commands
                     DiscordMember dcMember = resultList[0];
                     if(!dcMember.IsBot) 
                     {
-                        Database.SendSqlSave($"INSERT INTO Sync (playerName, discordId) VALUES ('{member.playerName}', {dcMember.Id})");
+                        Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{member.playerName}', {dcMember.Id})");
                     }   
                 }
             }

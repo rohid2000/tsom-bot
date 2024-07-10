@@ -18,7 +18,7 @@ namespace tsom_bot.Fetcher.database
         {
             DataSet ds = new();
             DataTable dt = new();
-            string tableName = "TicketResults";
+            string tableName = "ticketresults";
             MySqlConnection? conn = null;
             try
             {

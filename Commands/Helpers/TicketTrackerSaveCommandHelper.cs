@@ -1,4 +1,6 @@
-﻿using tsom_bot.Fetcher.database;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using System.Data;
+using tsom_bot.Fetcher.database;
 using tsom_bot.Models.Member;
 
 namespace tsom_bot.Commands.Helpers
@@ -6,14 +8,10 @@ namespace tsom_bot.Commands.Helpers
     public class TicketTrackerSaveCommandHelper
     {
         public async Task SaveTicketTrackerResultsInDatabase(List<IMemberTicketResult> members)
-        {;
+        {
             string sqlFormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
-
-<<<<<<< Updated upstream
-=======
             await Database.SendSqlSave($"DELETE FROM ticketresults WHERE date = '{sqlFormattedDate}'");
 
->>>>>>> Stashed changes
             foreach(IMemberTicketResult member in members)
             {
                 byte missingTickets = (byte) (member.missingTickets ? 1 : 0);
@@ -21,13 +19,6 @@ namespace tsom_bot.Commands.Helpers
                 byte TerritoryWar = (byte) (member.TerritoryWar ? 1 : 0);
                 byte RaidAttempts = (byte) (member.RaidAttempts ? 1 : 0);
 
-<<<<<<< Updated upstream
-                string sql = $"INSERT INTO TicketResults (playerName, missingTickets, TerritoryBattle, TerritoryWar, RaidAttempts, date) VALUES ('{member.playerName}', {missingTickets}, {TerritoryBattle}, {TerritoryWar}, {RaidAttempts}, '{sqlFormattedDate}')";
-                Console.WriteLine(sql);
-                await Database.SendSqlSave(sql);
-            }
-        }
-=======
                 string sql = $"INSERT INTO ticketresults (playerName, missingTickets, TerritoryBattle, TerritoryWar, RaidAttempts, date) VALUES ('{member.playerName}', {missingTickets}, {TerritoryBattle}, {TerritoryWar}, {RaidAttempts}, '{sqlFormattedDate}')";
                 await this.ExcludeMemberInDatabase(member.playerName);
                 await Database.SendSqlSave(sql);
@@ -58,6 +49,5 @@ namespace tsom_bot.Commands.Helpers
                 }
             }
         }
->>>>>>> Stashed changes
     }
 }

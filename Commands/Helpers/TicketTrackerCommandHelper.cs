@@ -3,6 +3,9 @@ using System.Data;
 using System.Data.Common;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DSharpPlus;
+using DSharpPlus.Entities;
+using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
 using tsom_bot.Models.Member;
@@ -10,43 +13,41 @@ using tsom_bot.Models.Member;
 namespace tsom_bot.Commands.Helpers
 {
     public class TicketTrackerCommandHelper {
-        public string message;
-        private ExcelHelper? excel;
-
-        async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId, int minimalTicketValue)  
+        private int minimalTicketValue;
+        private string guildId;
+        private DiscordClient client;
+        async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId, int minimalTicketValue, DiscordClient client)  
         {       
+            TicketTrackerCommandHelper helper =  new TicketTrackerCommandHelper();
+            helper.guildId = guildId;
+            helper.minimalTicketValue = minimalTicketValue;
+            helper.client = client;
+            return helper;
+        }
+        
+        public async Task SaveGuildData()
+        {
             ObservableCollection<IGuild> guildData = new();
-            guildData.Add(await GuildFetcher.GetGuildById(guildId, true, new()));
+            guildData.Add(await GuildFetcher.GetGuildById(this.guildId, true, new()));
             TicketTrackerSaveCommandHelper saveHelper = new();
             await saveHelper.SaveTicketTrackerResultsInDatabase(guildData[0].GetTicketResults(minimalTicketValue));
-            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
-
-            TicketTrackerCommandHelper helper =  new TicketTrackerCommandHelper();
-            helper.excel = new ExcelHelper();
-            await helper.excel.BuildExcel(dataToday);
-
-            helper.message = await helper.GetMemberTicketResultList(guildData[0], minimalTicketValue, dataToday);
-            return helper;
         }   
 
         public FileStream? GetExcelFile()
         {
-<<<<<<< Updated upstream
-            return this.excel?.GetGeneratedFile();
-=======
             ExcelHelper excel = new();
             DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';");
             await excel.BuildExcel(dataToday);
 
             return excel.GetGeneratedFile();
->>>>>>> Stashed changes
         }
 
-        private async Task<string> GetMemberTicketResultList(IGuild GuildData, int minimalTicketValue, DataTable dataToday)
+        public async Task<string> GetMessage()
         {
             // pull data from database
             string resultString = "";
-            int memberIndex = 0;
+
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM `ticketresults` WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}'");
 
             for (int i = 0; i < dataToday.Rows.Count; i++)
             {
@@ -60,21 +61,12 @@ namespace tsom_bot.Commands.Helpers
                     date = dataToday.Rows[i].Field<DateTime>("date"),
                 };
 
-<<<<<<< Updated upstream
-                if (memberResult.GetTotalStrikes() > 0)
-=======
                 DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM excludefromtickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
                 // if the player is found in this database it means they should not be included in the tickettracker
                 if (isExcludedData.Rows.Count == 0)
->>>>>>> Stashed changes
                 {
-                    resultString += $"- {memberResult.playerName} +{memberResult.GetTotalStrikes()} ticket(s) today \n";
-
                     if(memberResult.missingTickets)
                     {
-<<<<<<< Updated upstream
-                        resultString += $"  - did not reach the minimal ticket requirement of {minimalTicketValue}";
-=======
                         ConfigReader reader = new();
                         await reader.readConfig();
                         DiscordMember? dcMember = await DiscordUserHelper.GetDiscordUserFromIngameName(memberResult.playerName, client.Guilds[reader.server_id].Members);
@@ -127,22 +119,7 @@ namespace tsom_bot.Commands.Helpers
                         }
 
                         resultString += "\n";
->>>>>>> Stashed changes
                     }
-                    if(memberResult.RaidAttempts)
-                    {
-                        resultString += $"  - did not attempt the raid";
-                    }
-                    if(memberResult.TerritoryWar) 
-                    {
-                        resultString += $"  - failed on TW";
-                    }
-                    if (memberResult.TerritoryBattle)
-                    {
-                        resultString += $"  - failed on TB";
-                    }
-
-                    resultString += "\n\n";
                 }
             }
 
@@ -242,14 +219,7 @@ namespace tsom_bot.Commands.Helpers
                             }
                         }
 
-                        ticketMaxReached = (int)MathF.Floor(ticketAmount / 3);
                         ticketAmount = ticketAmount % 3;
-                        if (ticketAmount == 0)
-                        {
-                            ticketAmount = 3;
-                            worksheet.Cell("G" + (memberIndex + heightIndex)).Value = "3rd ticket reached";
-                            await Database.SendSqlSave($"INSERT INTO ExcludeFromTickets (playerName, date) VALUES ('{memberResult.playerName}', '{DateTime.Now.AddDays(2).ToString("yyyy-MM-dd")}')");
-                        }
 
                         var strikesCell = worksheet.Cell("F" + (memberIndex + heightIndex));
 

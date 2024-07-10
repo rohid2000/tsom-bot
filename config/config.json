@@ -1,7 +1,7 @@
 {
   "token": "token",
   "prefix": "/",
-  "server_id": 1247909896331198575,
+  "server_id": "serverId",
   "roleIds": {
     "acolyte": "roleId",
     "apprentice": "roleId",
@@ -12,7 +12,9 @@
     "tsomBotTesting": "channelId",
     "strikeSystem": "channelId",
     "strikeList": "channelId",
-    "promotions": "channelId"
+    "promotions": "channelId",
+    "botCommandsStaff": "channelId",
+    "botCommandsAlliance": "channelId"
   },
   "rolePromotionDays": {
     "acolyte": 30,

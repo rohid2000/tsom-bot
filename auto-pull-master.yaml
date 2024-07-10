@@ -1,16 +1,3 @@
-# name: auto-pull-master
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   deployment:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: deploy
-  
 name: auto-pull-master
 
 on:

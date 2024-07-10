@@ -24,7 +24,7 @@ jobs:
     - name: Pull latest changes on server
       run: |
         ssh -o StrictHostKeyChecking=no xrdpuser@10.42.180.47 << 'EOF'
-          cd Home/bot-repo/tsom-bot
+          cd $HOME/bot-repo/tsom-bot/tsom-bot
           git pull origin master
           exit
         EOF

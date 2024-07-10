@@ -13,7 +13,7 @@ namespace tsom_bot.Commands
             if(await RoleHelper.hasRole(Role.Acolyte, ctx.Member))
             {
                 string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400);
+                TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
                 if (param == "excel")
                 {
@@ -29,12 +29,22 @@ namespace tsom_bot.Commands
                         Console.WriteLine(ex.Message);
                     }
                 }
+                else if(param == "sync")
+                {
+                    await helper.SaveGuildData();
+
+                    await new DiscordMessageBuilder()
+                    .WithContent("sync data with latest")
+                    .SendAsync(ctx.Channel);
+                }
                 else
                 {
                     try
                     {
+                        string message = await helper.GetMessage();
+
                         await new DiscordMessageBuilder()
-                            .WithContent(await helper.GetMessage())
+                            .WithContent(message)
                             .SendAsync(ctx.Channel);
                     }
                     catch (Exception ex)

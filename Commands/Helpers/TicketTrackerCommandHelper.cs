@@ -3,6 +3,9 @@ using System.Data;
 using System.Data.Common;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DSharpPlus;
+using DSharpPlus.Entities;
+using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Models;
 using tsom_bot.Models.Member;
@@ -12,11 +15,13 @@ namespace tsom_bot.Commands.Helpers
     public class TicketTrackerCommandHelper {
         private int minimalTicketValue;
         private string guildId;
-        async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId, int minimalTicketValue)  
+        private DiscordClient client;
+        async public static Task<TicketTrackerCommandHelper> BuildViewModelAsync(string guildId, int minimalTicketValue, DiscordClient client)  
         {       
             TicketTrackerCommandHelper helper =  new TicketTrackerCommandHelper();
             helper.guildId = guildId;
             helper.minimalTicketValue = minimalTicketValue;
+            helper.client = client;
             return helper;
         }
         
@@ -31,7 +36,7 @@ namespace tsom_bot.Commands.Helpers
         public async Task<FileStream> GetExcelFile()
         {
             ExcelHelper excel = new();
-            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}';");
             await excel.BuildExcel(dataToday);
 
             return excel.GetGeneratedFile();
@@ -41,9 +46,8 @@ namespace tsom_bot.Commands.Helpers
         {
             // pull data from database
             string resultString = "";
-            int memberIndex = 0;
 
-            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date '{DateTime.Now.ToString("yyyy-MM-dd")}'");
+            DataTable dataToday = await Database.SendSqlPull($"SELECT * FROM `ticketresults` WHERE date = '{DateTime.Now.ToString("yyyy-MM-dd")}'");
 
             for (int i = 0; i < dataToday.Rows.Count; i++)
             {
@@ -57,28 +61,65 @@ namespace tsom_bot.Commands.Helpers
                     date = dataToday.Rows[i].Field<DateTime>("date"),
                 };
 
-                if (memberResult.GetTotalStrikes() > 0)
+                DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM ExcludeFromTickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                // if the player is found in this database it means they should not be included in the tickettracker
+                if (isExcludedData.Rows.Count == 0)
                 {
-                    resultString += $"- {memberResult.playerName} +{memberResult.GetTotalStrikes()} ticket(s) today \n";
+                    if (memberResult.GetTotalStrikes() > 0)
+                    {
+                        ConfigReader reader = new();
+                        await reader.readConfig();
+                        DiscordMember? dcMember = await DiscordUserHelper.GetDiscordUserFromIngameName(memberResult.playerName, client.Guilds[reader.server_id].Members);
+                        if(dcMember != null)
+                        {
+                            resultString += $"- {dcMember.Mention} \n";
+                        }
+                        else
+                        {
+                            resultString += $"- {memberResult.playerName} *please sync your name with `/sync name (swgoh name)`*\n";
+                        }
+        
+                        DateTime now = DateTime.Now;
+                        DataTable memberResultDataThisMonth = await Database.SendSqlPull($"SELECT * FROM TicketResults WHERE date BETWEEN '{new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd")}' AND '{new DateTime(now.Year, now.Month, 1).AddMonths(1).AddTicks(-1).ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
 
-                    if(memberResult.missingTickets)
-                    {
-                        resultString += $"  - did not reach the minimal ticket requirement of {this.minimalTicketValue}";
-                    }
-                    if(memberResult.RaidAttempts)
-                    {
-                        resultString += $"  - did not attempt the raid";
-                    }
-                    if(memberResult.TerritoryWar) 
-                    {
-                        resultString += $"  - failed on TW";
-                    }
-                    if (memberResult.TerritoryBattle)
-                    {
-                        resultString += $"  - failed on TB";
-                    }
+                        int ticketAmount = 0;
+                        if (memberResultDataThisMonth.Rows.Count >= 1)
+                        {
+                            for (int j = 0; j < memberResultDataThisMonth.Rows.Count; j++)
+                            {
+                                ticketAmount += new IMemberTicketResult()
+                                {
+                                    RaidAttempts = memberResultDataThisMonth.Rows[j].Field<sbyte>("RaidAttempts") == 1,
+                                    TerritoryBattle = memberResultDataThisMonth.Rows[j].Field<sbyte>("TerritoryBattle") == 1,
+                                    TerritoryWar = memberResultDataThisMonth.Rows[j].Field<sbyte>("TerritoryWar") == 1,
+                                    missingTickets = memberResultDataThisMonth.Rows[j].Field<sbyte>("missingTickets") == 1,
+                                }.GetTotalStrikes();
+                            }
+                        }
 
-                    resultString += "\n\n";
+                        ticketAmount = ticketAmount % 3;
+
+                        resultString += $" - +{memberResult.GetTotalStrikes()} strike(s) | Total {ticketAmount} \n";
+
+                        if (memberResult.missingTickets)
+                        {
+                            resultString += $"   - ticket requirement not reached";
+                        }
+                        if (memberResult.RaidAttempts)
+                        {
+                            resultString += $"   - did not attempt the raid";
+                        }
+                        if (memberResult.TerritoryWar)
+                        {
+                            resultString += $"   - failed on TW";
+                        }
+                        if (memberResult.TerritoryBattle)
+                        {
+                            resultString += $"   - failed on TB";
+                        }
+
+                        resultString += "\n";
+                    }
                 }
             }
 
@@ -178,14 +219,7 @@ namespace tsom_bot.Commands.Helpers
                             }
                         }
 
-                        ticketMaxReached = (int)MathF.Floor(ticketAmount / 3);
                         ticketAmount = ticketAmount % 3;
-                        if (ticketAmount == 0)
-                        {
-                            ticketAmount = 3;
-                            worksheet.Cell("G" + (memberIndex + heightIndex)).Value = "3rd ticket reached";
-                            await Database.SendSqlSave($"INSERT INTO ExcludeFromTickets (playerName, date) VALUES ('{memberResult.playerName}', '{DateTime.Now.AddDays(2).ToString("yyyy-MM-dd")}')");
-                        }
 
                         var strikesCell = worksheet.Cell("F" + (memberIndex + heightIndex));
 

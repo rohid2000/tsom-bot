@@ -108,11 +108,12 @@ namespace tsom_bot.Commands.Helpers
                 if (chan != null)
                 {
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400);
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
                     await helper.SaveGuildData();
 
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data")
+                        .WithContent("Synced strike data with latest data, here is the latest excel file...")
+                        .AddFile(await helper.GetExcelFile())
                         .SendAsync(chan);
                 }
             }

@@ -11,47 +11,47 @@ namespace tsom_bot.Commands.Helpers.promotions
 {
     public class RolePromotionHelper
     {
-        public async void GiveRole(DiscordClient client, Role role, DiscordMember dcMember)
+        public async Task GiveRole(DiscordClient client, Role role, DiscordMember dcMember)
         {
             ConfigReader reader = new();
             await reader.readConfig();;
 
             DiscordGuild guild = client.Guilds[reader.server_id];
-            DiscordRole? dcRole;
+            DiscordRole? dcRole = null;
 
             DiscordRole acolyteRole = guild.GetRole(reader.roleIds.acolyte);
-            DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.acolyte);
-            DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.acolyte);
-            DiscordRole sithLordRole = guild.GetRole(reader.roleIds.acolyte);
+            DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.apprentice);
+            DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
+            DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
+
 
             // removes all roles to make sure the top-permission role is only set on the player
-            await dcMember.RevokeRoleAsync(acolyteRole);
-            await dcMember.RevokeRoleAsync(apprenticeRole);
-            await dcMember.RevokeRoleAsync(mandalorianRole);
-            await dcMember.RevokeRoleAsync(sithLordRole);
-            switch(role)
-            {
-                case Role.Acolyte:
-                    dcRole = acolyteRole;
-                    break;
-                case Role.Apprentice:
-                    dcRole = apprenticeRole;
-                    break;
-                case Role.Mandalorian:
-                    dcRole = mandalorianRole;
-                    break;
-                case Role.SithLord:
-                    dcRole = sithLordRole;
-                    break;
-                default:
-                    dcRole = null;
-                    break;
-            }
 
-            if (!dcMember.Roles.Contains(dcRole) && dcRole != null)
+            if(!await RoleHelper.hasRole(role, dcMember))
             {
-                await dcMember.GrantRoleAsync(dcRole);
+                switch (role)
+                {
+                    case Role.Acolyte:
+                        dcRole = acolyteRole;
+                        break;
+                    case Role.Apprentice:
+                        await dcMember.RevokeRoleAsync(acolyteRole);
+                        dcRole = apprenticeRole;
+                        break;
+                    case Role.Mandalorian:
+                        await dcMember.RevokeRoleAsync(apprenticeRole);
+                        dcRole = mandalorianRole;
+                        break;
+                    case Role.SithLord:
+                        await dcMember.RevokeRoleAsync(mandalorianRole);
+                        dcRole = sithLordRole;
+                        break;
+                    default:
+                        break;
+                }
             }
+            if(dcRole != null)
+                await dcMember.GrantRoleAsync(dcRole);
         }
     }
 }

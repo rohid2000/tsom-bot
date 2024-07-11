@@ -41,6 +41,7 @@ internal class Program
         commands.RegisterCommands<commandTemplate>();
         commands.RegisterCommands<TicketTrackerCommand>();
         commands.RegisterCommands<DiscordNameSync>();
+        commands.RegisterCommands<PromotionCommand>();
 
         //Make connection
         await client.ConnectAsync();

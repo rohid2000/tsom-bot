@@ -19,7 +19,7 @@ namespace tsom_bot.Commands.Helpers.promotions
             foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
             {
                 DiscordMember dcMember = member.Value;
-                if (!HasAdminRole(dcMember) && !dcMember.IsBot)
+                if (!await HasAdminRole(dcMember) && !dcMember.IsBot)
                 {  
                     int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
                     RolePromotionHelper helper = new RolePromotionHelper();
@@ -57,7 +57,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                             var chan = await client.GetChannelAsync(channelId);
 
                             await new DiscordMessageBuilder()
-                            .WithContent($"{dcMember.Mention} has been promoted to **{roleName}**, Congrationaltions")
+                            .WithContent($"{dcMember.Mention} has been promoted to **{roleName}**, congratulations!")
                             .SendAsync(chan);
                         }
                     }

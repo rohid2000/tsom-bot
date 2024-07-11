@@ -63,35 +63,19 @@ namespace tsom_bot.Commands.Helpers
 
         public async void SendCheckPromotionCommand(DiscordClient client)
         {
-            int commandCycleCooldown = 24 * 60;
-            if (IsInCycle(commandCycleCooldown))
+            int cycleCooldown = 24 * 60;
+            if (IsInCycle(cycleCooldown))
             {
-                string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                ConfigReader reader = new();
-                await reader.readConfig();
-                foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
-                {
-                    DiscordMember dcMember = member.Value;
-                    int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
-                    RolePromotionHelper helper = new RolePromotionHelper();
+                await TimedPromotionHelper.SyncPromotions(client);
 
-                    if (totalDays >= reader.rolePromotionDays.sithlord)
-                    {
-                        helper.GiveRole(client, Role.SithLord, dcMember);
-                    }
-                    else if(totalDays >= reader.rolePromotionDays.mandalorian)
-                    {
-                        helper.GiveRole(client, Role.Mandalorian, dcMember);
-                    }
-                    else if (totalDays >= reader.rolePromotionDays.apprentice)
-                    {
-                        helper.GiveRole(client, Role.Apprentice, dcMember);
-                    }
-                    else if (totalDays >= reader.rolePromotionDays.acolyte)
-                    {
-                        helper.GiveRole(client, Role.Acolyte, dcMember);
-                    }
-                }
+                ConfigReader reader = new ConfigReader();
+                await reader.readConfig();
+                var channelId = reader.channelIds.promotions;
+                var chan = await client.GetChannelAsync(channelId);
+
+                await new DiscordMessageBuilder()
+                .WithContent("Promotion data has been synced")
+                .SendAsync(chan);
             }
         }
 

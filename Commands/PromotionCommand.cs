@@ -15,8 +15,15 @@ namespace tsom_bot.Commands
             {
                 if (param == "sync")
                 {
-                    await TimedPromotionHelper.SyncPromotions(ctx.Client);
-
+                    try
+                    {
+                        await TimedPromotionHelper.SyncPromotions(ctx.Client);
+                    }
+                    catch (Exception ex) 
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    
                     await new DiscordMessageBuilder()
                     .WithContent("sync data with latest")
                     .SendAsync(ctx.Channel);

@@ -24,7 +24,6 @@ namespace tsom_bot.Commands.Helpers.promotions
             DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
             DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
 
-
             // removes all roles to make sure the top-permission role is only set on the player
 
             if(!await RoleHelper.hasRole(role, dcMember))

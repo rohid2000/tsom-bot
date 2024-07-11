@@ -2,6 +2,12 @@
   "token": "token",
   "prefix": "/",
   "server_id": "serverId",
+  "adminRoleIds": [
+    "",
+    "",
+    "",
+    ""
+  ],
   "roleIds": {
     "acolyte": "roleId",
     "apprentice": "roleId",

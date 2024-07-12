@@ -95,10 +95,15 @@ namespace tsom_bot.Commands.Helpers
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
                     await helper.SaveGuildData();
 
+                    FileStream file = await helper.GetExcelFile();
+
                     await new DiscordMessageBuilder()
                         .WithContent("Synced strike data with latest data, here is the latest excel file...")
-                        .AddFile(await helper.GetExcelFile())
+                        .AddFile(file)
                         .SendAsync(chan);
+
+                    file.Close();
+                    File.Delete(file.Name);
                 }
             }
         }

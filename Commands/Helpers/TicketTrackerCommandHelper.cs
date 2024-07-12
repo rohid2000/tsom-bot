@@ -133,10 +133,23 @@ namespace tsom_bot.Commands.Helpers
     }
 
     internal class ExcelHelper {
-        internal readonly string fileName = "strike-list.xlsx";
+        internal string fileName;
+
+        private string generateFileName()
+        {
+            string fileName = "strike-list-" + DateTime.Now.ToString("yyyy-MM-dd");
+            string randomString = "";
+            for(int i = 0; i < 5; i++)
+            {
+                randomString += new Random().Next(1, 9).ToString();
+            }
+            string extension = ".xlsx";
+            return fileName + "-" + randomString + extension;
+        }
 
             public async Task BuildExcel(DataTable dataToday)
             {
+                fileName = generateFileName();
                 using (var workbook = new XLWorkbook())
                 {
                     var worksheet = workbook.Worksheets.Add("Missed tickets only");
@@ -240,14 +253,14 @@ namespace tsom_bot.Commands.Helpers
                         PaintBorders(strikesCell);
                         memberIndex++;
                     }
-                    try
-                    {
-                        workbook.SaveAs(fileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                }
+                try
+                {
+                    workbook.SaveAs(fileName);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
         }

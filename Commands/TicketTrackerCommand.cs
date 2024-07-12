@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Drawing;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -19,10 +20,15 @@ namespace tsom_bot.Commands
                 {
                     try
                     {
+                        FileStream file = await helper.GetExcelFile();
+
                         await new DiscordMessageBuilder()
                             .WithContent("this is your file")
-                            .AddFile(await helper.GetExcelFile())
+                            .AddFile(file)
                             .SendAsync(ctx.Channel);
+
+                        file.Close();
+                        File.Delete(file.Name);
                     }
                     catch (Exception ex)
                     {

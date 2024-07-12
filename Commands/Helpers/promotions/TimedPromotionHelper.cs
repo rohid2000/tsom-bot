@@ -1,4 +1,5 @@
-﻿using DSharpPlus;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using MySqlX.XDevAPI;
 using System;
@@ -16,10 +17,17 @@ namespace tsom_bot.Commands.Helpers.promotions
         {
             ConfigReader reader = new();
             await reader.readConfig();
+
+            var chan = await client.GetChannelAsync(reader.channelIds.promotions);
+            List<DiscordMember> acolytePromoters = new List<DiscordMember>();
+            List<DiscordMember> apprenticePromoters = new List<DiscordMember>();
+            List<DiscordMember> mandalorianPromoters = new List<DiscordMember>();
+            List<DiscordMember> sithlordPromoters = new List<DiscordMember>();
             foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
             {
                 DiscordMember dcMember = member.Value;
-                if (!await HasAdminRole(dcMember) && !dcMember.IsBot)
+                bool hasAdminRole = await HasAdminRole(dcMember);
+                if (!hasAdminRole && !dcMember.IsBot)
                 {  
                     int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
                     RolePromotionHelper helper = new RolePromotionHelper();
@@ -45,7 +53,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     {
                         roleName = "Acolyte";
                         role = Role.Acolyte;
-                    }
+                        acolytePromoters.Add(dcMember);                    }
 
                     if (roleName != null && role != null)
                     {
@@ -53,16 +61,79 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
 
-                            var channelId = reader.channelIds.promotions;
-                            var chan = await client.GetChannelAsync(channelId);
-
-                            await new DiscordMessageBuilder()
-                            .WithContent($"{dcMember.Mention} has been promoted to **{roleName}**, congratulations!")
-                            .SendAsync(chan);
+                            switch(role) 
+                            {
+                                case Role.Acolyte:
+                                    acolytePromoters.Add(dcMember);
+                                    break;
+                                case Role.Apprentice:
+                                    acolytePromoters.Add(dcMember);
+                                    break;
+                                case Role.Mandalorian:
+                                    mandalorianPromoters.Add(dcMember);
+                                    break;
+                                case Role.SithLord:
+                                    sithlordPromoters.Add(dcMember);
+                                    break;
+                            }
                         }
                     }
                 }
             }
+
+            string message = "";
+            DiscordGuild guild = client.Guilds[reader.server_id];
+            DiscordRole acolyteRole = guild.GetRole(reader.roleIds.acolyte);
+            DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.apprentice);
+            DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
+            DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
+
+
+            message += "The Sith Will Become All powerful! \n\nCongrats";
+
+            message += GetRolePromotionsString(acolytePromoters, acolyteRole);
+            message += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
+            message += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
+            message += GetRolePromotionsString(sithlordPromoters, sithLordRole);
+
+            message += "We are All the Sith!";
+
+            await new DiscordMessageBuilder()
+                .WithContent(message)
+                .SendAsync(chan);
+        }
+
+        private static string GetRolePromotionsString(List<DiscordMember> members, DiscordRole role)
+        {
+            string message = "";
+
+            foreach (DiscordMember dcMember in members)
+            {
+                if (dcMember != members.Last())
+                {
+                    message += dcMember.Mention + ", ";
+                }
+                else
+                {
+                    message += dcMember.Mention + " ";
+                }
+            }
+
+            if (members.Count > 1)
+            {
+                message += $"have been promoted to {role.Mention}";
+            }
+            else if (members.Count == 1)
+            {
+                message += $"has been promoted to {role.Mention}";
+            }
+
+            if(members.Count > 0)
+            {
+                message += "!\n\n";
+            } 
+
+            return message;
         }
 
         private async static Task<bool> HasAdminRole(DiscordMember dcMember)

@@ -56,6 +56,26 @@ namespace tsom_bot.Commands
                         Console.WriteLine(ex.Message);
                     }
                 }
+
+                [SlashCommand("excel", "Syncs the data with provided excel")]
+                public async Task SyncExcelCommand(InteractionContext ctx, [Option("file", "attach excel file")]DiscordAttachment file)
+                {
+                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+
+                    try
+                    {
+                        await helper.SyncExcelFile(file);
+
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Synced with excel data");
+
+                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
             }
 
             [SlashCommandGroup("get", "used to get strike data")]
@@ -140,7 +160,6 @@ namespace tsom_bot.Commands
                     try
                     {
                         await helper.RemoveMemberToNVT(dcMember);
-
                         DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"Removed {dcMember.Mention} from the not count list");
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                     }

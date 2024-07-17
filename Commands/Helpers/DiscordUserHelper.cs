@@ -14,5 +14,10 @@ namespace tsom_bot.Commands.Helpers
             ulong discordId = (ulong)result.Rows[0].Field<Int64>("discordId");
             return dcMembers.Where(i => i.Value.Id == discordId).ToArray()[0].Value;
         }
+
+        public async static Task<DataTable> GetLinkedAccounts(DiscordMember member)
+        {
+            return await Database.SendSqlPull($"SELECT * FROM `sync` WHERE discordId = '{member.Id}'");
+        }
     }
 }

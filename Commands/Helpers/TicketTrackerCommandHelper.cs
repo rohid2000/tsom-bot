@@ -33,6 +33,12 @@ namespace tsom_bot.Commands.Helpers
             await saveHelper.SaveTicketTrackerResultsInDatabase(guildData[0].GetTicketResults(minimalTicketValue));
         }   
 
+        public async Task<bool> IsDataSynced()
+        {
+            TicketTrackerSaveCommandHelper saveHelper = new();
+            return await saveHelper.IsSyncedToday();
+        }
+
         public async Task<FileStream?> GetExcelFile()
         {
             ExcelHelper excel = new();
@@ -129,6 +135,38 @@ namespace tsom_bot.Commands.Helpers
             }
 
             return resultString;
+        }
+
+        public async Task AddMemberToNVT(DiscordUser member, int dayAmount = 0)
+        {
+            DiscordMember dcMember = member as DiscordMember;
+            await AddMemberToNVT(dcMember, dayAmount);
+        }
+
+        public async Task AddMemberToNVT(DiscordMember member, int dayAmount = 0)
+        {
+            DataTable result = await DiscordUserHelper.GetLinkedAccounts(member);
+            string dateTime = DateTime.Now.AddDays(dayAmount).ToString("yyyy-MM-dd");
+
+            foreach (DataRow row in result.Rows) 
+            {
+                await Database.SendSqlSave($"INSERT INTO excludefromtickets (playerName, date) VALUES ('{row.Field<string>("playerName")}', '{dateTime}')");
+            }
+        }
+
+        public async Task RemoveMemberToNVT(DiscordUser member)
+        {
+            DiscordMember dcMember = member as DiscordMember;
+            await RemoveMemberToNVT(dcMember);
+        }
+
+        public async Task RemoveMemberToNVT(DiscordMember member)
+        {
+            DataTable result = await DiscordUserHelper.GetLinkedAccounts(member);
+            foreach (DataRow row in result.Rows)
+            {
+                await Database.SendSqlSave($"DELETE FROM excludefromtickets WHERE playerName = '{row.Field<string>("playerName")}'");
+            }
         }
     }
 

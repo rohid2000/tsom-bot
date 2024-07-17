@@ -49,5 +49,12 @@ namespace tsom_bot.Commands.Helpers
                 }
             }
         }
+
+        public async Task<bool> IsSyncedToday()
+        {
+            string sqlFormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
+            DataTable result = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE date = '{sqlFormattedDate}'");
+            return result.Rows.Count > 0;
+        }
     }
 }

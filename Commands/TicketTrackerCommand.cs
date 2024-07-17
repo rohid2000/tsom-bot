@@ -123,16 +123,16 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("nvt", "adds or removes a player from dont check players list")]
+            [SlashCommandGroup("nvt", "adds or removes a member from the count of the strikelist")]
             public class NVTContainer() : ApplicationCommandModule
             {
-                [SlashCommand("add", "adds a player from dont check players list")]
-                public async Task NVTAddCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("dayAmount", "Amount of days this user should not enter the strike list")] long dayAmount = 0)
+                [SlashCommand("add", "adds a member to the not count list")]
+                public async Task NVTAddCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("dayAmount", "Amount of days this member should not be counted for the strikelist")] long dayAmount = 0)
                 {
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    string sMessage = $"Added {dcMember.Mention} to the dont check list";
+                    string sMessage = $"Added {dcMember.Mention} to the not count list";
                     if(dayAmount > 0) 
                     {
                         sMessage += $" for {dayAmount} days";
@@ -151,7 +151,7 @@ namespace tsom_bot.Commands
                     }
                 }
 
-                [SlashCommand("remove", "removes a player from dont check players list")]
+                [SlashCommand("remove", "removes a member from the not count list")]
                 public async Task NVTRemoveCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember)
                 {
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
@@ -160,8 +160,7 @@ namespace tsom_bot.Commands
                     try
                     {
                         await helper.RemoveMemberToNVT(dcMember);
-
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"Removed {dcMember.Mention} from the dont check list");
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"Removed {dcMember.Mention} from the not count list");
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                     }
                     catch (Exception ex)

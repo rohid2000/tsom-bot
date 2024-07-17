@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
+using System.Net;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DSharpPlus;
@@ -46,6 +47,16 @@ namespace tsom_bot.Commands.Helpers
             await excel.BuildExcel(dataToday);
 
             return excel.GetGeneratedFile();
+        }
+
+        public async Task SyncExcelFile(DiscordAttachment file)
+        {
+            using(var webClient = new WebClient())
+            {
+                webClient.DownloadFile(new Uri(file.Url), file.FileName);
+            }
+            ExcelHelper excel = new();
+            await excel.ReadExcel(file.FileName);
         }
 
         public async Task<string> GetMessage()
@@ -183,6 +194,47 @@ namespace tsom_bot.Commands.Helpers
             }
             string extension = ".xlsx";
             return fileName + "-" + randomString + extension;
+        }
+
+        public async Task ReadExcel(string fileName)
+        {
+            string sqlFormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
+            await Database.SendSqlSave($"DELETE FROM ticketresults WHERE date = '{sqlFormattedDate}'");
+
+            int heightIndex = 5;
+            XLWorkbook wb = new XLWorkbook(fileName);
+            var ws = wb.Worksheet("Missed tickets only");
+
+            for(int i = 0; i < 50; i++) 
+            {
+                var row = ws.Row(i+heightIndex);
+                if(!row.IsEmpty())
+                {
+                    string playerName = row.Cell(1).Value.ToString();
+                    bool missingTickets = row.Cell(2).Style.Fill.BackgroundColor == XLColor.Red;
+                    bool RaidAttempts = row.Cell(3).Style.Fill.BackgroundColor == XLColor.Red;
+                    bool TerritoryWar = row.Cell(4).Style.Fill.BackgroundColor == XLColor.Red;
+                    bool TerritoryBattle = row.Cell(5).Style.Fill.BackgroundColor == XLColor.Red;
+
+                    IMemberTicketResult memberResult = new IMemberTicketResult()
+                    {
+                        playerName = playerName,
+                        missingTickets = missingTickets,
+                        RaidAttempts = RaidAttempts,
+                        TerritoryWar = TerritoryWar,
+                        TerritoryBattle = TerritoryBattle,
+                        date = DateTime.Now,
+                    };
+
+
+                    DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM excludefromtickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
+                    // if the player is found in this database it means they should not be included in the tickettracker
+                    if (isExcludedData.Rows.Count == 0)
+                    {
+                        await Database.SendSqlSave($"INSERT INTO ticketresults (playerName, missingTickets, TerritoryBattle, TerritoryWar, RaidAttempts, date) VALUES ('{memberResult.playerName}', {memberResult.missingTickets}, {memberResult.TerritoryBattle}, {memberResult.TerritoryWar}, {memberResult.RaidAttempts}, '{memberResult.date.Value.ToString("yyyy-MM-dd")}')");
+                    }
+                }
+            }
         }
 
             public async Task BuildExcel(DataTable dataToday)

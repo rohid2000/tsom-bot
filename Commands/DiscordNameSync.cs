@@ -26,7 +26,8 @@ namespace tsom_bot.Commands
             if (param == "nolist")
             {
                 await this.SendNoSyncList(ctx, dcMembers);
-            } else if (param == "name")
+            } 
+            else if (param == "name")
             {
                 if(param2 != "")
                 {
@@ -42,6 +43,68 @@ namespace tsom_bot.Commands
                 {
                     await new DiscordMessageBuilder()
                     .WithContent("You didn't provide a name | Usage: `/sync name {name}`")
+                    .SendAsync(ctx.Channel);
+                }
+            }
+            else if (param == "add")
+            {
+                if(param2 == "")
+                {
+                    await new DiscordMessageBuilder()
+                    .WithContent("You didn't provide a name | Usage: `/sync add name {name}`")
+                    .SendAsync(ctx.Channel);
+                }
+                else
+                {
+                    await SyncNameAdd(ctx, param2);
+                }
+            }
+            else if (param == "remove")
+            {
+                if (param2 == "")
+                {
+                    await new DiscordMessageBuilder()
+                    .WithContent("You didn't provide a name | Usage: `/sync remove name {name}`")
+                    .SendAsync(ctx.Channel);
+                }
+                else
+                {
+                    await SyncNameRemove(ctx, param2);
+                }
+            }
+            else if (param == "test")
+            {
+                DataTable result;
+                string linkedMessageName = "";
+                if (param2 == "")
+                {
+                    result = await DiscordUserHelper.GetLinkedAccounts(ctx.Member);
+                    foreach(DataRow row in result.Rows)
+                    {
+                        linkedMessageName += row.Field<string>("playerName");
+
+                        if(result.Rows.Count > 1 && row != result.Rows[result.Rows.Count - 1])
+                        {
+                            linkedMessageName += " , ";
+                        }
+                    }
+                }
+                else
+                {
+                    result = await Database.SendSqlPull($"SELECT * FROM sync WHERE playerName = '{param2.ToLower()}'");
+                    linkedMessageName = ctx.Guild.Members[(ulong)result.Rows[0].Field<Int64>("discordId")].Mention;
+                }
+                if(result.Rows.Count >= 1)
+                {
+                    await new DiscordMessageBuilder()
+                    .WithContent("You're account is linked to " + linkedMessageName)
+                    .SendAsync(ctx.Channel);
+                }
+                else
+                {
+                    string message = param2 == "" ? "You dont have a account linked to you" : "this name has no account linked to it";
+                    await new DiscordMessageBuilder()
+                    .WithContent(message)
                     .SendAsync(ctx.Channel);
                 }
             }
@@ -107,7 +170,7 @@ namespace tsom_bot.Commands
             else
             {
 
-                DataTable result = await Database.SendSqlPull($"SELECT * FROM sync WHERE discordId = '{ctx.Member.Id}'");
+                DataTable result = await DiscordUserHelper.GetLinkedAccounts(ctx.Member);
                 if (result.Rows.Count == 0)
                 {
                     await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
@@ -123,6 +186,25 @@ namespace tsom_bot.Commands
                     .SendAsync(ctx.Channel);
                 }
             }
+        }
+
+        private async Task SyncNameAdd(CommandContext ctx, string name)
+        {
+            await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+            DataTable result = await DiscordUserHelper.GetLinkedAccounts(ctx.Member);
+
+            await new DiscordMessageBuilder()
+            .WithContent("Synced your name: there are " + result.Rows.Count + " name*(s)* synced")
+            .SendAsync(ctx.Channel);
+        }
+        private async Task SyncNameRemove(CommandContext ctx, string name)
+        {
+            await Database.SendSqlSave($"DELETE FROM sync WHERE playerName = '{name}'");
+            DataTable result = await DiscordUserHelper.GetLinkedAccounts(ctx.Member);
+
+            await new DiscordMessageBuilder()
+            .WithContent("Removed your name: there are " + result.Rows.Count + "name*(s)* synced")
+            .SendAsync(ctx.Channel);
         }
 
         private async Task SyncDatabase(CommandContext ctx, IGuild guildData, List<DiscordMember> dcMembers)

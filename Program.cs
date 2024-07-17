@@ -5,6 +5,7 @@ using tsom_bot.Commands;
 using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
 using tsom_bot;
+using DSharpPlus.SlashCommands;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -35,11 +36,14 @@ internal class Program
             EnableDefaultHelp = false,
         };
 
+        var slash = client.UseSlashCommands();
+
+        slash.RegisterCommands<TicketTrackerCommand>();
+
         commands = client.UseCommandsNext(commandsConfig);
 
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
-        commands.RegisterCommands<TicketTrackerCommand>();
         commands.RegisterCommands<DiscordNameSync>();
         commands.RegisterCommands<PromotionCommand>();
 

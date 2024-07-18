@@ -34,26 +34,37 @@ namespace tsom_bot.Commands.Helpers.promotions
 
                     string? roleName = null;
                     Role? role = null;
-                    if (totalDays >= reader.rolePromotionDays.sithlord)
+                    if (
+                        totalDays >= reader.rolePromotionDays.sithlord
+                        )
                     {
                         roleName = "Sithlord";
                         role = Role.SithLord;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.mandalorian)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.mandalorian &&
+                        totalDays < reader.rolePromotionDays.sithlord
+                        )
                     {
                         roleName = "Mandalorian";
                         role = Role.Mandalorian;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.apprentice)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.apprentice &&
+                        totalDays < reader.rolePromotionDays.mandalorian
+                        )
                     {
                         roleName = "Apprentice";
                         role = Role.Apprentice;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.acolyte)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.acolyte &&
+                        totalDays < reader.rolePromotionDays.apprentice
+                        )
                     {
                         roleName = "Acolyte";
-                        role = Role.Acolyte;
-                        acolytePromoters.Add(dcMember);                    }
+                        role = Role.Acolyte;                    
+                    }
 
                     if (roleName != null && role != null)
                     {

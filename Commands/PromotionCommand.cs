@@ -1,43 +1,23 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using tsom_bot.Commands.Helpers;
+﻿using DSharpPlus.Entities;
+using DSharpPlus.SlashCommands;
 using tsom_bot.Commands.Helpers.promotions;
 
 namespace tsom_bot.Commands
 {
-    public class PromotionCommand : BaseCommandModule
+    public class PromotionCommand : ApplicationCommandModule
     {
-        [Command("promotion")]
-        public async Task templateCommand(CommandContext ctx, string param = "")
+        [SlashCommand("promotion", "Handles the promotions based on join date")]
+        public async Task promotionCommand(InteractionContext ctx, [Choice("sync", 0)][Option("param", "parameter")] double param)
         {
-            if (await RoleHelper.hasRole(Role.Acolyte, ctx.Member))
-            {
-                if (param == "sync")
-                {
-                    try
-                    {
-                        await TimedPromotionHelper.SyncPromotions(ctx.Client);
-                    }
-                    catch (Exception ex) 
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    
-                    await new DiscordMessageBuilder()
-                    .WithContent("sync data with latest")
-                    .SendAsync(ctx.Channel);
-                }
-            }
-            else
+            if (param == 0)
             {
                 try
                 {
-                    await new DiscordMessageBuilder()
-                        .WithContent(RoleHelper.noRoleMessage)
-                        .SendAsync(ctx.Channel);
+                    DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("synced promotions");
+                    await TimedPromotionHelper.SyncPromotions(ctx.Client);
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                 }
-                catch (Exception ex)
+                catch (Exception ex) 
                 {
                     Console.WriteLine(ex.Message);
                 }

@@ -39,13 +39,13 @@ internal class Program
         var slash = client.UseSlashCommands();
 
         slash.RegisterCommands<TicketTrackerCommand>();
+        slash.RegisterCommands<PromotionCommand>();
 
         commands = client.UseCommandsNext(commandsConfig);
 
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
         commands.RegisterCommands<DiscordNameSync>();
-        commands.RegisterCommands<PromotionCommand>();
 
         //Make connection
         await client.ConnectAsync();

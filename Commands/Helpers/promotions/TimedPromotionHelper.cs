@@ -1,12 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using MySqlX.XDevAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using tsom_bot.config;
 
 namespace tsom_bot.Commands.Helpers.promotions
@@ -23,6 +16,15 @@ namespace tsom_bot.Commands.Helpers.promotions
             List<DiscordMember> apprenticePromoters = new List<DiscordMember>();
             List<DiscordMember> mandalorianPromoters = new List<DiscordMember>();
             List<DiscordMember> sithlordPromoters = new List<DiscordMember>();
+
+            List<DiscordMember> jediMasterPromoters = new List<DiscordMember>();
+            List<DiscordMember> jediKnightPromoters = new List<DiscordMember>();
+            List<DiscordMember> padawanPromoters = new List<DiscordMember>();
+            List<DiscordMember> younglingPromoters = new List<DiscordMember>();
+
+            //TODO: adjust this file based on added tjom roles
+            
+
             foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
             {
                 DiscordMember dcMember = member.Value;

@@ -12,7 +12,11 @@
     "acolyte": "roleId",
     "apprentice": "roleId",
     "mandalorian": "roleId",
-    "sithlord": "roleId"
+    "sithlord": "roleId",
+    "youngling":  "",
+    "padawan":  "",
+    "jediKnight":  "",
+    "jediMaster":  ""
   },
   "channelIds": {
     "tsomBotTesting": "channelId",
@@ -26,6 +30,10 @@
     "acolyte": 30,
     "apprentice": 60,
     "mandalorian": 90,
-    "sithlord": 120
+    "sithlord": 120,
+    "youngling":  30,
+    "padawan":  60,
+    "jediKnight": 90,
+    "jediMaster": 120 
   }
 }

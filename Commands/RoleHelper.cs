@@ -1,9 +1,4 @@
 ﻿using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using tsom_bot.config;
 
 namespace tsom_bot.Commands
@@ -56,6 +51,51 @@ namespace tsom_bot.Commands
                     }
                 }
             }
+
+            foreach (DiscordRole dRole in member.Roles)
+            {
+                if (role == Role.JediMaster)
+                {
+                    return dRole.Id == await GetIdByRole(Role.JediMaster);
+                }
+
+                if (role == Role.JediKnight)
+                {
+                    if (
+                        dRole.Id == await GetIdByRole(Role.JediMaster) ||
+                        dRole.Id == await GetIdByRole(Role.JediKnight)
+                        )
+                    {
+                        return true;
+                    }
+                }
+
+                if (role == Role.Padawan)
+                {
+                    if (
+                        dRole.Id == await GetIdByRole(Role.JediMaster) ||
+                        dRole.Id == await GetIdByRole(Role.JediKnight) ||
+                        dRole.Id == await GetIdByRole(Role.Padawan)
+                        )
+                    {
+                        return true;
+                    }
+                }
+
+                if (role == Role.Youngling)
+                {
+                    if (
+                        dRole.Id == await GetIdByRole(Role.JediMaster) ||
+                        dRole.Id == await GetIdByRole(Role.JediKnight) ||
+                        dRole.Id == await GetIdByRole(Role.Padawan) ||
+                        dRole.Id == await GetIdByRole(Role.Youngling)
+                        )
+                    {
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
 
@@ -75,6 +115,18 @@ namespace tsom_bot.Commands
                     return configReader.roleIds.sithlord;
             }
 
+            switch (role)
+            {
+                case Role.Youngling:
+                    return configReader.roleIds.youngling;
+                case Role.Padawan:
+                    return configReader.roleIds.padawan;    
+                case Role.JediKnight:
+                    return configReader.roleIds.jediKnight;
+                case Role.JediMaster:
+                    return configReader.roleIds.jediMaster;
+            }
+
             return 1;
         }
     }
@@ -85,5 +137,9 @@ namespace tsom_bot.Commands
         Apprentice,
         Mandalorian,
         SithLord,
+        Youngling,
+        Padawan,
+        JediKnight,
+        JediMaster
     }
 }

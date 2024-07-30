@@ -1,12 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using MySqlX.XDevAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using tsom_bot.config;
 
 namespace tsom_bot.Commands.Helpers.promotions
@@ -23,6 +16,12 @@ namespace tsom_bot.Commands.Helpers.promotions
             List<DiscordMember> apprenticePromoters = new List<DiscordMember>();
             List<DiscordMember> mandalorianPromoters = new List<DiscordMember>();
             List<DiscordMember> sithlordPromoters = new List<DiscordMember>();
+
+            List<DiscordMember> jediMasterPromoters = new List<DiscordMember>();
+            List<DiscordMember> jediKnightPromoters = new List<DiscordMember>();
+            List<DiscordMember> padawanPromoters = new List<DiscordMember>();
+            List<DiscordMember> younglingPromoters = new List<DiscordMember>();
+
             foreach (KeyValuePair<ulong, DiscordMember> member in client.Guilds[reader.server_id].Members)
             {
                 DiscordMember dcMember = member.Value;
@@ -52,16 +51,16 @@ namespace tsom_bot.Commands.Helpers.promotions
                     else if (totalDays >= reader.rolePromotionDays.acolyte)
                     {
                         roleName = "Acolyte";
-                        role = Role.Acolyte;
-                        acolytePromoters.Add(dcMember);                    }
+                        role = Role.Acolyte;           
+                    }
 
                     if (roleName != null && role != null)
                     {
-                        if(!await RoleHelper.hasRole(role ?? Role.Acolyte, dcMember))
+                        if (!await RoleHelper.hasRole(role ?? Role.Acolyte, dcMember))
                         {
                             await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
 
-                            switch(role) 
+                            switch (role)
                             {
                                 case Role.Acolyte:
                                     acolytePromoters.Add(dcMember);
@@ -77,29 +76,93 @@ namespace tsom_bot.Commands.Helpers.promotions
                                     break;
                             }
                         }
+
+                    if (totalDays >= reader.rolePromotionDays.jediMaster)
+                    {
+                        roleName = "JediMaster";
+                        role = Role.JediMaster;
+                    }
+                    else if (totalDays >= reader.rolePromotionDays.jediKnight)
+                    {
+                        roleName = "JediKnight";
+                        role = Role.JediKnight;
+                    }
+                    else if (totalDays >= reader.rolePromotionDays.padawan)
+                    {
+                        roleName = "Padawan";
+                        role = Role.Padawan;
+                    }
+                    else if (totalDays >= reader.rolePromotionDays.youngling)
+                    {
+                        roleName = "Youngling";
+                        role = Role.Youngling;
+                    }
+
+                        if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))
+                        {
+                            // Function call commented so that Roles won'be given when being tested
+                            //await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
+
+                            switch(role)
+                            {
+                                case Role.Youngling:
+                                    younglingPromoters.Add(dcMember);
+                                    break;
+                                case Role.Padawan:
+                                    padawanPromoters.Add(dcMember);
+                                    break;
+                                case Role.JediKnight:
+                                    jediKnightPromoters.Add(dcMember);
+                                    break;
+                                case Role.JediMaster:
+                                    jediMasterPromoters.Add(dcMember);
+                                    break;
+                            }
+                        }
                     }
                 }
             }
 
-            string message = "";
             DiscordGuild guild = client.Guilds[reader.server_id];
+
+            string tsomMessage = "";
             DiscordRole acolyteRole = guild.GetRole(reader.roleIds.acolyte);
             DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.apprentice);
             DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
             DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
 
 
-            message += "The Sith Will Become All powerful! \n\nCongrats";
+            tsomMessage += "The Sith Will Become All powerful! \n\nCongrats";
 
-            message += GetRolePromotionsString(acolytePromoters, acolyteRole);
-            message += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
-            message += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
-            message += GetRolePromotionsString(sithlordPromoters, sithLordRole);
+            tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
+            tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
+            tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
+            tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-            message += "We are All the Sith!";
+            tsomMessage += "We are all the Sith!";
 
             await new DiscordMessageBuilder()
-                .WithContent(message)
+                .WithContent(tsomMessage)
+                .SendAsync(chan);
+
+            string tjomMessage = "";
+            DiscordRole younglingRole = guild.GetRole(reader.roleIds.acolyte);
+            DiscordRole padawanRole = guild.GetRole(reader.roleIds.apprentice);
+            DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.mandalorian);
+            DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.sithlord);
+
+
+            tjomMessage += "We are keepers of the peace! \n\nCongrats";
+
+            tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
+            tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
+            tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
+            tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
+
+            tjomMessage += "We are all the Jedi!";
+
+            await new DiscordMessageBuilder()
+                .WithContent(tjomMessage)
                 .SendAsync(chan);
         }
 

@@ -61,6 +61,10 @@ namespace tsom_bot.config
         public ulong apprentice { get; set; }
         public ulong mandalorian { get; set; }
         public ulong sithlord { get; set; }
+        public ulong youngling { get; set; }
+        public ulong padawan { get; set; }
+        public ulong jediKnight { get; set; }
+        public ulong jediMaster { get; set; }
     }
 
     public class ConfigStructureRolePromotionDays
@@ -69,5 +73,9 @@ namespace tsom_bot.config
         public int apprentice { get; set; }
         public int mandalorian { get; set; }
         public int sithlord { get; set; }
+        public int youngling { get;set; }
+        public int padawan { get; set; }
+        public int jediKnight { get;set; }
+        public int jediMaster { get; set; }
     }
 }

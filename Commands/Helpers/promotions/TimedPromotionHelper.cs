@@ -51,8 +51,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     else if (totalDays >= reader.rolePromotionDays.acolyte)
                     {
                         roleName = "Acolyte";
-                        role = Role.Acolyte;
-                        acolytePromoters.Add(dcMember);                    
+                        role = Role.Acolyte;           
                     }
 
                     if (roleName != null && role != null)
@@ -97,7 +96,6 @@ namespace tsom_bot.Commands.Helpers.promotions
                     {
                         roleName = "Youngling";
                         role = Role.Youngling;
-                        younglingPromoters.Add(dcMember);
                     }
 
                         if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))

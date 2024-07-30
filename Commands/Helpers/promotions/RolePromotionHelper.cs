@@ -48,7 +48,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     default:
                         break;
                 }
-
+                // Als switch tussen tsom en tjom er is, moeten ze apart behandelt worden
                 switch (role)
                 {
                     case Role.Youngling:

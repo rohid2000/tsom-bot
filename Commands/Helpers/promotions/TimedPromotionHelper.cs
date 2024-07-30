@@ -102,7 +102,8 @@ namespace tsom_bot.Commands.Helpers.promotions
 
                         if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))
                         {
-                            await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
+                            // Function call commented so that Roles won'be given when being tested
+                            //await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
 
                             switch(role)
                             {

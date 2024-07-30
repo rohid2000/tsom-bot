@@ -76,6 +76,26 @@ namespace tsom_bot.Commands
                         Console.WriteLine(ex.Message);
                     }
                 }
+
+                [SlashCommand("cleanup", "will cleanup the database and only save total strikes lifetime")]
+                public async Task SyncCleanupCommand(InteractionContext ctx)
+                {
+                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+
+                    try
+                    {
+                        await helper.CleanupStrikes();
+
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Cleaned up ticket data");
+
+                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
             }
 
             [SlashCommandGroup("get", "used to get strike data")]

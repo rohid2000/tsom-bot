@@ -6,10 +6,11 @@ namespace tsom_bot.Commands
 {
     public class PromotionCommand : ApplicationCommandModule
     {
-        [SlashCommand("promotion", "Handles the promotions based on join date")]
-        public async Task promotionCommand(InteractionContext ctx, [Choice("sync", 0)][Option("param", "parameter")] double param)
+        [SlashCommandGroup("promotion", "Handles the promotions based on join date")]
+        public class PromotionContainer : ApplicationCommandModule
         {
-            if (param == 0)
+            [SlashCommand("sync", "synces the ranks of all players in guild")]
+            public async Task promotionCommand(InteractionContext ctx)
             {
                 try
                 {
@@ -17,7 +18,22 @@ namespace tsom_bot.Commands
                     await TimedPromotionHelper.SyncPromotions(ctx.Client);
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            [SlashCommand("override", "override a players rank for this command")]
+            public async Task promotionOverrrideCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("role", "the role that the player always has")] Role role)
+            {
+                try
+                {
+                    DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"excluded {dcMember.Mention} from promotion sync");
+                    await TimedPromotionHelper.ExludePlayerFromPromotion(dcMember, role);
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }

@@ -68,6 +68,49 @@ public class IMember
                 return "";
         }
     }
+
+    public async Task cleanupStrikeResults()
+    {
+        if (!await this.IsAlreadyCleaned())
+        {
+            DataTable result = await Database.SendSqlPull($"SELECT * FROM ticketresults WHERE playerName = '{this.playerName}'");
+
+            if(result.Rows.Count > 0) 
+            {
+                DataTable resultLifeTime = await Database.SendSqlPull($"SELECT * FROM lifetimetickets WHERE playerName = '{this.playerName}'");
+
+                int ticketamount = 0;
+                if (resultLifeTime.Rows.Count > 0)
+                {
+                    await Database.SendSqlSave($"DELETE FROM lifetime WHERE playerName = '{this.playerName}'");
+                    ticketamount += resultLifeTime.Rows[0].Field<int>("ticketamount");
+                }
+                foreach (DataRow row in result.Rows)
+                {
+                    ticketamount += new IMemberTicketResult()
+                    {
+                        playerName = row.Field<string>("playerName"),
+                        missingTickets = row.Field<sbyte>("missingTickets") == 1,
+                        RaidAttempts = row.Field<sbyte>("RaidAttempts") == 1,
+                        TerritoryWar = row.Field<sbyte>("TerritoryWar") == 1,
+                        TerritoryBattle = row.Field<sbyte>("TerritoryBattle") == 1,
+                        date = row.Field<DateTime>("date"),
+                    }.GetTotalStrikes();
+                }
+                string dateTime = DateTime.Now.ToString("yyyy-MM-dd");
+                await Database.SendSqlSave($"INSERT INTO lifetimetickets (playerName, ticketamount, date) VALUES ('{this.playerName}', {ticketamount}, '{dateTime}')");
+                await Database.SendSqlSave($"DELETE FROM ticketresults WHERE playerName = '{this.playerName}'");
+            }
+        }
+    }
+
+    private async Task<bool> IsAlreadyCleaned()
+    {
+        string dateTime = DateTime.Now.ToString("yyyy-MM-dd");
+        DataTable result = await Database.SendSqlPull($"SELECT * FROM lifetimetickets WHERE playerName = '{this.playerName}' AND date = '{dateTime}'");
+
+        return result.Rows.Count > 1;
+    }
 }
 
 public enum ContributionReached

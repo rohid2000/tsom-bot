@@ -59,6 +59,17 @@ namespace tsom_bot.Commands.Helpers
             await excel.ReadExcel(file.FileName);
         }
 
+        public async Task CleanupStrikes()
+        {
+            ObservableCollection<IGuild> guildData = new();
+            guildData.Add(await GuildFetcher.GetGuildById(this.guildId, true, new()));
+
+            foreach(IMember member in guildData[0].member)
+            {
+                await member.cleanupStrikeResults();
+            }
+        }
+
         public async Task<string> GetMessage()
         {
             // pull data from database
@@ -253,6 +264,7 @@ namespace tsom_bot.Commands.Helpers
                     worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
                     worksheet.Cell("E1").Value = "Raids (0 attempts)";
                     worksheet.Cell("F1").Value = "Total strikes";
+                    worksheet.Cell("G1").Value = "LifeTime Strikes";
                     worksheet.Cell("A3").Value = "Member name";
                     // pull data from database
                     int memberIndex = 0;
@@ -267,7 +279,6 @@ namespace tsom_bot.Commands.Helpers
                         TerritoryBattle = dataToday.Rows[i].Field<sbyte>("TerritoryBattle") == 1,
                         date = dataToday.Rows[i].Field<DateTime>("date"),
                     };
-
                     DataTable isExcludedData = await Database.SendSqlPull($"SELECT * FROM excludefromtickets WHERE date > '{DateTime.Now.ToString("yyyy-MM-dd")}' AND playerName = '{memberResult.playerName}'");
                     // if the player is found in this database it means they should not be included in the tickettracker
                     if (isExcludedData.Rows.Count == 0)
@@ -307,7 +318,6 @@ namespace tsom_bot.Commands.Helpers
                         }
 
                         int ticketAmount = 0;
-                        int ticketMaxReached = 0;
                         if (memberResultDataThisMonth.Rows.Count >= 1)
                         {
                             for (int j = 0; j < memberResultDataThisMonth.Rows.Count; j++)
@@ -322,9 +332,30 @@ namespace tsom_bot.Commands.Helpers
                             }
                         }
 
-                        ticketAmount = ticketAmount % 3;
 
+                        DataTable resultLifeTime = await Database.SendSqlPull($"SELECT * FROM lifetimetickets WHERE playerName = '{memberResult.playerName}'");
+                        int lifeTimeTickets = 0;
+                        if(resultLifeTime.Rows.Count > 0)
+                        {
+                            lifeTimeTickets += resultLifeTime.Rows[0].Field<int>("ticketamount");
+                        }
+
+                        lifeTimeTickets += ticketAmount;
+       
+                        if (ticketAmount % 3 == 0 && memberResult.GetTotalStrikes() > 0)
+                        {
+                            ticketAmount = 3;
+                        }
+                        else
+                        {
+                            ticketAmount = ticketAmount % 3;
+                        }
+ 
+                        var lifetimeStrikesCell = worksheet.Cell("G" + (memberIndex + heightIndex));
                         var strikesCell = worksheet.Cell("F" + (memberIndex + heightIndex));
+
+                        // when whe add the feature that the database gets cleared every month add a table that saves the tickets that month before it is cleared.
+                        lifetimeStrikesCell.Value = lifeTimeTickets;
 
                         strikesCell.Value = ticketAmount;
 

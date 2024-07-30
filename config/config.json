@@ -1,7 +1,7 @@
 {
-  "token": "token",
+  "token": "",
   "prefix": "/",
-  "server_id": "serverId",
+  "server_id": "",
   "adminRoleIds": [
     "",
     "",
@@ -9,22 +9,22 @@
     ""
   ],
   "roleIds": {
-    "acolyte": "roleId",
-    "apprentice": "roleId",
-    "mandalorian": "roleId",
-    "sithlord": "roleId",
+    "acolyte": "",
+    "apprentice": "",
+    "mandalorian": "",
+    "sithlord": "",
     "youngling":  "",
     "padawan":  "",
     "jediKnight":  "",
     "jediMaster":  ""
   },
   "channelIds": {
-    "tsomBotTesting": "channelId",
-    "strikeSystem": "channelId",
-    "strikeList": "channelId",
-    "promotions": "channelId",
-    "botCommandsStaff": "channelId",
-    "botCommandsAlliance": "channelId"
+    "tsomBotTesting": "",
+    "strikeSystem": "",
+    "strikeList": "",
+    "promotions": "",
+    "botCommandsStaff": "",
+    "botCommandsAlliance": ""
   },
   "rolePromotionDays": {
     "acolyte": 30,

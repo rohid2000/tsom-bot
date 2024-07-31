@@ -1,10 +1,5 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using tsom_bot.config;
 
 namespace tsom_bot.Commands.Helpers.promotions
@@ -23,6 +18,11 @@ namespace tsom_bot.Commands.Helpers.promotions
             DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.apprentice);
             DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
             DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
+
+            DiscordRole younglingRole = guild.GetRole(reader.roleIds.youngling);
+            DiscordRole padawanRole = guild.GetRole(reader.roleIds.padawan);
+            DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jediKnight);
+            DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jediMaster);
 
             // removes all roles to make sure the top-permission role is only set on the player
 
@@ -46,6 +46,22 @@ namespace tsom_bot.Commands.Helpers.promotions
                         dcRole = sithLordRole;
                         break;
                     default:
+                        break;
+                }
+                // Als switch tussen tsom en tjom er is, moeten ze apart behandelt worden
+                switch (role)
+                {
+                    case Role.Youngling:
+                        dcRole = younglingRole;
+                        break;
+                    case Role.Padawan:
+                        dcRole = padawanRole;
+                        break;
+                    case Role.JediKnight:
+                        dcRole = jediKnightRole;
+                        break;
+                    case Role.JediMaster:
+                        dcRole = jediMasterRole;
                         break;
                 }
             }

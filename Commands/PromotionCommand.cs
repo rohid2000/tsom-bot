@@ -1,41 +1,37 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using tsom_bot.Commands.Helpers;
+﻿using DSharpPlus.Entities;
+using DSharpPlus.SlashCommands;
 using tsom_bot.Commands.Helpers.promotions;
 
 namespace tsom_bot.Commands
 {
-    public class PromotionCommand : BaseCommandModule
+    public class PromotionCommand : ApplicationCommandModule
     {
-        [Command("promotion")]
-        public async Task templateCommand(CommandContext ctx, string param = "")
+        [SlashCommandGroup("promotion", "Handles the promotions based on join date")]
+        public class PromotionContainer : ApplicationCommandModule
         {
-            if (await RoleHelper.hasRole(Role.Acolyte, ctx.Member))
-            {
-                if (param == "sync")
-                {
-                    try
-                    {
-                        await TimedPromotionHelper.SyncPromotions(ctx.Client);
-                    }
-                    catch (Exception ex) 
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    
-                    await new DiscordMessageBuilder()
-                    .WithContent("sync data with latest")
-                    .SendAsync(ctx.Channel);
-                }
-            }
-            else
+            [SlashCommand("sync", "synces the ranks of all players in guild")]
+            public async Task promotionCommand(InteractionContext ctx)
             {
                 try
                 {
-                    await new DiscordMessageBuilder()
-                        .WithContent(RoleHelper.noRoleMessage)
-                        .SendAsync(ctx.Channel);
+                    DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("synced promotions");
+                    await TimedPromotionHelper.SyncPromotions(ctx.Client);
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            [SlashCommand("override", "override a players rank for this command")]
+            public async Task promotionOverrrideCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("role", "the role that the player always has")] Role role)
+            {
+                try
+                {
+                    DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"excluded {dcMember.Mention} from promotion sync");
+                    await TimedPromotionHelper.ExludePlayerFromPromotion(dcMember, role);
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                 }
                 catch (Exception ex)
                 {

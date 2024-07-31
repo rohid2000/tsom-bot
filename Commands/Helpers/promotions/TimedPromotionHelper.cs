@@ -1,6 +1,14 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using MySqlX.XDevAPI;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using tsom_bot.config;
+using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers.promotions
 {
@@ -26,32 +34,44 @@ namespace tsom_bot.Commands.Helpers.promotions
             {
                 DiscordMember dcMember = member.Value;
                 bool hasAdminRole = await HasAdminRole(dcMember);
-                if (!hasAdminRole && !dcMember.IsBot)
-                {  
+                DataTable result = await Database.SendSqlPull($"SELECT * FROM excludefrompromotion WHERE dcid = {dcMember.Id}");
+                if (!hasAdminRole && !dcMember.IsBot && result.Rows.Count == 0)
+                {
                     int totalDays = (int)MathF.Floor((float)(DateTime.Now - dcMember.JoinedAt).TotalDays);
                     RolePromotionHelper helper = new RolePromotionHelper();
 
                     string? roleName = null;
                     Role? role = null;
-                    if (totalDays >= reader.rolePromotionDays.sithlord)
+                    if (
+                        totalDays >= reader.rolePromotionDays.sithlord
+                        )
                     {
                         roleName = "Sithlord";
                         role = Role.SithLord;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.mandalorian)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.mandalorian &&
+                        totalDays < reader.rolePromotionDays.sithlord
+                        )
                     {
                         roleName = "Mandalorian";
                         role = Role.Mandalorian;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.apprentice)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.apprentice &&
+                        totalDays < reader.rolePromotionDays.mandalorian
+                        )
                     {
                         roleName = "Apprentice";
                         role = Role.Apprentice;
                     }
-                    else if (totalDays >= reader.rolePromotionDays.acolyte)
+                    else if (
+                        totalDays >= reader.rolePromotionDays.acolyte &&
+                        totalDays < reader.rolePromotionDays.apprentice
+                        )
                     {
                         roleName = "Acolyte";
-                        role = Role.Acolyte;           
+                        role = Role.Acolyte;                    
                     }
 
                     if (roleName != null && role != null)
@@ -121,6 +141,15 @@ namespace tsom_bot.Commands.Helpers.promotions
                         }
                     }
                 }
+                else if(result.Rows.Count > 1)
+                {
+                    RolePromotionHelper helper = new RolePromotionHelper();
+                    Role role = convertStringToRole(result.Rows[0].Field<string>("role"));
+                    if (!await RoleHelper.hasRole(role, dcMember))
+                    {
+                        await helper.GiveRole(client, role, dcMember);
+                    }
+                }
             }
 
             DiscordGuild guild = client.Guilds[reader.server_id];
@@ -164,6 +193,32 @@ namespace tsom_bot.Commands.Helpers.promotions
             await new DiscordMessageBuilder()
                 .WithContent(tjomMessage)
                 .SendAsync(chan);
+        }
+
+        public async static Task ExludePlayerFromPromotion(DiscordUser dcMember, Role role)
+        {
+            string roleString;
+
+            switch(role)
+            {
+                case Role.Acolyte:
+                    roleString = "Acolyte";
+                    break;
+                case Role.Apprentice:
+                    roleString = "Apprentice";
+                    break;
+                case Role.Mandalorian:
+                    roleString = "Mandalorian";
+                    break;
+                case Role.SithLord:
+                    roleString = "SithLord";
+                    break;
+                default:
+                    roleString = "";
+                    break;
+            }
+
+            await Database.SendSqlSave($"INSERT INTO excludefrompromotion (dcid, rank) VALUES ({dcMember.Id}, '{roleString}')");
         }
 
         private static string GetRolePromotionsString(List<DiscordMember> members, DiscordRole role)
@@ -212,6 +267,23 @@ namespace tsom_bot.Commands.Helpers.promotions
                 }
             }
             return false;
+        }
+
+        private static Role convertStringToRole(string roleString)
+        {
+            switch (roleString)
+            {
+                case "Acolyte":
+                    return Role.Acolyte;
+                case "Apprentice":
+                    return Role.Apprentice;
+                case "Mandalorian":
+                    return Role.Mandalorian;
+                case "SithLord":
+                    return Role.SithLord;
+                default:
+                    return Role.Acolyte;
+            }
         }
     }
 }

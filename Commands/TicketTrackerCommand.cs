@@ -15,18 +15,20 @@ namespace tsom_bot.Commands
                 [SlashCommand("go", "Syncs the guilds data with the database")]
                 public async Task SyncCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
                     try
                     {
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("sync data with latest");
+                        DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.tickettracker.sync.go.complete);
+                        
+                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
                         await helper.SaveGuildData();
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
+                        await ctx.EditResponseAsync(message);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.sync.go.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -41,11 +43,11 @@ namespace tsom_bot.Commands
                         string content;
                         if(await helper.IsDataSynced())
                         {
-                            content = "data was already synced today";
+                            content = i18n.i18n.data.commands.tickettracker.sync.check.complete.true_message;
                         }
                         else
                         {
-                            content = "data was not synced today";
+                            content = i18n.i18n.data.commands.tickettracker.sync.check.complete.false_message;
                         }
                         DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(content);
                         
@@ -67,13 +69,13 @@ namespace tsom_bot.Commands
                     {
                         await helper.SyncExcelFile(file);
 
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Synced with excel data");
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(i18n.i18n.data.commands.tickettracker.sync.excel.complete);
 
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.sync.excel.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -87,13 +89,13 @@ namespace tsom_bot.Commands
                     {
                         await helper.CleanupStrikes();
 
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Cleaned up ticket data");
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(i18n.i18n.data.commands.tickettracker.sync.cleanup.complete);
 
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.sync.cleanup.fail + "\n ERROR: " + ex.Message);
                     }
                 }
             }
@@ -110,7 +112,7 @@ namespace tsom_bot.Commands
                     try
                     {
                         FileStream file = await helper.GetExcelFile();
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("this is your file").AddFile(file);
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(i18n.i18n.data.commands.tickettracker.get.excel.complete).AddFile(file);
 
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
 
@@ -119,7 +121,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.get.excel.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -138,7 +140,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.get.message.fail + "\n ERROR: " + ex.Message);
                     }
                 }
             }
@@ -152,7 +154,7 @@ namespace tsom_bot.Commands
                     string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    string sMessage = $"Added {dcMember.Mention} to the not count list";
+                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember); 
                     if(dayAmount > 0) 
                     {
                         sMessage += $" for {dayAmount} days";
@@ -167,7 +169,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.nvt.add.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -180,12 +182,12 @@ namespace tsom_bot.Commands
                     try
                     {
                         await helper.RemoveMemberToNVT(dcMember);
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"Removed {dcMember.Mention} from the not count list");
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.remove.complete, dcMember));
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.nvt.remove.fail + "\n ERROR: " + ex.Message);
                     }
                 }
             }

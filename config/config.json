@@ -2,6 +2,11 @@
   "token": "",
   "prefix": "/",
   "server_id": "",
+  "connectionString": "",
+  "guild_id": {
+    "jedi": "",
+    "sith": ""
+  },
   "adminRoleIds": [
     "",
     "",
@@ -9,31 +14,46 @@
     ""
   ],
   "roleIds": {
-    "acolyte": "",
-    "apprentice": "",
-    "mandalorian": "",
-    "sithlord": "",
-    "youngling":  "",
-    "padawan":  "",
-    "jediKnight":  "",
-    "jediMaster":  ""
+    "jedi": {
+      "youngling": "",
+      "padawan": "",
+      "jediKnight": "",
+      "jediMaster": ""
+    },
+    "sith": {
+      "acolyte": "",
+      "apprentice": "",
+      "mandalorian": "",
+      "sithlord": ""
+    }
   },
   "channelIds": {
-    "tsomBotTesting": "",
-    "strikeSystem": "",
-    "strikeList": "",
-    "promotions": "",
-    "botCommandsStaff": "",
-    "botCommandsAlliance": ""
+    "test": "",
+    "jedi": {
+      "strikeList": "",
+      "promotions": "",
+      "commands_private": "",
+      "commands_public": ""
+    },
+    "sith": {
+      "strikeList": "",
+      "promotions": "",
+      "commands-private": "",
+      "commands-public": ""
+    }
   },
   "rolePromotionDays": {
-    "acolyte": 30,
-    "apprentice": 60,
-    "mandalorian": 90,
-    "sithlord": 120,
-    "youngling":  30,
-    "padawan":  60,
-    "jediKnight": 90,
-    "jediMaster": 120 
+    "sith": {
+      "acolyte": 30,
+      "apprentice": 60,
+      "mandalorian": 90,
+      "sithlord": 120
+    },
+    "jedi": {
+      "youngling": 30,
+      "padawan": 60,
+      "jediKnight": 90,
+      "jediMaster": 120
+    }
   }
 }

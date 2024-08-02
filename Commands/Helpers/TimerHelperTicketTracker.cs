@@ -66,11 +66,11 @@ namespace tsom_bot.Commands.Helpers
             int cycleCooldown = 24 * 60;
             if (IsInCycle(cycleCooldown))
             {
-                await TimedPromotionHelper.SyncPromotions(client);
+                //await TimedPromotionHelper.SyncPromotions(client);
 
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.promotions;
+                var channelId = reader.channelIds.sith.promotions;
                 var chan = await client.GetChannelAsync(channelId);
 
                 await new DiscordMessageBuilder()
@@ -86,7 +86,7 @@ namespace tsom_bot.Commands.Helpers
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.strikeList;
+                var channelId = reader.channelIds.sith.strikeList;
                 var chan = await client.GetChannelAsync(channelId);
 
                 if (chan != null)

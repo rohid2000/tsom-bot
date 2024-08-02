@@ -1,0 +1,85 @@
+{
+  "commands": {
+    "sync": {
+      "name": {
+        "complete": "",
+        "fail": "",
+        "already_linked": "",
+        "loading": ""
+      },
+      "test": {
+        "complete": "",
+        "fail": "",
+        "no_link_self": "",
+        "no_link_name": "",
+        "loading": ""
+      },
+      "nolist": {
+        "complete": "",
+        "fail": "",
+        "loading": ""
+      }
+    },
+    "promotion": {
+      "sync": {
+        "completed": "",
+        "fail": "",
+        "loading": ""
+      },
+      "override_M": {
+        "completed": "",
+        "fail": "",
+        "loading": ""
+      }
+    },
+    "tickettracker": {
+      "sync": {
+        "go": {
+          "complete": "",
+          "fail": "",
+          "loading": ""
+        },
+        "check": {
+          "complete": {
+            "true_message": "",
+            "false_message": ""
+          },
+          "loading": ""
+        },
+        "excel": {
+          "complete": "",
+          "fail": "",
+          "loading": ""
+        },
+        "cleanup": {
+          "complete": "",
+          "fail": "",
+          "loading": ""
+        }
+      },
+      "get": {
+        "excel": {
+          "complete": "",
+          "fail": "",
+          "loading": ""
+        },
+        "message": {
+          "fail": "",
+          "loading": ""
+        }
+      },
+      "nvt": {
+        "add": {
+          "complete": "&&p ", // a change that (for 10 days) gets added add the end
+          "fail": "",
+          "loading": ""
+        },
+        "remove": {
+          "complete": "",
+          "fail": "",
+          "loading": ""
+        }
+      }
+    }
+  }
+}

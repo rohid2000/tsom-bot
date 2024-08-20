@@ -9,6 +9,7 @@ namespace tsom_bot.config
         public ulong server_id { get; set; }
         public string connectionString { get; set; }
         public ConfigStructureGuildIds guild_ids { get; set; }
+        public ConfigStructureClanRoleIds clanrole_ids { get; set; }
         public ChannelIds channelIds { get; set; }
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
@@ -28,6 +29,7 @@ namespace tsom_bot.config
                     this.server_id = data.server_id;
                     this.connectionString = data.connectionString;
                     this.guild_ids = data.guild_ids;
+                    this.clanrole_ids = data.clanrole_ids;
                     this.adminRoleIds = data.adminRoleIds;
                     this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;  
@@ -44,6 +46,7 @@ namespace tsom_bot.config
         public ulong server_id { get; set; }
         public string connectionString { get; set; }
         public ConfigStructureGuildIds guild_ids { get; set; }
+        public ConfigStructureClanRoleIds clanrole_ids { get; set; }
         public ChannelIds channelIds { get; set; }
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
@@ -107,6 +110,12 @@ namespace tsom_bot.config
     }
 
     public class ConfigStructureGuildIds
+    {
+        public string jedi;
+        public string sith;
+    }
+
+    public class ConfigStructureClanRoleIds
     {
         public ulong jedi;
         public ulong sith;

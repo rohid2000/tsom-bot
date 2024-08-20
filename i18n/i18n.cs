@@ -120,5 +120,10 @@ namespace tsom_bot.i18n
     {
         public string true_message { get; set; }
         public string false_message { get; set; }
+
+        public string getMessage(bool result)
+        {
+            return result ? this.true_message : this.false_message;
+        }
     }
 }

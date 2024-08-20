@@ -14,7 +14,7 @@ namespace tsom_bot
         public static DateTime timerStartTime;
         public static GuildSwitch guildSwitch = GuildSwitch.Sith;
 
-        public static async Task<ulong> getGuildId()
+        public static async Task<string> getGuildId()
         {
             ConfigReader reader = new ConfigReader();
             await reader.readConfig();

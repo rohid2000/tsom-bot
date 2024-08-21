@@ -77,7 +77,7 @@ namespace tsom_bot.Commands.Helpers
                 {
                     ClientManager.guildSwitch = GuildSwitch.Sith;
                     string guildId = await ClientManager.getGuildId();
-                    await TimedPromotionHelper.SyncPromotions(client, null, i18n.i18n.data.commands.promotion.sync.complete);
+                    await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
 
                     await new DiscordMessageBuilder()
                     .WithContent("Promotion data has been synced")
@@ -88,7 +88,7 @@ namespace tsom_bot.Commands.Helpers
                 {
                     ClientManager.guildSwitch = GuildSwitch.Jedi;
                     string guildId = await ClientManager.getGuildId();
-                    await TimedPromotionHelper.SyncPromotions(client, null, i18n.i18n.data.commands.promotion.sync.complete);
+                    await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
 
                     await new DiscordMessageBuilder()
                     .WithContent("Promotion data has been synced")

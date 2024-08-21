@@ -13,7 +13,7 @@ namespace tsom_bot.Commands
             [SlashCommand("sync", "synces the ranks of all players in guild")]
             public async Task promotionCommand(InteractionContext ctx)
             {
-                await DiscordMessageHelper.BuildPromotionMessageWithExecute(ctx, i18n.i18n.data.commands.promotion.sync, (completeMessage) => TimedPromotionHelper.SyncPromotions(ctx.Client, ctx, completeMessage));
+                await DiscordMessageHelper.BuildPromotionMessageWithExecute(ctx, i18n.i18n.data.commands.promotion.sync, (completeMessage) => TimedPromotionHelper.SyncPromotions(ctx.Client, completeMessage, ctx));
             }
 
             [SlashCommand("override", "override a players rank for this command")]

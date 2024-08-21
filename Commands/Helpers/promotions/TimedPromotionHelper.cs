@@ -10,7 +10,7 @@ namespace tsom_bot.Commands.Helpers.promotions
 {
     public static class TimedPromotionHelper
     {
-        public async static Task SyncPromotions(DiscordClient client, InteractionContext? ctx = null, i18nStructurePromotionCommandSyncComplete completeMessage)
+        public async static Task SyncPromotions(DiscordClient client, i18nStructurePromotionCommandSyncComplete completeMessage, InteractionContext? ctx = null)
         {
             ConfigReader reader = new();
             await reader.readConfig();
@@ -176,14 +176,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                 DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
 
-                tsomMessage += i18n.i18n.data.commands.promotion.sync.complete.header;
+                tsomMessage += completeMessage.header;
 
                 tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
                 tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
                 tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
                 tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-                tsomMessage += i18n.i18n.data.commands.promotion.sync.complete.footer;
+                tsomMessage += completeMessage.footer;
 
                 if (ctx != null)
                 {
@@ -200,16 +200,16 @@ namespace tsom_bot.Commands.Helpers.promotions
                 DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
 
-                tjomMessage += "We are keepers of the peace! \n\nCongrats";
+                tjomMessage += completeMessage.header;
 
                 tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
                 tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
                 tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
                 tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
 
-                tjomMessage += "We are all the Jedi!";
+                tjomMessage += completeMessage.footer;
 
-                if(ctx != null)
+                if (ctx != null)
                 {
                     DiscordWebhookBuilder tjomMessageB = new DiscordWebhookBuilder().WithContent(tjomMessage);
                     await ctx.EditResponseAsync(tjomMessageB);

@@ -50,9 +50,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     Role? role = null;
                     if (ClientManager.guildSwitch == GuildSwitch.Sith)
                     {
-                        if (
-                       totalDays >= reader.rolePromotionDays.sith.sithlord
-                       )
+                        if (totalDays >= reader.rolePromotionDays.sith.sithlord)
                         {
                             roleName = "Sithlord";
                             role = Role.SithLord;
@@ -93,7 +91,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                                         acolytePromoters.Add(dcMember);
                                         break;
                                     case Role.Apprentice:
-                                        acolytePromoters.Add(dcMember);
+                                        apprenticePromoters.Add(dcMember);
                                         break;
                                     case Role.Mandalorian:
                                         mandalorianPromoters.Add(dcMember);
@@ -176,14 +174,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                 DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
 
-                tsomMessage += completeMessage.header;
+                tsomMessage += completeMessage.sith.GetRandomHeader() + "\n\n";
 
                 tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
                 tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
                 tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
                 tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-                tsomMessage += completeMessage.footer;
+                tsomMessage += completeMessage.sith.GetRandomFooter();
 
                 if (ctx != null)
                 {
@@ -200,14 +198,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                 DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
 
-                tjomMessage += completeMessage.header;
+                tjomMessage += completeMessage.jedi.GetRandomHeader() + "\n\n";
 
                 tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
                 tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
                 tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
                 tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
 
-                tjomMessage += completeMessage.footer;
+                tjomMessage += completeMessage.jedi.GetRandomFooter();
 
                 if (ctx != null)
                 {

@@ -8,6 +8,8 @@ namespace tsom_bot.config
         public string prefix { get; set; }
         public ulong server_id { get; set; }
         public string connectionString { get; set; }
+        public ConfigStructureGuildIds guild_ids { get; set; }
+        public ConfigStructureClanRoleIds clanrole_ids { get; set; }
         public ChannelIds channelIds { get; set; }
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
@@ -26,6 +28,8 @@ namespace tsom_bot.config
                     this.prefix = data.prefix;
                     this.server_id = data.server_id;
                     this.connectionString = data.connectionString;
+                    this.guild_ids = data.guild_ids;
+                    this.clanrole_ids = data.clanrole_ids;
                     this.adminRoleIds = data.adminRoleIds;
                     this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;  
@@ -41,6 +45,8 @@ namespace tsom_bot.config
         public string prefix { get; set; }
         public ulong server_id { get; set; }
         public string connectionString { get; set; }
+        public ConfigStructureGuildIds guild_ids { get; set; }
+        public ConfigStructureClanRoleIds clanrole_ids { get; set; }
         public ChannelIds channelIds { get; set; }
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
@@ -49,18 +55,34 @@ namespace tsom_bot.config
 
     public sealed class ChannelIds
     {
-        public ulong tsomBotTesting { get; set; }
-        public ulong strikeSystem { get; set; }
+        public Channel jedi { get; set; }
+        public Channel sith { get; set; }
+        public ulong test { get; set; }
+    }
+
+    public class Channel
+    {
         public ulong strikeList { get; set; }
         public ulong promotions { get; set; }
+        public ulong commands_private { get; set; }
+        public ulong commands_public { get; set; }
     }
 
     public class ConfigStructureRoleId
+    {
+        public ConfigStructureRolesJedi jedi {  get; set; }
+        public ConfigStructureRolesSith sith {  get; set; }
+    }
+
+    public class ConfigStructureRolesSith
     {
         public ulong acolyte { get; set; }
         public ulong apprentice { get; set; }
         public ulong mandalorian { get; set; }
         public ulong sithlord { get; set; }
+    }
+    public class ConfigStructureRolesJedi
+    {
         public ulong youngling { get; set; }
         public ulong padawan { get; set; }
         public ulong jediKnight { get; set; }
@@ -69,13 +91,33 @@ namespace tsom_bot.config
 
     public class ConfigStructureRolePromotionDays
     {
+        public ConfigStructureRolePromotionDaysJedi jedi { get; set; }
+        public ConfigStructureRolePromotionDaysSith sith { get; set; }
+    }
+    public class ConfigStructureRolePromotionDaysSith
+    {
         public int acolyte { get; set; }
         public int apprentice { get; set; }
         public int mandalorian { get; set; }
         public int sithlord { get; set; }
-        public int youngling { get;set; }
+    }
+    public class ConfigStructureRolePromotionDaysJedi
+    {
+        public int youngling { get; set; }
         public int padawan { get; set; }
-        public int jediKnight { get;set; }
+        public int jediKnight { get; set; }
         public int jediMaster { get; set; }
+    }
+
+    public class ConfigStructureGuildIds
+    {
+        public string jedi;
+        public string sith;
+    }
+
+    public class ConfigStructureClanRoleIds
+    {
+        public ulong jedi;
+        public ulong sith;
     }
 }

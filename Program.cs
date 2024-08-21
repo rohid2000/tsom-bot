@@ -6,6 +6,7 @@ using tsom_bot.Fetcher.database;
 using tsom_bot.Commands.Helpers;
 using tsom_bot;
 using DSharpPlus.SlashCommands;
+using tsom_bot.i18n;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -40,12 +41,13 @@ internal class Program
 
         slash.RegisterCommands<TicketTrackerCommand>();
         slash.RegisterCommands<PromotionCommand>();
+        slash.RegisterCommands<GuildSwitchCommand>();
+        slash.RegisterCommands<DiscordNameSync>();
 
         commands = client.UseCommandsNext(commandsConfig);
 
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
-        commands.RegisterCommands<DiscordNameSync>();
 
         //Make connection
         await client.ConnectAsync();
@@ -53,6 +55,7 @@ internal class Program
         await Database.Init(configReader.connectionString);
         TimerHelper timer = new(client, 60);
         ClientManager.timerStartTime = DateTime.Now;
+        i18n.load();
         //Keep bot running
         await Task.Delay(-1);
     }

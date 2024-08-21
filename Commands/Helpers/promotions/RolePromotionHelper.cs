@@ -14,15 +14,15 @@ namespace tsom_bot.Commands.Helpers.promotions
             DiscordGuild guild = client.Guilds[reader.server_id];
             DiscordRole? dcRole = null;
 
-            DiscordRole acolyteRole = guild.GetRole(reader.roleIds.acolyte);
-            DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.apprentice);
-            DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.mandalorian);
-            DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sithlord);
+            DiscordRole acolyteRole = guild.GetRole(reader.roleIds.sith.acolyte);
+            DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.sith.apprentice);
+            DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.sith.mandalorian);
+            DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
-            DiscordRole younglingRole = guild.GetRole(reader.roleIds.youngling);
-            DiscordRole padawanRole = guild.GetRole(reader.roleIds.padawan);
-            DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jediKnight);
-            DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jediMaster);
+            DiscordRole younglingRole = guild.GetRole(reader.roleIds.jedi.youngling);
+            DiscordRole padawanRole = guild.GetRole(reader.roleIds.jedi.padawan);
+            DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jedi.jediKnight);
+            DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jedi.jediMaster);
 
             // removes all roles to make sure the top-permission role is only set on the player
 

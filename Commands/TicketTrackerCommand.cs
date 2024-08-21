@@ -1,6 +1,8 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Net.Mail;
 using tsom_bot.Commands.Helpers;
+using tsom_bot.Commands.Helpers.Discord;
 
 namespace tsom_bot.Commands
 {
@@ -15,86 +17,41 @@ namespace tsom_bot.Commands
                 [SlashCommand("go", "Syncs the guilds data with the database")]
                 public async Task SyncCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.go,
+                        async () =>
+                        {
+                            string guildId = await ClientManager.getGuildId();
+                            TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    try
-                    {
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("sync data with latest");
-                        await helper.SaveGuildData();
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                            await helper.SaveGuildData();
+                        });
                 }
 
                 [SlashCommand("check", "Checks if the data was synced today")]
                 public async Task SyncCheckCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    try
-                    {
-                        string content;
-                        if(await helper.IsDataSynced())
-                        {
-                            content = "data was already synced today";
-                        }
-                        else
-                        {
-                            content = "data was not synced today";
-                        }
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(content);
-                        
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    await DiscordMessageHelper.BuildCheckMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.check, helper.IsDataSynced);
                 }
 
                 [SlashCommand("excel", "Syncs the data with provided excel")]
                 public async Task SyncExcelCommand(InteractionContext ctx, [Option("file", "attach excel file")]DiscordAttachment file)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    try
-                    {
-                        await helper.SyncExcelFile(file);
-
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Synced with excel data");
-
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.excel, () => helper.SyncExcelFile(file));
                 }
 
                 [SlashCommand("cleanup", "will cleanup the database and only save total strikes lifetime")]
                 public async Task SyncCleanupCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    try
-                    {
-                        await helper.CleanupStrikes();
-
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("Cleaned up ticket data");
-
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.cleanup, helper.CleanupStrikes);
                 }
             }
 
@@ -104,13 +61,13 @@ namespace tsom_bot.Commands
                 [SlashCommand("excel", "Returns an excel file with the synced strike data")]
                 public async Task ExcelCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
                     try
                     {
                         FileStream file = await helper.GetExcelFile();
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent("this is your file").AddFile(file);
+                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent(i18n.i18n.data.commands.tickettracker.get.excel.complete).AddFile(file);
 
                         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
 
@@ -119,14 +76,14 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.get.excel.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
                 [SlashCommand("message", "Returns a message that pings all the members with strikes")]
                 public async Task MessageCommand(InteractionContext ctx)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
                     try
@@ -138,7 +95,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.get.message.fail + "\n ERROR: " + ex.Message);
                     }
                 }
             }
@@ -149,10 +106,10 @@ namespace tsom_bot.Commands
                 [SlashCommand("add", "adds a member to the not count list")]
                 public async Task NVTAddCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("dayAmount", "Amount of days this member should not be counted for the strikelist")] long dayAmount = 0)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    string sMessage = $"Added {dcMember.Mention} to the not count list";
+                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember); 
                     if(dayAmount > 0) 
                     {
                         sMessage += $" for {dayAmount} days";
@@ -167,26 +124,17 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.nvt.add.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
                 [SlashCommand("remove", "removes a member from the not count list")]
                 public async Task NVTRemoveCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    try
-                    {
-                        await helper.RemoveMemberToNVT(dcMember);
-                        DiscordInteractionResponseBuilder message = new DiscordInteractionResponseBuilder().WithContent($"Removed {dcMember.Mention} from the not count list");
-                        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.ChannelMessageWithSource, message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
             }
         }

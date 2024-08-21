@@ -66,16 +66,34 @@ namespace tsom_bot.Commands.Helpers
             int cycleCooldown = 24 * 60;
             if (IsInCycle(cycleCooldown))
             {
-                await TimedPromotionHelper.SyncPromotions(client);
-
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.promotions;
-                var chan = await client.GetChannelAsync(channelId);
+                var channelIdSith = reader.channelIds.sith.promotions;
+                var channelIdJedi = reader.channelIds.jedi.promotions;
+                var chanSith = await client.GetChannelAsync(channelIdSith);
+                var chanJedi = await client.GetChannelAsync(channelIdJedi);
 
-                await new DiscordMessageBuilder()
-                .WithContent("Promotion data has been synced")
-                .SendAsync(chan);
+                if(chanSith != null) 
+                {
+                    ClientManager.guildSwitch = GuildSwitch.Sith;
+                    string guildId = await ClientManager.getGuildId();
+                    await TimedPromotionHelper.SyncPromotions(client, null, i18n.i18n.data.commands.promotion.sync.complete);
+
+                    await new DiscordMessageBuilder()
+                    .WithContent("Promotion data has been synced")
+                    .SendAsync(chanSith);
+                }
+
+                if(chanJedi != null)
+                {
+                    ClientManager.guildSwitch = GuildSwitch.Jedi;
+                    string guildId = await ClientManager.getGuildId();
+                    await TimedPromotionHelper.SyncPromotions(client, null, i18n.i18n.data.commands.promotion.sync.complete);
+
+                    await new DiscordMessageBuilder()
+                    .WithContent("Promotion data has been synced")
+                    .SendAsync(chanJedi);
+                }
             }
         }
 
@@ -86,24 +104,33 @@ namespace tsom_bot.Commands.Helpers
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelId = reader.channelIds.strikeList;
-                var chan = await client.GetChannelAsync(channelId);
+                var channelIdSith = reader.channelIds.sith.strikeList;
+                var channelIdJedi = reader.channelIds.jedi.strikeList;
+                var chanSith = await client.GetChannelAsync(channelIdSith);
+                var chanJedi = await client.GetChannelAsync(channelIdJedi);
 
-                if (chan != null)
+                if (chanSith != null)
                 {
-                    string guildId = "l943tTO8QQ-_IwWHfwyJuQ";
+                    ClientManager.guildSwitch = GuildSwitch.Sith;
+                    string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
                     await helper.SaveGuildData();
 
-                    FileStream file = await helper.GetExcelFile();
+                    await new DiscordMessageBuilder()
+                        .WithContent("Synced strike data with latest data")
+                        .SendAsync(chanSith);
+                }
+
+                if (chanJedi != null)
+                {
+                    ClientManager.guildSwitch = GuildSwitch.Jedi;
+                    string guildId = await ClientManager.getGuildId();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                    await helper.SaveGuildData();
 
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data, here is the latest excel file...")
-                        .AddFile(file)
-                        .SendAsync(chan);
-
-                    file.Close();
-                    File.Delete(file.Name);
+                        .WithContent("Synced strike data with latest data")
+                        .SendAsync(chanJedi);
                 }
             }
         }

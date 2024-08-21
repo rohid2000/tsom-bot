@@ -84,7 +84,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Acolyte, dcMember))
                             {
-                                //await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
+                                await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
                                 switch (role)
                                 {
                                     case Role.Acolyte:

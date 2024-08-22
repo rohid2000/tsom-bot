@@ -50,9 +50,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     Role? role = null;
                     if (ClientManager.guildSwitch == GuildSwitch.Sith)
                     {
-                        if (
-                       totalDays >= reader.rolePromotionDays.sith.sithlord
-                       )
+                        if (totalDays >= reader.rolePromotionDays.sith.sithlord)
                         {
                             roleName = "Sithlord";
                             role = Role.SithLord;
@@ -93,7 +91,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                                         acolytePromoters.Add(dcMember);
                                         break;
                                     case Role.Apprentice:
-                                        acolytePromoters.Add(dcMember);
+                                        apprenticePromoters.Add(dcMember);
                                         break;
                                     case Role.Mandalorian:
                                         mandalorianPromoters.Add(dcMember);
@@ -132,7 +130,6 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))
                             {
-                                // Function call commented so that Roles won'be given when being tested
                                 //await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
 
                                 switch (role)
@@ -176,14 +173,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                 DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
 
 
-                tsomMessage += completeMessage.header;
+                tsomMessage += completeMessage.sith.GetRandomHeader() + "\n\n";
 
                 tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
                 tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
                 tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
                 tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-                tsomMessage += completeMessage.footer;
+                tsomMessage += completeMessage.sith.GetRandomFooter();
 
                 if (ctx != null)
                 {
@@ -194,20 +191,20 @@ namespace tsom_bot.Commands.Helpers.promotions
             else
             {
                 string tjomMessage = "";
-                DiscordRole younglingRole = guild.GetRole(reader.roleIds.sith.acolyte);
-                DiscordRole padawanRole = guild.GetRole(reader.roleIds.sith.apprentice);
-                DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.sith.mandalorian);
-                DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.sith.sithlord);
+                DiscordRole younglingRole = guild.GetRole(reader.roleIds.jedi.youngling);
+                DiscordRole padawanRole = guild.GetRole(reader.roleIds.jedi.padawan);
+                DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jedi.jediKnight);
+                DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jedi.jediMaster);
 
 
-                tjomMessage += completeMessage.header;
+                tjomMessage += completeMessage.jedi.GetRandomHeader() + "\n\n";
 
                 tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
                 tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
                 tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
                 tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
 
-                tjomMessage += completeMessage.footer;
+                tjomMessage += completeMessage.jedi.GetRandomFooter();
 
                 if (ctx != null)
                 {
@@ -234,6 +231,18 @@ namespace tsom_bot.Commands.Helpers.promotions
                     break;
                 case Role.SithLord:
                     roleString = "SithLord";
+                    break;
+                case Role.Youngling:
+                    roleString = "Youngling";
+                    break;
+                case Role.Padawan:
+                    roleString = "Padawan";
+                    break;
+                case Role.JediKnight:
+                    roleString = "JediKnight";
+                    break;
+                case Role.JediMaster:
+                    roleString = "JediMaster";
                     break;
                 default:
                     roleString = "";
@@ -303,6 +312,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                     return Role.Mandalorian;
                 case "SithLord":
                     return Role.SithLord;
+                case "Youngling":
+                    return Role.Youngling;
+                case "Padawan":
+                    return Role.Padawan;
+                case "JediKnight":
+                    return Role.JediKnight;
+                case "JediMaster":
+                    return Role.JediMaster;
                 default:
                     return Role.Acolyte;
             }

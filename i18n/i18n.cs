@@ -66,8 +66,26 @@ namespace tsom_bot.i18n
 
     public class i18nStructurePromotionCommandSyncComplete
     {
-        public string header { get; set; }
-        public string footer { get; set; }
+        public i18nStructurePromotionCommandSyncCompleteHeaderAndFooter jedi { get; set; }
+        public i18nStructurePromotionCommandSyncCompleteHeaderAndFooter sith { get; set; }
+    }
+
+    public class i18nStructurePromotionCommandSyncCompleteHeaderAndFooter
+    {
+        public string[] header { get; set; }
+        public string[] footer { get; set; }
+
+        public string GetRandomHeader()
+        {
+            Random rng = new();
+            return header[rng.Next(0, header.Length - 1)];
+        }
+
+        public string GetRandomFooter()
+        {
+            Random rng = new();
+            return footer[rng.Next(0, footer.Length - 1)];
+        }
     }
 
     public class i18nStructureTicketTrackerCommand

@@ -116,9 +116,15 @@ namespace tsom_bot.Commands.Helpers
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
                     await helper.SaveGuildData();
 
+                    FileStream file = await helper.GetExcelFile();
+
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data")
+                        .WithContent("Synced strike data with latest data, here is the latest strike data")
+                        .AddFile(file)
                         .SendAsync(chanSith);
+
+                    file.Close();
+                    File.Delete(file.Name);
                 }
 
                 if (chanJedi != null)
@@ -128,9 +134,15 @@ namespace tsom_bot.Commands.Helpers
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
                     await helper.SaveGuildData();
 
+                    FileStream file = await helper.GetExcelFile();
+
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data")
+                        .WithContent("Synced strike data with latest data, here is the latest strike data")
+                        .AddFile(file)
                         .SendAsync(chanJedi);
+
+                    file.Close();
+                    File.Delete(file.Name);
                 }
             }
         }

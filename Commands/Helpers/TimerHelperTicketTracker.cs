@@ -80,7 +80,7 @@ namespace tsom_bot.Commands.Helpers
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
 
                     await new DiscordMessageBuilder()
-                    .WithContent("Promotion data has been synced")
+                    .WithContent("TSOM promotion data has been synced")
                     .SendAsync(chanSith);
                 }
 
@@ -91,7 +91,7 @@ namespace tsom_bot.Commands.Helpers
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
 
                     await new DiscordMessageBuilder()
-                    .WithContent("Promotion data has been synced")
+                    .WithContent("TJOM promotion data has been synced")
                     .SendAsync(chanJedi);
                 }
             }
@@ -119,7 +119,7 @@ namespace tsom_bot.Commands.Helpers
                     FileStream file = await helper.GetExcelFile();
 
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data, here is the latest strike data")
+                        .WithContent("Synced with latest data, here is the TSOM strike data")
                         .AddFile(file)
                         .SendAsync(chanSith);
 
@@ -137,7 +137,7 @@ namespace tsom_bot.Commands.Helpers
                     FileStream file = await helper.GetExcelFile();
 
                     await new DiscordMessageBuilder()
-                        .WithContent("Synced strike data with latest data, here is the latest strike data")
+                        .WithContent("Synced with latest data, here is the TJOM strike data")
                         .AddFile(file)
                         .SendAsync(chanJedi);
 

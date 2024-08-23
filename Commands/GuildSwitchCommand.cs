@@ -16,11 +16,11 @@ namespace tsom_bot.Commands
                 string messageString = "bot switched to ";
                 if(guild == GuildSwitch.Sith) 
                 {
-                    messageString += "sith guild";
+                    messageString += "TSOM guild";
                 }
                 else
                 {
-                    messageString += "jedi guild";
+                    messageString += "TJOM guild";
                 }
 
                 try

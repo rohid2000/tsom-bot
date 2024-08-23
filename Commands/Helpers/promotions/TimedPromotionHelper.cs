@@ -84,7 +84,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Acolyte, dcMember))
                             {
-                                //await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
+                                await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
                                 switch (role)
                                 {
                                     case Role.Acolyte:
@@ -130,7 +130,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))
                             {
-                                //await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
+                                await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
 
                                 switch (role)
                                 {
@@ -157,7 +157,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     Role role = convertStringToRole(result.Rows[0].Field<string>("role"));
                     if (!await RoleHelper.hasRole(role, dcMember))
                     {
-                        //await helper.GiveRole(client, role, dcMember);
+                        await helper.GiveRole(client, role, dcMember);
                     }
                 }
             }

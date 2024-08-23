@@ -68,8 +68,8 @@ namespace tsom_bot.Commands.Helpers
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                var channelIdSith = reader.channelIds.sith.promotions;
-                var channelIdJedi = reader.channelIds.jedi.promotions;
+                var channelIdSith = reader.channelIds.sith.commands_private;
+                var channelIdJedi = reader.channelIds.jedi.commands_private;
                 var chanSith = await client.GetChannelAsync(channelIdSith);
                 var chanJedi = await client.GetChannelAsync(channelIdJedi);
 

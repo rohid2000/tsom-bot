@@ -255,15 +255,15 @@ namespace tsom_bot.Commands.Helpers
                 {
                     var worksheet = workbook.Worksheets.Add("Missed tickets only");
                     int heightIndex = 5;
-                    worksheet.ColumnWidth = 16;
+                    worksheet.ColumnWidth = 22;
 
                     // fill excel headers
                     worksheet.Cell("A1").Value = "Strike reason";
-                    worksheet.Cell("B1").Value = "Missing 400 tickets";
-                    worksheet.Cell("C1").Value = "TB (0 TB Points in a Phase)";
-                    worksheet.Cell("D1").Value = "TW (0 banners in Defense Phase)";
+                    worksheet.Cell("B1").Value = "Missing 400 Tickets";
+                    worksheet.Cell("C1").Value = "TB (0 Points in Defense)";
+                    worksheet.Cell("D1").Value = "TW (0 banners in Defense)";
                     worksheet.Cell("E1").Value = "Raids (0 attempts)";
-                    worksheet.Cell("F1").Value = "Total strikes";
+                    worksheet.Cell("F1").Value = "Total Strikes";
                     worksheet.Cell("G1").Value = "LifeTime Strikes";
                     worksheet.Cell("A3").Value = "Member name";
                     // pull data from database

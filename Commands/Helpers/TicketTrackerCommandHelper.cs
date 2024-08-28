@@ -165,6 +165,12 @@ namespace tsom_bot.Commands.Helpers
             await AddMemberToNVT(dcMember, dayAmount);
         }
 
+        public async Task NoTicketTrackGuild(Guild guild)
+        {
+            Guild guildId = guild as Guild;
+            await NoTicketTrackGuild(guild);
+        }
+
         public async Task AddMemberToNVT(DiscordMember member, int dayAmount = 0)
         {
             DataTable result = await DiscordUserHelper.GetLinkedAccounts(member);

@@ -165,19 +165,6 @@ namespace tsom_bot.Commands.Helpers
             await AddMemberToNVT(dcMember, dayAmount);
         }
 
-        public void SwitchLaunchTicketTrackCommand()
-        {
-            if (ClientManager.guildSwitch == GuildSwitch.Jedi)
-            {
-                ClientManager.launchTicketTrackerSwitchCommandJedi = !ClientManager.launchTicketTrackerSwitchCommandJedi;
-            }
-
-            if (ClientManager.guildSwitch == GuildSwitch.Sith)
-            {
-                ClientManager.launchTicketTrackerSwitchCommandSith = !ClientManager.launchTicketTrackerSwitchCommandSith;
-            }
-        }
-
         public async Task AddMemberToNVT(DiscordMember member, int dayAmount = 0)
         {
             DataTable result = await DiscordUserHelper.GetLinkedAccounts(member);

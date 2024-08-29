@@ -102,7 +102,7 @@ namespace tsom_bot.Commands.Helpers
             int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
             if (IsInCycle(commandCycleCooldown, adjustedInterval))
             {
-                if (ClientManager.launchTicketTrackCommandJedi || ClientManager.launchTicketTrackCommandSith)
+                if (ClientManager.launchTicketTrackerSwitchCommandJedi || ClientManager.launchTicketTrackerSwitchCommandSith)
                 {
                     ConfigReader reader = new ConfigReader();
                     await reader.readConfig();
@@ -111,7 +111,7 @@ namespace tsom_bot.Commands.Helpers
                     var chanSith = await client.GetChannelAsync(channelIdSith);
                     var chanJedi = await client.GetChannelAsync(channelIdJedi);
 
-                    if (chanSith != null && ClientManager.launchTicketTrackCommandSith)
+                    if (chanSith != null && ClientManager.launchTicketTrackerSwitchCommandSith)
                     {
                         ClientManager.guildSwitch = GuildSwitch.Sith;
                         string guildId = await ClientManager.getGuildId();
@@ -129,7 +129,7 @@ namespace tsom_bot.Commands.Helpers
                         File.Delete(file.Name);
                     }
 
-                    if (chanJedi != null && ClientManager.launchTicketTrackCommandJedi)
+                    if (chanJedi != null && ClientManager.launchTicketTrackerSwitchCommandJedi)
                     {
                         ClientManager.guildSwitch = GuildSwitch.Jedi;
                         string guildId = await ClientManager.getGuildId();

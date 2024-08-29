@@ -100,7 +100,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("nvt", "adds or removes a member from the count of the strikelist")]
+            [SlashCommandGroup("nvt", "adds or removes members from ticket count")]
             public class NVTContainer() : ApplicationCommandModule
             {
                 [SlashCommand("add", "adds a member to the not count list")]
@@ -140,7 +140,7 @@ namespace tsom_bot.Commands
                 [SlashCommand("switch", "switches the ticket tracker off or on for a guild")]
                 public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
                 {
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.ticketTrackerSwitch, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.ticketTrackerSwitch, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
                 }
             }
         }

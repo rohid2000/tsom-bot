@@ -34,7 +34,6 @@ namespace tsom_bot.i18n
         public i18nStructureTicketTrackerCommand tickettracker { get; set; }
         public i18nStructurePromotionCommand promotion { get; set; }
         public i18nStructureSyncCommand sync { get; set; }
-        public i18nBasicMessages ticketTrackerSwitch { get; set; }
     }
 
     public class i18nStructureSyncCommand
@@ -114,6 +113,7 @@ namespace tsom_bot.i18n
     {
         public i18nBasicMessages add { get; set; }
         public i18nBasicMessages remove { get; set; }
+        public i18nBasicMessages ticketTrackerSwitch { get; set; }
     }
 
     public class i18nBasicMessages

@@ -165,10 +165,17 @@ namespace tsom_bot.Commands.Helpers
             await AddMemberToNVT(dcMember, dayAmount);
         }
 
-        public async Task NoTicketTrackGuild(Guild guild)
+        public void SwitchLaunchTicketTrackCommand()
         {
-            Guild guildId = guild as Guild;
-            await NoTicketTrackGuild(guild);
+            if (ClientManager.guildSwitch == GuildSwitch.Jedi)
+            {
+                ClientManager.launchTicketTrackCommandJedi = false;
+            }
+
+            if (ClientManager.guildSwitch == GuildSwitch.Sith)
+            {
+                ClientManager.launchTicketTrackCommandSith = false;
+            }
         }
 
         public async Task AddMemberToNVT(DiscordMember member, int dayAmount = 0)

@@ -143,7 +143,7 @@ namespace tsom_bot.Commands
                     string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.off, () => helper.NoTicketTrackGuild(guildId));
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.off, helper.SwitchLaunchTicketTrackCommand);
                 }
             }
         }

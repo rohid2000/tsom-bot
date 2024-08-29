@@ -169,12 +169,12 @@ namespace tsom_bot.Commands.Helpers
         {
             if (ClientManager.guildSwitch == GuildSwitch.Jedi)
             {
-                ClientManager.launchTicketTrackCommandJedi = false;
+                ClientManager.launchTicketTrackerSwitchCommandJedi = !ClientManager.launchTicketTrackerSwitchCommandJedi;
             }
 
             if (ClientManager.guildSwitch == GuildSwitch.Sith)
             {
-                ClientManager.launchTicketTrackCommandSith = false;
+                ClientManager.launchTicketTrackerSwitchCommandSith = !ClientManager.launchTicketTrackerSwitchCommandSith;
             }
         }
 

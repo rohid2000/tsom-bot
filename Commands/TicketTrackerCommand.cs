@@ -137,13 +137,13 @@ namespace tsom_bot.Commands
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
 
-                [SlashCommand("off", "turns off the ticket tracker for the guild")]
+                [SlashCommand("switch", "turns off the ticket tracker for the guild")]
                 public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.off, helper.SwitchLaunchTicketTrackCommand);
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.ticketTrackerSwitch, helper.SwitchLaunchTicketTrackCommand);
                 }
             }
         }

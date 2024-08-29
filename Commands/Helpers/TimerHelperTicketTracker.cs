@@ -102,47 +102,50 @@ namespace tsom_bot.Commands.Helpers
             int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
             if (IsInCycle(commandCycleCooldown, adjustedInterval))
             {
-                ConfigReader reader = new ConfigReader();
-                await reader.readConfig();
-                var channelIdSith = reader.channelIds.sith.strikeList;
-                var channelIdJedi = reader.channelIds.jedi.strikeList;
-                var chanSith = await client.GetChannelAsync(channelIdSith);
-                var chanJedi = await client.GetChannelAsync(channelIdJedi);
-
-                if (chanSith != null)
+                if (ClientManager.launchTicketTrackerSwitchCommandJedi || ClientManager.launchTicketTrackerSwitchCommandSith)
                 {
-                    ClientManager.guildSwitch = GuildSwitch.Sith;
-                    string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
-                    await helper.SaveGuildData();
+                    ConfigReader reader = new ConfigReader();
+                    await reader.readConfig();
+                    var channelIdSith = reader.channelIds.sith.strikeList;
+                    var channelIdJedi = reader.channelIds.jedi.strikeList;
+                    var chanSith = await client.GetChannelAsync(channelIdSith);
+                    var chanJedi = await client.GetChannelAsync(channelIdJedi);
 
-                    FileStream file = await helper.GetExcelFile();
+                    if (chanSith != null && ClientManager.launchTicketTrackerSwitchCommandSith)
+                    {
+                        ClientManager.guildSwitch = GuildSwitch.Sith;
+                        string guildId = await ClientManager.getGuildId();
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                        await helper.SaveGuildData();
 
-                    await new DiscordMessageBuilder()
-                        .WithContent("Synced with latest data, here is the TSOM strike data")
-                        .AddFile(file)
-                        .SendAsync(chanSith);
+                        FileStream file = await helper.GetExcelFile();
 
-                    file.Close();
-                    File.Delete(file.Name);
-                }
+                        await new DiscordMessageBuilder()
+                            .WithContent("Synced with latest data, here is the TSOM strike data")
+                            .AddFile(file)
+                            .SendAsync(chanSith);
 
-                if (chanJedi != null)
-                {
-                    ClientManager.guildSwitch = GuildSwitch.Jedi;
-                    string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
-                    await helper.SaveGuildData();
+                        file.Close();
+                        File.Delete(file.Name);
+                    }
 
-                    FileStream file = await helper.GetExcelFile();
+                    if (chanJedi != null && ClientManager.launchTicketTrackerSwitchCommandJedi)
+                    {
+                        ClientManager.guildSwitch = GuildSwitch.Jedi;
+                        string guildId = await ClientManager.getGuildId();
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                        await helper.SaveGuildData();
 
-                    await new DiscordMessageBuilder()
-                        .WithContent("Synced with latest data, here is the TJOM strike data")
-                        .AddFile(file)
-                        .SendAsync(chanJedi);
+                        FileStream file = await helper.GetExcelFile();
 
-                    file.Close();
-                    File.Delete(file.Name);
+                        await new DiscordMessageBuilder()
+                            .WithContent("Synced with latest data, here is the TJOM strike data")
+                            .AddFile(file)
+                            .SendAsync(chanJedi);
+
+                        file.Close();
+                        File.Delete(file.Name);
+                    }
                 }
             }
         }

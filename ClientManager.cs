@@ -13,6 +13,8 @@ namespace tsom_bot
         public static int time;
         public static DateTime timerStartTime;
         public static GuildSwitch guildSwitch = GuildSwitch.Sith;
+        public static bool launchTicketTrackerSwitchCommandSith = true;
+        public static bool launchTicketTrackerSwitchCommandJedi = true;
 
         public static async Task<string> getGuildId()
         {

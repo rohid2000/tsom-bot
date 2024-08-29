@@ -109,8 +109,8 @@ namespace tsom_bot.Commands
                     string guildId = await ClientManager.getGuildId();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
-                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember); 
-                    if(dayAmount > 0) 
+                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember);
+                    if (dayAmount > 0)
                     {
                         sMessage += $" for {dayAmount} days";
                     }
@@ -135,6 +135,12 @@ namespace tsom_bot.Commands
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
 
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
+                }
+
+                [SlashCommand("switch", "switches the ticket tracker off or on for a guild")]
+                public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
+                {
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.ticketTrackerSwitch, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
                 }
             }
         }

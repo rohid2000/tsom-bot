@@ -55,7 +55,7 @@ namespace tsom_bot.Commands.Helpers
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 
-            if (ClientManager.time >= differenceInMin) 
+            if (ClientManager.time >= 3) 
             {
                 SendSaveGuildData(client, differenceInMin);
             }
@@ -99,7 +99,7 @@ namespace tsom_bot.Commands.Helpers
 
         public async void SendSaveGuildData(DiscordClient client, int adjustedInterval)
         {
-            int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
+            int commandCycleCooldown = 3; //24 * 60; //24h cooldown if bot sends interval every 60s
             if (IsInCycle(commandCycleCooldown, adjustedInterval))
             {
                 if (ClientManager.launchTicketTrackerSwitchCommandJedi || ClientManager.launchTicketTrackerSwitchCommandSith)

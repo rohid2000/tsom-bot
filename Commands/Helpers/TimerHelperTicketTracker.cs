@@ -106,6 +106,8 @@ namespace tsom_bot.Commands.Helpers
                 {
                     ConfigReader reader = new ConfigReader();
                     await reader.readConfig();
+                    var ticketsSith = reader.minimumRaidTicketAmount.ticketAmountSith;
+                    var ticketsJedi = reader.minimumRaidTicketAmount.ticketAmountJedi;
                     var channelIdSith = reader.channelIds.sith.strikeList;
                     var channelIdJedi = reader.channelIds.jedi.strikeList;
                     var chanSith = await client.GetChannelAsync(channelIdSith);
@@ -115,7 +117,7 @@ namespace tsom_bot.Commands.Helpers
                     {
                         ClientManager.guildSwitch = GuildSwitch.Sith;
                         string guildId = await ClientManager.getGuildId();
-                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, ticketsSith, client);
                         await helper.SaveGuildData();
 
                         FileStream file = await helper.GetExcelFile();
@@ -133,7 +135,7 @@ namespace tsom_bot.Commands.Helpers
                     {
                         ClientManager.guildSwitch = GuildSwitch.Jedi;
                         string guildId = await ClientManager.getGuildId();
-                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, client);
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, ticketsJedi, client);
                         await helper.SaveGuildData();
 
                         FileStream file = await helper.GetExcelFile();

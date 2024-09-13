@@ -14,6 +14,7 @@ namespace tsom_bot.config
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
+        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
 
         public async Task readConfig()
         {
@@ -32,8 +33,9 @@ namespace tsom_bot.config
                     this.clanrole_ids = data.clanrole_ids;
                     this.adminRoleIds = data.adminRoleIds;
                     this.roleIds = data.roleIds;
-                    this.channelIds = data.channelIds;  
+                    this.channelIds = data.channelIds;
                     this.rolePromotionDays = data.rolePromotionDays;
+                    this.minimumTicketAmount = data.minimumTicketAmount;
                 }
             }
         }
@@ -51,6 +53,7 @@ namespace tsom_bot.config
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
+        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
     }
 
     public sealed class ChannelIds
@@ -70,8 +73,8 @@ namespace tsom_bot.config
 
     public class ConfigStructureRoleId
     {
-        public ConfigStructureRolesJedi jedi {  get; set; }
-        public ConfigStructureRolesSith sith {  get; set; }
+        public ConfigStructureRolesJedi jedi { get; set; }
+        public ConfigStructureRolesSith sith { get; set; }
     }
 
     public class ConfigStructureRolesSith
@@ -94,6 +97,7 @@ namespace tsom_bot.config
         public ConfigStructureRolePromotionDaysJedi jedi { get; set; }
         public ConfigStructureRolePromotionDaysSith sith { get; set; }
     }
+
     public class ConfigStructureRolePromotionDaysSith
     {
         public int acolyte { get; set; }
@@ -101,12 +105,19 @@ namespace tsom_bot.config
         public int mandalorian { get; set; }
         public int sithlord { get; set; }
     }
+
     public class ConfigStructureRolePromotionDaysJedi
     {
         public int youngling { get; set; }
         public int padawan { get; set; }
         public int jediKnight { get; set; }
         public int jediMaster { get; set; }
+    }
+
+    public class ConfigureStructureMinimumTicketAmountSithOrJedi
+    {
+        public int ticketAmountSith { get; set; }
+        public int ticketAmountJedi { get; set; }
     }
 
     public class ConfigStructureGuildIds

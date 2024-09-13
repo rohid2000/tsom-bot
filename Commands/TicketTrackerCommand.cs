@@ -21,7 +21,8 @@ namespace tsom_bot.Commands
                         async () =>
                         {
                             string guildId = await ClientManager.getGuildId();
-                            TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                            int minimumTicketAmount = await ClientManager.minimumTickets();
+                            TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                             await helper.SaveGuildData();
                         });
@@ -31,7 +32,8 @@ namespace tsom_bot.Commands
                 public async Task SyncCheckCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     await DiscordMessageHelper.BuildCheckMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.check, helper.IsDataSynced);
                 }
@@ -40,7 +42,8 @@ namespace tsom_bot.Commands
                 public async Task SyncExcelCommand(InteractionContext ctx, [Option("file", "attach excel file")]DiscordAttachment file)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.excel, () => helper.SyncExcelFile(file));
                 }
@@ -49,7 +52,8 @@ namespace tsom_bot.Commands
                 public async Task SyncCleanupCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.cleanup, helper.CleanupStrikes);
                 }
@@ -62,7 +66,8 @@ namespace tsom_bot.Commands
                 public async Task ExcelCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     try
                     {
@@ -84,7 +89,8 @@ namespace tsom_bot.Commands
                 public async Task MessageCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     try
                     {
@@ -107,7 +113,8 @@ namespace tsom_bot.Commands
                 public async Task NVTAddCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("dayAmount", "Amount of days this member should not be counted for the strikelist")] long dayAmount = 0)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember);
                     if (dayAmount > 0)
@@ -132,7 +139,8 @@ namespace tsom_bot.Commands
                 public async Task NVTRemoveCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember)
                 {
                     string guildId = await ClientManager.getGuildId();
-                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, 400, ctx.Client);
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }

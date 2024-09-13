@@ -14,7 +14,7 @@ namespace tsom_bot.config
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
-        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumRaidTicketAmount { get; set; }
+        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
 
         public async Task readConfig()
         {
@@ -35,7 +35,7 @@ namespace tsom_bot.config
                     this.roleIds = data.roleIds;
                     this.channelIds = data.channelIds;
                     this.rolePromotionDays = data.rolePromotionDays;
-                    this.minimumRaidTicketAmount = data.minimumTicketAmountSithOrJedi;
+                    this.minimumTicketAmount = data.minimumTicketAmount;
                 }
             }
         }
@@ -53,7 +53,7 @@ namespace tsom_bot.config
         public ulong[] adminRoleIds { get; set; }
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
-        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmountSithOrJedi { get; set; }
+        public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
     }
 
     public sealed class ChannelIds

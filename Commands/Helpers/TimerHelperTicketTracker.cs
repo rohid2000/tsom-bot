@@ -106,8 +106,8 @@ namespace tsom_bot.Commands.Helpers
                 {
                     ConfigReader reader = new ConfigReader();
                     await reader.readConfig();
-                    var ticketsSith = reader.minimumRaidTicketAmount.ticketAmountSith;
-                    var ticketsJedi = reader.minimumRaidTicketAmount.ticketAmountJedi;
+                    var ticketsSith = reader.minimumTicketAmount.ticketAmountSith;
+                    var ticketsJedi = reader.minimumTicketAmount.ticketAmountJedi;
                     var channelIdSith = reader.channelIds.sith.strikeList;
                     var channelIdJedi = reader.channelIds.jedi.strikeList;
                     var chanSith = await client.GetChannelAsync(channelIdSith);

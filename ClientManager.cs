@@ -30,6 +30,21 @@ namespace tsom_bot
                 return reader.guild_ids.jedi;
             }
         }
+
+        public static async Task<int> minimumTickets()
+        {
+            ConfigReader reader = new ConfigReader();
+            await reader.readConfig();
+
+            if (guildSwitch == GuildSwitch.Sith)
+            {
+                return reader.minimumTicketAmount.ticketAmountSith;
+            }
+            else
+            {
+                return reader.minimumTicketAmount.ticketAmountJedi;
+            }
+        }
     }
 
     public enum GuildSwitch

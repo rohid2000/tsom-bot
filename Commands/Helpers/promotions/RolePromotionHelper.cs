@@ -55,12 +55,15 @@ namespace tsom_bot.Commands.Helpers.promotions
                         dcRole = younglingRole;
                         break;
                     case Role.Padawan:
+                        await dcMember.RevokeRoleAsync(younglingRole);
                         dcRole = padawanRole;
                         break;
                     case Role.JediKnight:
+                        await dcMember.RevokeRoleAsync(padawanRole);
                         dcRole = jediKnightRole;
                         break;
                     case Role.JediMaster:
+                        await dcMember.RevokeRoleAsync(jediKnightRole);
                         dcRole = jediMasterRole;
                         break;
                 }

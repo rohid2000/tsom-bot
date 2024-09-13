@@ -18,7 +18,7 @@ namespace tsom_bot.Commands.Helpers
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;
-                SyncGuildSaveCommand(client);
+                await SyncGuildSaveCommand(client);
                 SendCheckPromotionCommand(client);
             },
             null,
@@ -48,16 +48,18 @@ namespace tsom_bot.Commands.Helpers
             return (ClientManager.time - adjustedInterval) % cycleCooldown == 0;
         }
 
-        private void SyncGuildSaveCommand(DiscordClient client)
+        private async Task SyncGuildSaveCommand(DiscordClient client)
         {
             DateTime now = DateTime.Now;
             DateTime syncTime = new(now.Year, now.Month, now.Day, 19, 28, 0); // 0, 0, 0, 19, 28, 0 preferred time
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 
+            differenceInMin = 0;
+
             if (ClientManager.time >= differenceInMin) 
             {
-                SendSaveGuildData(client, differenceInMin);
+                await SendSaveGuildData(client, differenceInMin);
             }
         }
 
@@ -97,9 +99,9 @@ namespace tsom_bot.Commands.Helpers
             }
         }
 
-        public async void SendSaveGuildData(DiscordClient client, int adjustedInterval)
+        public async Task SendSaveGuildData(DiscordClient client, int adjustedInterval)
         {
-            int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
+            int commandCycleCooldown = 1; //24h cooldown if bot sends interval every 60s
             if (IsInCycle(commandCycleCooldown, adjustedInterval))
             {
                 if (ClientManager.launchTicketTrackerSwitchCommandJedi || ClientManager.launchTicketTrackerSwitchCommandSith)

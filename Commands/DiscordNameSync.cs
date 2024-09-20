@@ -1,7 +1,9 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Google.Protobuf;
 using System.Data;
 using tsom_bot.Commands.Helpers;
+using tsom_bot.Commands.Helpers.Discord;
 using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands
@@ -12,7 +14,7 @@ namespace tsom_bot.Commands
         public class DiscordNameSyncContainer
         {
             [SlashCommand("name", "give your ingame name and it gets linked to your discord account")]
-            public async Task NameSyncCommand(InteractionContext ctx, [Option("name", "your ingame name")] string name, [Option("override", "overrides an already linked name")] bool overrideB = false)
+            public async Task NameSyncCommand(InteractionContext ctx, [Option("name", "your ingame name")] string name)
             {
                 DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.name.loading);
                 DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.name.fail);
@@ -20,31 +22,43 @@ namespace tsom_bot.Commands
                 await ctx.EditResponseAsync(loadingMessage);
                 try
                 {
-                    string messageS = "";
-                    if (overrideB)
-                    {
-                        await Database.SendSqlSave($"DELETE FROM sync WHERE discordId = {ctx.Member.Id}");
-                        await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
+                    await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
-                        messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.complete, ctx.Member);
+                    string messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.complete, ctx.Member);
+                    DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(messageS);
+                    await ctx.EditResponseAsync(message);
+                }
+                catch (Exception ex)
+                {
+                    await ctx.EditResponseAsync(failMessage);
+                    Console.WriteLine(i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.fail, ctx.Member) + "\n ERROR: " + ex.Message);
+                }
+            }
+
+            [SlashCommand("remove", "remove a linked name from a user")]
+            public async Task RemoveNameCommand(InteractionContext ctx, [Option("name", "your ingame name")] string name)
+            {
+                DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.remove.loading);
+                DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.remove.fail);
+                await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+                await ctx.EditResponseAsync(loadingMessage);
+                try
+                {
+                    DataTable result = await Database.SendSqlPull($"SELECT * FROM sync WHERE playerName = '{name.ToLower()}'");
+                    if(result.Rows.Count > 0)
+                    {
+                        await Database.SendSqlSave($"DELETE FROM sync WHERE playerName = '{name.ToLower()}'");
+
+                        string messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.remove.complete, ctx.Member);
+                        DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(messageS);
+                        await ctx.EditResponseAsync(message);
                     }
                     else
                     {
-
-                        DataTable result = await DiscordUserHelper.GetLinkedAccounts(ctx.Member);
-                        if (result.Rows.Count == 0)
-                        {
-                            await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
-
-                            messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.complete, ctx.Member);
-                        }
-                        else
-                        {
-                            messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.already_linked, ctx.Member);
-                        }
+                        DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent("This name is not synced to a User");
+                        await ctx.EditResponseAsync(message);
                     }
-                    DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(messageS);
-                    await ctx.EditResponseAsync(message);
+
                 }
                 catch (Exception ex)
                 {
@@ -149,6 +163,21 @@ namespace tsom_bot.Commands
                     DiscordWebhookBuilder noAccountMessage = new DiscordWebhookBuilder().WithContent(name == "" ? i18n.i18n.data.commands.sync.test.no_link_self : i18n.i18n.data.commands.sync.test.no_link_name);
                     await ctx.EditResponseAsync(noAccountMessage);
                 }
+            }
+
+            [SlashCommand("all", "tries to sync all Discord names with ingame names")]
+            public async Task SyncAllNames(InteractionContext ctx)
+            {
+                await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.sync.all, async () =>
+                {
+                    List<DiscordMember> members = new List<DiscordMember>();
+                    foreach(KeyValuePair<ulong, DiscordMember> dcMember in ctx.Guild.Members)
+                    {
+                        members.Add(dcMember.Value);
+                    }
+
+                    await SyncCommandHelper.SyncAllNames(members);
+                });
             }
         }
     }

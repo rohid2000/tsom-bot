@@ -41,6 +41,8 @@ namespace tsom_bot.i18n
         public i18nStructureSyncCommandName name { get; set; }
         public i18nStructureSyncCommandTest test {  get; set; }
         public i18nBasicMessages nolist { get; set; }
+        public i18nBasicMessages all { get; set; }
+        public i18nBasicMessages remove { get; set; }
     }
 
     public class i18nStructureSyncCommandName : i18nBasicMessages

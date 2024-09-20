@@ -18,6 +18,16 @@
         "complete": "",
         "fail": "",
         "loading": ""
+      },
+      "all": {
+        "complete": "",
+        "fail": "",
+        "loading": ""
+      },
+      "remove": {
+        "complete": "",
+        "fail": "",
+        "loading": ""
       }
     },
     "promotion": {

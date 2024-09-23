@@ -1,7 +1,6 @@
 ﻿
 using DSharpPlus;
 using DSharpPlus.Entities;
-using System;
 using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
 
@@ -11,15 +10,14 @@ namespace tsom_bot.Commands.Helpers
     {
         private readonly Timer _timer;
         private readonly int _interval;
-        private ConfigReader configReader;
         public TimerHelper(DiscordClient client, int intervalInSec)
         {
             _interval = intervalInSec * 1000;
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;
-                await SyncGuildSaveCommand(client);
-                SendCheckPromotionCommand(client);
+                await SyncGuildSaveCommand(client, true);
+                await SyncCheckPromotion(client, false);
             },
             null,
             0,  // 4) Time that message should fire after the timer is created
@@ -41,30 +39,43 @@ namespace tsom_bot.Commands.Helpers
             return ClientManager.time % cycleCooldown == 0;
         }
 
-        private bool IsInCycle(int cycleCooldown, int adjustedInterval)
+        private bool IsInCycle(int cycleCooldown, int adjustedInterval, bool runOnLaunch)
         {
-            if (ClientManager.time == adjustedInterval)
+            if (ClientManager.time == adjustedInterval && runOnLaunch)
                 return true;
             return (ClientManager.time - adjustedInterval) % cycleCooldown == 0;
         }
 
-        private async Task SyncGuildSaveCommand(DiscordClient client)
+        private async Task SyncGuildSaveCommand(DiscordClient client, bool runOnLaunch)
         {
             DateTime now = DateTime.Now;
-            DateTime syncTime = new(now.Year, now.Month, now.Day, 19, 28, 0); // 0, 0, 0, 19, 28, 0 preferred time
+            DateTime syncTime = new(now.Year, now.Month, now.Day, 19, 28, 0);
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 
             if (ClientManager.time >= differenceInMin) 
             {
-                await SendSaveGuildData(client, differenceInMin);
+                await SendSaveGuildData(client, differenceInMin, runOnLaunch);
             }
         }
 
-        public async void SendCheckPromotionCommand(DiscordClient client)
+        private async Task SyncCheckPromotion(DiscordClient client, bool runOnLaunch)
         {
-            int cycleCooldown = 24 * 60;
-            if (IsInCycle(cycleCooldown))
+            DateTime now = DateTime.Now;
+            DateTime syncTime = new(now.Year, now.Month, now.Day, 20, 0, 0);
+
+            int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
+
+            if (ClientManager.time >= differenceInMin)
+            {
+                await this.SendCheckPromotionCommand(client, differenceInMin, runOnLaunch);
+            }
+        }
+
+        public async Task SendCheckPromotionCommand(DiscordClient client, int adjustedInterval, bool runOnLaunch)
+        {
+            int cycleCooldown = 24 * 60 * 30;
+            if (IsInCycle(cycleCooldown, adjustedInterval, runOnLaunch))
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
@@ -73,81 +84,85 @@ namespace tsom_bot.Commands.Helpers
                 var chanSith = await client.GetChannelAsync(channelIdSith);
                 var chanJedi = await client.GetChannelAsync(channelIdJedi);
 
-                if(chanSith != null) 
+                GuildSwitch resetGuildSwitch = ClientManager.guildSwitch;
+
+                if (chanSith != null) 
                 {
                     ClientManager.guildSwitch = GuildSwitch.Sith;
-                    string guildId = await ClientManager.getGuildId();
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
-
-                    await new DiscordMessageBuilder()
-                    .WithContent("TSOM promotion data has been synced")
-                    .SendAsync(chanSith);
                 }
 
                 if(chanJedi != null)
                 {
                     ClientManager.guildSwitch = GuildSwitch.Jedi;
-                    string guildId = await ClientManager.getGuildId();
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
-
-                    await new DiscordMessageBuilder()
-                    .WithContent("TJOM promotion data has been synced")
-                    .SendAsync(chanJedi);
                 }
+
+                ClientManager.guildSwitch = resetGuildSwitch;
             }
         }
 
-        public async Task SendSaveGuildData(DiscordClient client, int adjustedInterval)
+        public async Task SendSaveGuildData(DiscordClient client, int adjustedInterval, bool runOnLaunch)
         {
             int commandCycleCooldown = 24 * 60; //24h cooldown if bot sends interval every 60s
-            if (IsInCycle(commandCycleCooldown, adjustedInterval))
+            if (IsInCycle(commandCycleCooldown, adjustedInterval, runOnLaunch))
             {
                 if (ClientManager.launchTicketTrackerSwitchCommandJedi || ClientManager.launchTicketTrackerSwitchCommandSith)
                 {
                     ConfigReader reader = new ConfigReader();
                     await reader.readConfig();
-                    var ticketsSith = reader.minimumTicketAmount.ticketAmountSith;
-                    var ticketsJedi = reader.minimumTicketAmount.ticketAmountJedi;
-                    var channelIdSith = reader.channelIds.sith.strikeList;
-                    var channelIdJedi = reader.channelIds.jedi.strikeList;
-                    var chanSith = await client.GetChannelAsync(channelIdSith);
-                    var chanJedi = await client.GetChannelAsync(channelIdJedi);
+
+                    var channelIds = reader.channelIds;
+                    var minimunTicketAmounts = reader.minimumTicketAmount;
+
+                    var chanSith = await client.GetChannelAsync(channelIds.sith.strikeList);
+                    var chanJedi = await client.GetChannelAsync(channelIds.jedi.strikeList);
+
+                    GuildSwitch resetGuildSwitch = ClientManager.guildSwitch;
 
                     if (chanSith != null && ClientManager.launchTicketTrackerSwitchCommandSith)
                     {
                         ClientManager.guildSwitch = GuildSwitch.Sith;
                         string guildId = await ClientManager.getGuildId();
-                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, ticketsSith, client);
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimunTicketAmounts.ticketAmountSith, client);
                         await helper.SaveGuildData();
 
-                        FileStream file = await helper.GetExcelFile();
+                        FileStream? file = await helper.GetExcelFile();
 
-                        await new DiscordMessageBuilder()
-                            .WithContent("Synced with latest data, here is the TSOM strike data")
-                            .AddFile(file)
-                            .SendAsync(chanSith);
+                        if (file != null)
+                        {
+                            await new DiscordMessageBuilder()
+                                .WithContent("Synced with latest data, here is the TSOM strike data")
+                                .AddFile(file)
+                                .SendAsync(chanSith);
 
-                        file.Close();
-                        File.Delete(file.Name);
+                            file.Close();
+                            File.Delete(file.Name);
+                        }
                     }
 
                     if (chanJedi != null && ClientManager.launchTicketTrackerSwitchCommandJedi)
                     {
                         ClientManager.guildSwitch = GuildSwitch.Jedi;
                         string guildId = await ClientManager.getGuildId();
-                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, ticketsJedi, client);
+                        TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimunTicketAmounts.ticketAmountJedi, client);
                         await helper.SaveGuildData();
 
-                        FileStream file = await helper.GetExcelFile();
+                        FileStream? file = await helper.GetExcelFile();
 
-                        await new DiscordMessageBuilder()
-                            .WithContent("Synced with latest data, here is the TJOM strike data")
-                            .AddFile(file)
-                            .SendAsync(chanJedi);
+                        if(file != null)
+                        {
+                            await new DiscordMessageBuilder()
+                                .WithContent("Synced with latest data, here is the TJOM strike data")
+                                .AddFile(file)
+                                .SendAsync(chanJedi);
 
-                        file.Close();
-                        File.Delete(file.Name);
+                            file.Close();
+                            File.Delete(file.Name);
+                        }
                     }
+
+                    ClientManager.guildSwitch = resetGuildSwitch;
                 }
             }
         }

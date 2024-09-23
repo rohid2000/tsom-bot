@@ -166,54 +166,83 @@ namespace tsom_bot.Commands.Helpers.promotions
 
             if (ClientManager.guildSwitch == GuildSwitch.Sith)
             {
-                string tsomMessage = "";
-                DiscordRole acolyteRole = guild.GetRole(reader.roleIds.sith.acolyte);
-                DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.sith.apprentice);
-                DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.sith.mandalorian);
-                DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
-
-
-                tsomMessage += completeMessage.sith.GetRandomHeader() + "\n\n";
-
-                tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
-                tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
-                tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
-                tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
-
-                tsomMessage += completeMessage.sith.GetRandomFooter();
-
-                if (ctx != null)
+                if(
+                    HasPromotions(acolytePromoters) ||
+                    HasPromotions(apprenticePromoters) ||
+                    HasPromotions(mandalorianPromoters) ||
+                    HasPromotions(sithlordPromoters))
                 {
-                    DiscordWebhookBuilder tsomMessageB = new DiscordWebhookBuilder().WithContent(tsomMessage);
-                    await ctx.EditResponseAsync(tsomMessageB);
+                    string tsomMessage = "";
+                    DiscordRole acolyteRole = guild.GetRole(reader.roleIds.sith.acolyte);
+                    DiscordRole apprenticeRole = guild.GetRole(reader.roleIds.sith.apprentice);
+                    DiscordRole mandalorianRole = guild.GetRole(reader.roleIds.sith.mandalorian);
+                    DiscordRole sithLordRole = guild.GetRole(reader.roleIds.sith.sithlord);
+
+
+                    tsomMessage += completeMessage.sith.GetRandomHeader() + "\n\n";
+
+                    tsomMessage += GetRolePromotionsString(acolytePromoters, acolyteRole);
+                    tsomMessage += GetRolePromotionsString(apprenticePromoters, apprenticeRole);
+                    tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
+                    tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
+
+                    tsomMessage += completeMessage.sith.GetRandomFooter();
+
+                    if (ctx != null)
+                    {
+                        DiscordWebhookBuilder tsomMessageB = new DiscordWebhookBuilder().WithContent(tsomMessage);
+                        await ctx.EditResponseAsync(tsomMessageB);
+                    }
+                }
+                else
+                {
+                    if (ctx != null)
+                    {
+                        DiscordWebhookBuilder tsomMessage = new DiscordWebhookBuilder().WithContent("No Promotions this month");
+                        await ctx.EditResponseAsync(tsomMessage);
+                    }
                 }
             }
             else
             {
-                string tjomMessage = "";
-                DiscordRole younglingRole = guild.GetRole(reader.roleIds.jedi.youngling);
-                DiscordRole padawanRole = guild.GetRole(reader.roleIds.jedi.padawan);
-                DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jedi.jediKnight);
-                DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jedi.jediMaster);
-
-
-                tjomMessage += completeMessage.jedi.GetRandomHeader() + "\n\n";
-
-                tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
-                tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
-                tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
-                tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
-
-                tjomMessage += completeMessage.jedi.GetRandomFooter();
-
-                if (ctx != null)
+                if (
+                    HasPromotions(younglingPromoters) ||
+                    HasPromotions(padawanPromoters) ||
+                    HasPromotions(jediKnightPromoters) ||
+                    HasPromotions(jediMasterPromoters))
                 {
-                    DiscordWebhookBuilder tjomMessageB = new DiscordWebhookBuilder().WithContent(tjomMessage);
-                    await ctx.EditResponseAsync(tjomMessageB);
+                    string tjomMessage = "";
+                    DiscordRole younglingRole = guild.GetRole(reader.roleIds.jedi.youngling);
+                    DiscordRole padawanRole = guild.GetRole(reader.roleIds.jedi.padawan);
+                    DiscordRole jediKnightRole = guild.GetRole(reader.roleIds.jedi.jediKnight);
+                    DiscordRole jediMasterRole = guild.GetRole(reader.roleIds.jedi.jediMaster);
+
+
+                    tjomMessage += completeMessage.jedi.GetRandomHeader() + "\n\n";
+
+                    tjomMessage += GetRolePromotionsString(younglingPromoters, younglingRole);
+                    tjomMessage += GetRolePromotionsString(padawanPromoters, padawanRole);
+                    tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
+                    tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
+
+                    tjomMessage += completeMessage.jedi.GetRandomFooter();
+
+                    if (ctx != null)
+                    {
+                        DiscordWebhookBuilder tjomMessageB = new DiscordWebhookBuilder().WithContent(tjomMessage);
+                        await ctx.EditResponseAsync(tjomMessageB);
+                    }
+                }
+                else
+                {
+                    if (ctx != null)
+                    {
+                        DiscordWebhookBuilder tsomMessage = new DiscordWebhookBuilder().WithContent("No Promotions this month");
+                        await ctx.EditResponseAsync(tsomMessage);
+                    }
                 }
             }
         }
-
         public async static Task ExludePlayerFromPromotion(DiscordUser dcMember, Role role)
         {
             string roleString;
@@ -298,6 +327,11 @@ namespace tsom_bot.Commands.Helpers.promotions
                 }
             }
             return false;
+        }
+
+        private static bool HasPromotions(List<DiscordMember> members) 
+        {
+            return members.Any();
         }
 
         private static Role convertStringToRole(string roleString)

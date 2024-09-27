@@ -95,6 +95,7 @@ namespace tsom_bot.i18n
         public i18nStructureTicketTrackerCommandSync sync { get; set; }
         public i18nStructureTicketTrackerCommandGet get { get; set; }
         public i18nStructureTicketTrackerCommandNVT nvt { get; set; }
+        public i18nBasicMessages remove { get; set; }
     }
 
     public class i18nStructureTicketTrackerCommandSync

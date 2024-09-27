@@ -1,5 +1,6 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Mysqlx.Prepare;
 using System.Net.Mail;
 using tsom_bot.Commands.Helpers;
 using tsom_bot.Commands.Helpers.Discord;
@@ -102,6 +103,37 @@ namespace tsom_bot.Commands
                     catch (Exception ex)
                     {
                         Console.WriteLine(i18n.i18n.data.commands.tickettracker.get.message.fail + "\n ERROR: " + ex.Message);
+                    }
+                }
+            }
+
+            [SlashCommandGroup("remove", "remove already obtained strikes")]
+            public class RemoveContainer() : ApplicationCommandModule
+            {
+                [SlashCommand("user", "adds a member to the not count list")]
+                public async Task RemoveUserStrikes(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("amount", "Amount of strikes")] long amount = 1)
+                {
+                    string guildId = await ClientManager.getGuildId();
+                    int minimumTicketAmount = await ClientManager.minimumTickets();
+                    TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
+
+                    string complete = i18n.i18n.data.commands.tickettracker.remove.complete;
+                    string fail = i18n.i18n.data.commands.tickettracker.remove.fail;
+                    string loading = i18n.i18n.data.commands.tickettracker.remove.loading;
+
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+                    try
+                    {
+                        DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(loading);
+                        await ctx.EditResponseAsync(loadingMessage);
+                        string addToComplete = await helper.removeStrikes(dcMember, (int)amount);
+                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(complete + "\n\n" + addToComplete);
+                        await ctx.EditResponseAsync(completeMessage);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(fail + "\n ERROR: " + ex.Message);
                     }
                 }
             }

@@ -70,6 +70,33 @@ namespace tsom_bot.Commands.Helpers
             }
         }
 
+        public async Task<string> removeStrikes(DiscordUser member, int dayAmount = 1)
+        {
+            DataTable accounts = await DiscordUserHelper.GetLinkedAccounts(member);
+            string message = "";
+            foreach (DataRow accountRow in accounts.Rows)
+            {
+                string accountName = accountRow.Field<string>("playerName");
+
+                DataTable result = await Database.SendSqlPull($"SELECT * FROM `ticketresults` WHERE playerName = '{accountName}' ORDER BY date DESC");
+
+                if (result.Rows.Count < 1)
+                {
+                    message += $"No ticket data found for user:{accountName}" + "\n";
+                    continue;
+                }
+                
+                for (int i = 0; i < dayAmount; i++)
+                {
+                    DataRow row = result.Rows[i];
+                    message += $"removed strike for {accountName} on {row.Field<DateTime>("date").ToString("dd-MM-yyyy")}" + "\n";
+                    await Database.SendSqlSave($"DELETE FROM ticketresults WHERE playerName = '{accountName}' AND date = '{row.Field<DateTime>("date").ToString("yyyy-MM-dd")}'");
+                }
+            }
+
+            return message;
+        }
+
         public async Task<string> GetMessage()
         {
             // pull data from database

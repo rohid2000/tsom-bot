@@ -20,5 +20,10 @@ namespace tsom_bot.Commands.Helpers
         {
             return await Database.SendSqlPull($"SELECT * FROM `sync` WHERE discordId = '{member.Id}'");
         }
+
+        public async static Task<DataTable> GetLinkedAccounts(DiscordUser member)
+        {
+            return await Database.SendSqlPull($"SELECT * FROM `sync` WHERE discordId = '{member.Id}'");
+        }
     }
 }

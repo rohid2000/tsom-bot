@@ -89,6 +89,11 @@
           "fail": "",
           "loading": ""
         }
+      },
+      "remove": {
+        "complete": "",
+        "fail": "",
+        "loading": ""
       }
     }
   }

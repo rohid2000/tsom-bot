@@ -5,22 +5,22 @@ namespace tsom_bot.Commands
 {
     public class GuildSwitchCommand : ApplicationCommandModule
     {
-        [SlashCommandGroup("switch", "Switch the bot with jedi and sith guild")]
+        [SlashCommandGroup("switch", "Switch the BOT between TSOM and TJOM")]
         public class GuildSwitchContainer : ApplicationCommandModule
         {
-            [SlashCommand("set", "switches the bot")]
-            public async Task switchCommand(InteractionContext ctx, [Option("guild", "the selected guild")] GuildSwitch guild)
+            [SlashCommand("guild", "Switches between Guilds")]
+            public async Task switchCommand(InteractionContext ctx, [Option("guild", "The selected guild")] GuildSwitch guild)
             {
                 ClientManager.guildSwitch = guild;
 
-                string messageString = "bot switched to ";
+                string messageString = "BOT switched to ";
                 if(guild == GuildSwitch.Sith) 
                 {
-                    messageString += "TSOM guild";
+                    messageString += "TSOM";
                 }
                 else
                 {
-                    messageString += "TJOM guild";
+                    messageString += "TJOM";
                 }
 
                 try

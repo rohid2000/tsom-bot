@@ -9,10 +9,10 @@ namespace tsom_bot.Commands
 {
     public class TicketTrackerCommand : ApplicationCommandModule
     {
-        [SlashCommandGroup("tickets", "Command used to view strike data")]
+        [SlashCommandGroup("tickets", "To return strike data")]
         public class TicketTrackerContainer : ApplicationCommandModule
         {
-            [SlashCommandGroup("sync", "used to sync strike data")]
+            [SlashCommandGroup("sync", "To sync strike data")]
             public class SyncContainer : ApplicationCommandModule
             {
                 [SlashCommand("go", "Syncs the guilds data with the database")]
@@ -49,7 +49,7 @@ namespace tsom_bot.Commands
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.sync.excel, () => helper.SyncExcelFile(file));
                 }
 
-                [SlashCommand("cleanup", "will cleanup the database and only save total strikes lifetime")]
+                [SlashCommand("cleanup", "Empties ticketresults table and saves lifetimetickets")]
                 public async Task SyncCleanupCommand(InteractionContext ctx)
                 {
                     string guildId = await ClientManager.getGuildId();
@@ -60,7 +60,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("get", "used to get strike data")]
+            [SlashCommandGroup("get", "To get strike data")]
             public class GetContainer : ApplicationCommandModule
             {
                 [SlashCommand("excel", "Returns an excel file with the synced strike data")]
@@ -107,10 +107,10 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("remove", "remove already obtained strikes")]
+            [SlashCommandGroup("remove", "To remove strikes")]
             public class RemoveContainer() : ApplicationCommandModule
             {
-                [SlashCommand("user", "adds a member to the not count list")]
+                [SlashCommand("user", "Removes strikes from a user")]
                 public async Task RemoveUserStrikes(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("amount", "Amount of strikes")] long amount = 1)
                 {
                     string guildId = await ClientManager.getGuildId();
@@ -138,10 +138,10 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("nvt", "adds or removes members from ticket count")]
+            [SlashCommandGroup("nvt", "Adds or removes members from strike-list count")]
             public class NVTContainer() : ApplicationCommandModule
             {
-                [SlashCommand("add", "adds a member to the not count list")]
+                [SlashCommand("add", "Exludes a member from strike-list count")]
                 public async Task NVTAddCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("dayAmount", "Amount of days this member should not be counted for the strikelist")] long dayAmount = 0)
                 {
                     string guildId = await ClientManager.getGuildId();
@@ -167,7 +167,7 @@ namespace tsom_bot.Commands
                     }
                 }
 
-                [SlashCommand("remove", "removes a member from the not count list")]
+                [SlashCommand("remove", "Includes a member to the strike-list count")]
                 public async Task NVTRemoveCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember)
                 {
                     string guildId = await ClientManager.getGuildId();
@@ -177,7 +177,7 @@ namespace tsom_bot.Commands
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
 
-                [SlashCommand("switch", "switches the ticket tracker off or on for a guild")]
+                [SlashCommand("switch", "turns off strike-list count for selected guild")]
                 public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
                 {
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.ticketTrackerSwitch, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);

@@ -94,7 +94,7 @@ namespace tsom_bot.i18n
     {
         public i18nStructureTicketTrackerCommandSync sync { get; set; }
         public i18nStructureTicketTrackerCommandGet get { get; set; }
-        public i18nStructureTicketTrackerCommandNVT nvt { get; set; }
+        public i18nStructureTicketTrackerCommandNVT exclude { get; set; }
         public i18nBasicMessages remove { get; set; }
     }
 
@@ -116,7 +116,7 @@ namespace tsom_bot.i18n
     {
         public i18nBasicMessages add { get; set; }
         public i18nBasicMessages remove { get; set; }
-        public i18nBasicMessages ticketTrackerSwitch { get; set; }
+        public i18nBasicMessages guildStrikeCount { get; set; }
     }
 
     public class i18nBasicMessages

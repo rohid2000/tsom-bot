@@ -148,7 +148,7 @@ namespace tsom_bot.Commands
                     int minimumTicketAmount = await ClientManager.minimumTickets();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
-                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.nvt.add.complete, dcMember);
+                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.exclude.add.complete, dcMember);
                     if (dayAmount > 0)
                     {
                         sMessage += $" for {dayAmount} days";
@@ -163,7 +163,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.nvt.add.fail + "\n ERROR: " + ex.Message);
+                        Console.WriteLine(i18n.i18n.data.commands.tickettracker.exclude.add.fail + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -174,13 +174,13 @@ namespace tsom_bot.Commands
                     int minimumTicketAmount = await ClientManager.minimumTickets();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.remove, () => helper.RemoveMemberToNVT(dcMember));
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
 
-                [SlashCommand("switch", "turns off strike-list count for selected guild")]
+                [SlashCommand("guildstrikecount", "turns off strike-list count for selected guild")]
                 public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
                 {
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.nvt.ticketTrackerSwitch, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
+                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
                 }
             }
         }

@@ -10,14 +10,14 @@ namespace tsom_bot.Commands
         [SlashCommandGroup("promotion", "Handles the promotions based on join date")]
         public class PromotionContainer : ApplicationCommandModule
         {
-            [SlashCommand("sync", "synces the ranks of all players in guild")]
+            [SlashCommand("sync", "Synces the Roles of all players in guild")]
             public async Task promotionCommand(InteractionContext ctx)
             {
                 await DiscordMessageHelper.BuildPromotionMessageWithExecute(ctx, i18n.i18n.data.commands.promotion.sync, (completeMessage) => TimedPromotionHelper.SyncPromotions(ctx.Client, completeMessage, ctx));
             }
 
-            [SlashCommand("override", "override a players rank for this command")]
-            public async Task promotionOverrrideCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("role", "the role that the player always has")] Role role)
+            [SlashCommand("override", "Override a players Role for this command")]
+            public async Task promotionOverrrideCommand(InteractionContext ctx, [Option("user", "player")] DiscordUser dcMember, [Option("role", "The role that the player always has")] Role role)
             {
                 await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.promotion.override_M, () => TimedPromotionHelper.ExludePlayerFromPromotion(dcMember, role));
             }

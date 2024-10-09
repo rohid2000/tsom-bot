@@ -10,11 +10,11 @@ namespace tsom_bot.Commands
 {
     public class DiscordNameSync : ApplicationCommandModule
     {
-        [SlashCommandGroup("sync", "sync your discord account with your Swgoh account")]
+        [SlashCommandGroup("sync", "Syncs your discord account with your SWGOH account")]
         public class DiscordNameSyncContainer
         {
-            [SlashCommand("name", "give your ingame name and it gets linked to your discord account")]
-            public async Task NameSyncCommand(InteractionContext ctx, [Option("name", "your ingame name")] string name)
+            [SlashCommand("name", "Links your ingame name to your Discord account")]
+            public async Task NameSyncCommand(InteractionContext ctx, [Option("name", "Your ingame name")] string name)
             {
                 DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.name.loading);
                 DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.name.fail);
@@ -35,7 +35,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommand("remove", "remove a linked name from a user")]
+            [SlashCommand("remove", "Removes a linked ingame name from a Discord account")]
             public async Task RemoveNameCommand(InteractionContext ctx, [Option("name", "your ingame name")] string name)
             {
                 DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.remove.loading);
@@ -67,7 +67,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommand("nolist", "get a list of players who are not yet linked")]
+            [SlashCommand("nolist", "Get a list of players who are not linked")]
             public async Task NoListCommand(InteractionContext ctx)
             {
                 DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(i18n.i18n.data.commands.sync.nolist.loading);
@@ -114,7 +114,7 @@ namespace tsom_bot.Commands
                 await ctx.EditResponseAsync(message);
             }
 
-            [SlashCommand("test", "test if username is linked to discord account")]
+            [SlashCommand("test", "Test if username is linked to discord account")]
             public async Task TestNameCommand(InteractionContext ctx, [Option("name", "ingame name")] string name)
             {
                 await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
@@ -165,7 +165,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommand("all", "tries to sync all Discord names with ingame names")]
+            [SlashCommand("all", "Attempts to sync all Discord names with ingame names")]
             public async Task SyncAllNames(InteractionContext ctx)
             {
                 await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.sync.all, async () =>

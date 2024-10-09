@@ -12,7 +12,7 @@ namespace tsom_bot
     {
         public static int time;
         public static DateTime timerStartTime;
-        public static GuildSwitch guildSwitch = GuildSwitch.Sith;
+        public static GuildSwitch guildSwitch = GuildSwitch.TSOM;
         public static bool launchTicketTrackerSwitchCommandSith = true;
         public static bool launchTicketTrackerSwitchCommandJedi = true;
 
@@ -21,7 +21,7 @@ namespace tsom_bot
             ConfigReader reader = new ConfigReader();
             await reader.readConfig();
 
-            if(guildSwitch == GuildSwitch.Sith) 
+            if(guildSwitch == GuildSwitch.TSOM) 
             {
                 return reader.guild_ids.sith;
             }
@@ -36,7 +36,7 @@ namespace tsom_bot
             ConfigReader reader = new ConfigReader();
             await reader.readConfig();
 
-            if (guildSwitch == GuildSwitch.Sith)
+            if (guildSwitch == GuildSwitch.TSOM)
             {
                 return reader.minimumTicketAmount.ticketAmountSith;
             }
@@ -49,6 +49,7 @@ namespace tsom_bot
 
     public enum GuildSwitch
     {
-        Jedi, Sith
+        TSOM,
+        TJOM
     }
 }

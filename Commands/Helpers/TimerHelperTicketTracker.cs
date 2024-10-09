@@ -88,13 +88,13 @@ namespace tsom_bot.Commands.Helpers
 
                 if (chanSith != null) 
                 {
-                    ClientManager.guildSwitch = GuildSwitch.Sith;
+                    ClientManager.guildSwitch = GuildSwitch.TSOM;
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
                 }
 
                 if(chanJedi != null)
                 {
-                    ClientManager.guildSwitch = GuildSwitch.Jedi;
+                    ClientManager.guildSwitch = GuildSwitch.TJOM;
                     await TimedPromotionHelper.SyncPromotions(client, i18n.i18n.data.commands.promotion.sync.complete);
                 }
 
@@ -122,7 +122,7 @@ namespace tsom_bot.Commands.Helpers
 
                     if (chanSith != null && ClientManager.launchTicketTrackerSwitchCommandSith)
                     {
-                        ClientManager.guildSwitch = GuildSwitch.Sith;
+                        ClientManager.guildSwitch = GuildSwitch.TSOM;
                         string guildId = await ClientManager.getGuildId();
                         TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimunTicketAmounts.ticketAmountSith, client);
                         await helper.SaveGuildData();
@@ -143,7 +143,7 @@ namespace tsom_bot.Commands.Helpers
 
                     if (chanJedi != null && ClientManager.launchTicketTrackerSwitchCommandJedi)
                     {
-                        ClientManager.guildSwitch = GuildSwitch.Jedi;
+                        ClientManager.guildSwitch = GuildSwitch.TJOM;
                         string guildId = await ClientManager.getGuildId();
                         TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimunTicketAmounts.ticketAmountJedi, client);
                         await helper.SaveGuildData();

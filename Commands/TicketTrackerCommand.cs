@@ -138,7 +138,7 @@ namespace tsom_bot.Commands
                 }
             }
 
-            [SlashCommandGroup("notCount", "Adds or removes members from strike-list count")]
+            [SlashCommandGroup("exclude", "Adds or removes members from strike-list count")]
             public class NVTContainer() : ApplicationCommandModule
             {
                 [SlashCommand("add", "Exludes a member from strike-list count")]

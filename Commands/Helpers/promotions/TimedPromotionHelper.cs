@@ -26,7 +26,7 @@ namespace tsom_bot.Commands.Helpers.promotions
             List<DiscordMember> younglingPromoters = new List<DiscordMember>();
 
             IReadOnlyDictionary<ulong, DiscordMember> allMembers = client.Guilds[reader.server_id].Members;
-            ulong roleId = ClientManager.guildSwitch == GuildSwitch.Sith ? reader.clanrole_ids.sith : reader.clanrole_ids.jedi;
+            ulong roleId = ClientManager.guildSwitch == GuildSwitch.TSOM ? reader.clanrole_ids.sith : reader.clanrole_ids.jedi;
 
             List<KeyValuePair<ulong, DiscordMember>> members = allMembers.Where((member) => member.Value.Roles.Where((role) => role.Id == roleId).Count() > 0).ToList();
 
@@ -48,7 +48,7 @@ namespace tsom_bot.Commands.Helpers.promotions
 
                     string? roleName = null;
                     Role? role = null;
-                    if (ClientManager.guildSwitch == GuildSwitch.Sith)
+                    if (ClientManager.guildSwitch == GuildSwitch.TSOM)
                     {
                         if (totalDays >= reader.rolePromotionDays.sith.sithlord)
                         {
@@ -164,7 +164,7 @@ namespace tsom_bot.Commands.Helpers.promotions
 
             DiscordGuild guild = client.Guilds[reader.server_id];
 
-            if (ClientManager.guildSwitch == GuildSwitch.Sith)
+            if (ClientManager.guildSwitch == GuildSwitch.TSOM)
             {
                 if(
                     HasPromotions(acolytePromoters) ||

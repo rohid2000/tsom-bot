@@ -14,7 +14,7 @@ namespace tsom_bot.Commands
                 ClientManager.guildSwitch = guild;
 
                 string messageString = "BOT switched to ";
-                if(guild == GuildSwitch.Sith) 
+                if(guild == GuildSwitch.TSOM) 
                 {
                     messageString += "TSOM";
                 }

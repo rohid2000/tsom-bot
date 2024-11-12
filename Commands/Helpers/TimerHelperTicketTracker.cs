@@ -49,7 +49,7 @@ namespace tsom_bot.Commands.Helpers
         private async Task SyncGuildSaveCommand(DiscordClient client, bool runOnLaunch)
         {
             DateTime now = DateTime.Now;
-            DateTime syncTime = new(now.Year, now.Month, now.Day, 19, 28, 0);
+            DateTime syncTime = new(now.Year, now.Month, now.Day, 18, 28, 0);
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 

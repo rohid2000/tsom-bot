@@ -15,6 +15,7 @@ namespace tsom_bot.config
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
         public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
+        public ConfigureStructureStrikeListHourSendTime strikeListSendTime { get; set; }
 
         public async Task readConfig()
         {
@@ -36,6 +37,7 @@ namespace tsom_bot.config
                     this.channelIds = data.channelIds;
                     this.rolePromotionDays = data.rolePromotionDays;
                     this.minimumTicketAmount = data.minimumTicketAmount;
+                    this.strikeListSendTime = data.strikeListSendTime;
                 }
             }
         }
@@ -54,6 +56,7 @@ namespace tsom_bot.config
         public ConfigStructureRoleId roleIds { get; set; }
         public ConfigStructureRolePromotionDays rolePromotionDays { get; set; }
         public ConfigureStructureMinimumTicketAmountSithOrJedi minimumTicketAmount { get; set; }
+        public ConfigureStructureStrikeListHourSendTime strikeListSendTime { get; set; }
     }
 
     public sealed class ChannelIds
@@ -118,6 +121,11 @@ namespace tsom_bot.config
     {
         public int ticketAmountSith { get; set; }
         public int ticketAmountJedi { get; set; }
+    }
+
+    public class ConfigureStructureStrikeListHourSendTime
+    {
+        public DateTime sendTime { get; set; }
     }
 
     public class ConfigStructureGuildIds

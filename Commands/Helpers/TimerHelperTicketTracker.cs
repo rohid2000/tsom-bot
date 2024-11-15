@@ -48,8 +48,10 @@ namespace tsom_bot.Commands.Helpers
 
         private async Task SyncGuildSaveCommand(DiscordClient client, bool runOnLaunch)
         {
+            ConfigReader configReader = new ConfigReader();
+            DateTime strikeListSendTime = configReader.strikeListSendTime.sendTime;
             DateTime now = DateTime.Now;
-            DateTime syncTime = new(now.Year, now.Month, now.Day, 18, 28, 0);
+            DateTime syncTime = new(now.Year, now.Month, now.Day, strikeListSendTime);
 
             int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
 

@@ -1,7 +1,5 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using Mysqlx.Prepare;
-using System.Net.Mail;
 using tsom_bot.Commands.Helpers;
 using tsom_bot.Commands.Helpers.Discord;
 

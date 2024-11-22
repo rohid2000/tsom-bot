@@ -10,11 +10,11 @@ namespace tsom_bot
 {
     public static class ClientManager
     {
-        public static int time;
+        public static int time = 0;
         public static DateTime timerStartTime;
         public static GuildSwitch guildSwitch = GuildSwitch.TSOM;
         public static bool launchTicketTrackerSwitchCommandSith = true;
-        public static bool launchTicketTrackerSwitchCommandJedi = true;
+        public static bool launchTicketTrackerSwitchCommandJedi = false;
 
         public static async Task<string> getGuildId()
         {

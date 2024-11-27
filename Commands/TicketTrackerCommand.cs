@@ -175,8 +175,8 @@ namespace tsom_bot.Commands
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
 
-                [SlashCommand("guildstrikecount", "turns off strike-list count for selected guild")]
-                public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
+                [SlashCommand("guildstrikecount", "Switch state of strike count for selected Guild")]
+                public async Task SwitchStrikeCountState(InteractionContext ctx)
                 {
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
                 }

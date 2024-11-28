@@ -44,6 +44,7 @@ internal class Program
         slash.RegisterCommands<PromotionCommand>();
         slash.RegisterCommands<GuildSwitchCommand>();
         slash.RegisterCommands<DiscordNameSync>();
+        slash.RegisterCommands<QueueCommand>();
 
         commands = client.UseCommandsNext(commandsConfig);
 

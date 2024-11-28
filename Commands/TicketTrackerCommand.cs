@@ -180,7 +180,7 @@ namespace tsom_bot.Commands
                 {
                     try
                     {
-                        await DiscordMessageHelper.BuildMessageWithExecuteWithParams(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, () => a(guild, state));
+                        await DiscordMessageHelper.BuildMessageWithExecuteWithParams(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, () => SwitchGuildStrikeCountState(guild, state));
                     }
                     catch (Exception ex)
                     {
@@ -188,7 +188,7 @@ namespace tsom_bot.Commands
                     }
                 }
 
-                private async Task<Dictionary<string, string>> a(GuildSwitch guild, SwitchState state)
+                private static async Task<Dictionary<string, string>> SwitchGuildStrikeCountState(GuildSwitch guild, SwitchState state)
                 {
                     Dictionary<string, string> parameters = new Dictionary<string, string>();
                     if (guild == GuildSwitch.TJOM)

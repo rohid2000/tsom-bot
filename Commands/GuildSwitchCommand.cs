@@ -1,5 +1,7 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using tsom_bot.Commands.Helpers.EventQueue;
+using tsom_bot.config;
 
 namespace tsom_bot.Commands
 {
@@ -11,6 +13,10 @@ namespace tsom_bot.Commands
             [SlashCommand("guild", "Switches between Guilds")]
             public async Task switchCommand(InteractionContext ctx, [Option("guild", "The selected guild")] GuildSwitch guild)
             {
+                ConfigReader reader = new ConfigReader();
+                await reader.readConfig();
+                await QueueHelper.AddMessageToQueue("test Message", reader.channelIds.test, DateTime.Now.AddMinutes(1));
+
                 ClientManager.guildSwitch = guild;
 
                 string messageString = "BOT switched to ";

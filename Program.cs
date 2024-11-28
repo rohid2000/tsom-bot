@@ -7,6 +7,7 @@ using tsom_bot.Commands.Helpers;
 using tsom_bot;
 using DSharpPlus.SlashCommands;
 using tsom_bot.i18n;
+using MySqlX.XDevAPI;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -51,6 +52,8 @@ internal class Program
 
         //Make connection
         await client.ConnectAsync();
+
+        ClientManager.client = client;
 
         await Database.Init(configReader.connectionString);
         TimerHelper timer = new(client, 60);

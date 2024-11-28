@@ -94,7 +94,7 @@ namespace tsom_bot.Commands.Helpers.Discord
             }
         }
 
-        public async static Task BuildMessageWithExecuteWithParams(InteractionContext ctx, i18nBasicMessages messageContainer, Func<Task<KeyValuePair<string, string>[]>> execute)
+        public async static Task BuildMessageWithExecuteWithParams(InteractionContext ctx, i18nBasicMessages messageContainer, Func<Task<Dictionary<string, string>>> execute)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace tsom_bot.Commands.Helpers.Discord
                 await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
                 await ctx.EditResponseAsync(loadingMessage);
 
-                KeyValuePair<string, string>[] parameters = await execute.Invoke();
+                Dictionary<string, string> parameters = await execute.Invoke();
                 var completeMessageString = i18n.i18n.TransformParams(messageContainer.complete, parameters);
                 DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(completeMessageString);
 

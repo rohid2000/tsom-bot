@@ -188,9 +188,9 @@ namespace tsom_bot.Commands
                     }
                 }
 
-                private async Task<KeyValuePair<string, string>[]> a(GuildSwitch guild, SwitchState state)
+                private async Task<Dictionary<string, string>> a(GuildSwitch guild, SwitchState state)
                 {
-                    KeyValuePair<string, string>[] parameters = [];
+                    Dictionary<string, string> parameters = new Dictionary<string, string>();
                     if (guild == GuildSwitch.TJOM)
                     {
                         ClientManager.launchTicketTrackerSwitchCommandJedi = state == SwitchState.On;
@@ -199,11 +199,9 @@ namespace tsom_bot.Commands
                     {
                         ClientManager.launchTicketTrackerSwitchCommandSith = state == SwitchState.On;
                     }
-                    KeyValuePair<string, string> test = new KeyValuePair<string, string>("state", state.ToString());
 
-
-                    parameters.Append(test);
-                    parameters.Append(new KeyValuePair<string, string>("guild", guild.ToString()));
+                    parameters.Add("guild", guild.ToString());
+                    parameters.Add("state", state.ToString());
                     return parameters;
                 }
             }

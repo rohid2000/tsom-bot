@@ -24,11 +24,12 @@ namespace tsom_bot.i18n
             return tranformableString.Replace("&&p", dcuser.Mention);
         }
 
-        public static string TransformParams(string transformableString, KeyValuePair<string, string>[] parameters)
+        public static string TransformParams(string transformableString, Dictionary<string, string> parameters)
         {
             foreach (var param in parameters)
             {
-                transformableString.Replace($"({param.Key})", param.Value);
+                string test = $"({param.Key})";
+                transformableString = transformableString.Replace(test, param.Value);
             }
 
             return transformableString;

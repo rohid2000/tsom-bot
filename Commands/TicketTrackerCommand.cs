@@ -146,7 +146,7 @@ namespace tsom_bot.Commands
                     int minimumTicketAmount = await ClientManager.minimumTickets();
                     TicketTrackerCommandHelper helper = await TicketTrackerCommandHelper.BuildViewModelAsync(guildId, minimumTicketAmount, ctx.Client);
 
-                    string sMessage = i18n.i18n.Transform(i18n.i18n.data.commands.tickettracker.exclude.add.complete, dcMember);
+                    string sMessage = i18n.i18n.TransformDcUser(i18n.i18n.data.commands.tickettracker.exclude.add.complete, dcMember);
                     if (dayAmount > 0)
                     {
                         sMessage += $" for {dayAmount} days";
@@ -175,10 +175,34 @@ namespace tsom_bot.Commands
                     await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.remove, () => helper.RemoveMemberToNVT(dcMember));
                 }
 
-                [SlashCommand("guildstrikecount", "turns off strike-list count for selected guild")]
-                public async Task TurnOffTicketTrackerCommand(InteractionContext ctx)
+                [SlashCommand("guildstrikecount", "Switch state of strike count for selected Guild")]
+                public async Task SwitchStrikeCountState(InteractionContext ctx, [Option("guild", "guild to switch")]GuildSwitch guild, [Option("state", "The state if strike count is being tracked")] SwitchState state)
                 {
-                    await DiscordMessageHelper.BuildMessageWithExecute(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, TicketTrackerSwitchCommandHelper.SwitchLaunchTicketTrackCommand);
+                    try
+                    {
+                        await DiscordMessageHelper.BuildMessageWithExecuteWithParams(ctx, i18n.i18n.data.commands.tickettracker.exclude.guildStrikeCount, () => SwitchGuildStrikeCountState(guild, state));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+
+                private static async Task<Dictionary<string, string>> SwitchGuildStrikeCountState(GuildSwitch guild, SwitchState state)
+                {
+                    Dictionary<string, string> parameters = new Dictionary<string, string>();
+                    if (guild == GuildSwitch.TJOM)
+                    {
+                        ClientManager.launchTicketTrackerSwitchCommandJedi = state == SwitchState.On;
+                    }
+                    if (guild == GuildSwitch.TSOM)
+                    {
+                        ClientManager.launchTicketTrackerSwitchCommandSith = state == SwitchState.On;
+                    }
+
+                    parameters.Add("guild", guild.ToString());
+                    parameters.Add("state", state.ToString());
+                    return parameters;
                 }
             }
         }

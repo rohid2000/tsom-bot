@@ -93,5 +93,29 @@ namespace tsom_bot.Commands.Helpers.Discord
                 Console.WriteLine(ex.Message);
             }
         }
+
+        public async static Task BuildMessageWithExecuteWithParams(InteractionContext ctx, i18nBasicMessages messageContainer, Func<Task<Dictionary<string, string>>> execute)
+        {
+            try
+            {
+                DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent(messageContainer.loading);
+
+                await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+                await ctx.EditResponseAsync(loadingMessage);
+
+                Dictionary<string, string> parameters = await execute.Invoke();
+                var completeMessageString = i18n.i18n.TransformParams(messageContainer.complete, parameters);
+                DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(completeMessageString);
+
+                await ctx.EditResponseAsync(completeMessage);
+            }
+            catch (Exception ex)
+            {
+                DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent(messageContainer.fail);
+
+                await ctx.EditResponseAsync(failMessage);
+                Console.WriteLine(messageContainer.fail + "\n ERROR: " + ex.Message);
+            }
+        }
     }
 }

@@ -19,9 +19,20 @@ namespace tsom_bot.i18n
             }
         }
 
-        public static string Transform(string tranformableString, DiscordUser dcuser)
+        public static string TransformDcUser(string tranformableString, DiscordUser dcuser)
         {
             return tranformableString.Replace("&&p", dcuser.Mention);
+        }
+
+        public static string TransformParams(string transformableString, Dictionary<string, string> parameters)
+        {
+            foreach (var param in parameters)
+            {
+                string test = $"({param.Key})";
+                transformableString = transformableString.Replace(test, param.Value);
+            }
+
+            return transformableString;
         }
     }
     public class i18nStructure

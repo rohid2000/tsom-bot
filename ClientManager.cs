@@ -52,4 +52,10 @@ namespace tsom_bot
         TSOM,
         TJOM
     }
+
+    public enum SwitchState
+    {
+        On,
+        Off
+    }
 }

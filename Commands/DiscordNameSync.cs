@@ -24,14 +24,14 @@ namespace tsom_bot.Commands
                 {
                     await Database.SendSqlSave($"INSERT INTO sync (playerName, discordId) VALUES ('{name}', {ctx.Member.Id})");
 
-                    string messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.complete, ctx.Member);
+                    string messageS = i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.name.complete, ctx.Member);
                     DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(messageS);
                     await ctx.EditResponseAsync(message);
                 }
                 catch (Exception ex)
                 {
                     await ctx.EditResponseAsync(failMessage);
-                    Console.WriteLine(i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.fail, ctx.Member) + "\n ERROR: " + ex.Message);
+                    Console.WriteLine(i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.name.fail, ctx.Member) + "\n ERROR: " + ex.Message);
                 }
             }
 
@@ -49,7 +49,7 @@ namespace tsom_bot.Commands
                     {
                         await Database.SendSqlSave($"DELETE FROM sync WHERE playerName = '{name.ToLower()}'");
 
-                        string messageS = i18n.i18n.Transform(i18n.i18n.data.commands.sync.remove.complete, ctx.Member);
+                        string messageS = i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.remove.complete, ctx.Member);
                         DiscordWebhookBuilder message = new DiscordWebhookBuilder().WithContent(messageS);
                         await ctx.EditResponseAsync(message);
                     }
@@ -63,7 +63,7 @@ namespace tsom_bot.Commands
                 catch (Exception ex)
                 {
                     await ctx.EditResponseAsync(failMessage);
-                    Console.WriteLine(i18n.i18n.Transform(i18n.i18n.data.commands.sync.name.fail, ctx.Member) + "\n ERROR: " + ex.Message);
+                    Console.WriteLine(i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.name.fail, ctx.Member) + "\n ERROR: " + ex.Message);
                 }
             }
 
@@ -97,7 +97,7 @@ namespace tsom_bot.Commands
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(i18n.i18n.Transform(i18n.i18n.data.commands.sync.nolist.fail, ctx.Member) + "\n ERROR: " + ex.Message);
+                        Console.WriteLine(i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.nolist.fail, ctx.Member) + "\n ERROR: " + ex.Message);
                     }
                 }
 
@@ -106,7 +106,7 @@ namespace tsom_bot.Commands
                 {
                     if (!dcMember.IsBot)
                     {
-                        messageS += i18n.i18n.Transform(i18n.i18n.data.commands.sync.nolist.complete, dcMember);
+                        messageS += i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.nolist.complete, dcMember);
                     }
                 }
 
@@ -150,7 +150,7 @@ namespace tsom_bot.Commands
                 catch (Exception ex)
                 {
                     await ctx.EditResponseAsync(failMessage);
-                    Console.WriteLine(i18n.i18n.Transform(i18n.i18n.data.commands.sync.test.fail, ctx.Member) + "\n ERROR: " + ex.Message);
+                    Console.WriteLine(i18n.i18n.TransformDcUser(i18n.i18n.data.commands.sync.test.fail, ctx.Member) + "\n ERROR: " + ex.Message);
                 }
 
                 if (result != null && result.Rows.Count >= 1)

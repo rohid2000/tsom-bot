@@ -1,10 +1,8 @@
-﻿
-using DSharpPlus;
-using DSharpPlus.Entities;
+﻿using DSharpPlus;
 using System.Data;
 using tsom_bot.Commands.Helpers.EventQueue;
-using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
+using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers
 {
@@ -20,6 +18,8 @@ namespace tsom_bot.Commands.Helpers
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;
+                await removeAllCheckCommands();
+                await SetFirstTicketCheckCommandInQueue();
                 await CheckForCommand();
             },
             null,
@@ -49,84 +49,77 @@ namespace tsom_bot.Commands.Helpers
             }
         }
 
-        private bool IsInCycle(int cycleCooldown)
+        public async Task removeAllCheckCommands()
         {
-            return ClientManager.time % cycleCooldown == 0;
-        }
+            DataTable resultTicket = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventId = 3");
+            DataTable resultPromotion = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventId = 4");
 
-        private bool IsInCycle(int cycleCooldown, int adjustedInterval, bool runOnLaunch)
-        {
-            if (ClientManager.time == adjustedInterval && runOnLaunch)
-                return true;
-            return (ClientManager.time - adjustedInterval) % cycleCooldown == 0;
-        }
-
-        private async Task SyncGuildSaveCommand(bool runOnLaunch)
-        {
-            ConfigReader configReader = new ConfigReader();
-            await configReader.readConfig();
-
-            int strikeListSendTimeHour = configReader.strikeListSendTime.hour;
-            int strikeListSendTimeMinute = configReader.strikeListSendTime.minute;
-            int strikeListSendTimeSecond = configReader.strikeListSendTime.second;
-
-            DateTime now = DateTime.Now;
-            DateTime syncTime = new(now.Year, now.Month, now.Day, strikeListSendTimeHour, strikeListSendTimeMinute, strikeListSendTimeSecond);
-
-            int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
-
-            if (ClientManager.time >= differenceInMin) 
+            foreach(DataRow row in resultTicket.Rows)
             {
-                await AddPromotionCommandToQueue();
+                await QueueHelper.RemoveQueuedItem(row);
+            }
+            if(resultPromotion.Rows.Count > 0)
+            {
+                foreach (DataRow row in resultPromotion.Rows)
+                {
+                    DateTime sendTime = row.Field<DateTime>("sendDate");
+                    if (sendTime < DateTime.Now)
+                    {
+                        await QueueHelper.RemoveQueuedItem(row);
+                        await SetFirstPromotionCheckCommandInQueue();
+                    }
+                }
+            }
+            else
+            {
+                await SetFirstPromotionCheckCommandInQueue();
             }
         }
 
-        private async Task SyncCheckPromotion(bool runOnLaunch)
+        public async Task SetFirstTicketCheckCommandInQueue()
         {
+            ConfigReader reader = new ConfigReader();
+            await reader.readConfig();
+
             DateTime now = DateTime.Now;
-            DateTime syncTime = new(now.Year, now.Month, now.Day, 20, 0, 0);
+            DateTime queueTime = new DateTime(now.Year, now.Month, now.Day, reader.strikeListSendTime.hour, reader.strikeListSendTime.minute, 0);
 
-            int differenceInMin = (int)MathF.Floor((float)(syncTime - ClientManager.timerStartTime).TotalMinutes);
-
-            if (ClientManager.time >= differenceInMin)
+            if(queueTime > now)
             {
-                await this.SendCheckPromotionCommand(differenceInMin, runOnLaunch);
+                queueTime.AddDays(1);
             }
-        }
 
-        private async Task AddPromotionCommandToQueue()
-        {
-            ConfigReader configReader = new ConfigReader();
-            await configReader.readConfig();
-        }
-
-        public async Task SendCheckPromotionCommand(int adjustedInterval, bool runOnLaunch)
-        {
-            int cycleCooldown = 24 * 60 * 30;
-            if (IsInCycle(cycleCooldown, adjustedInterval, runOnLaunch))
+            ulong channelId;
+            string guildId;
+            if (ClientManager.launchTicketTrackerSwitchCommandJedi)
             {
-                ConfigReader reader = new ConfigReader();
-                await reader.readConfig();
-                var channelIdSith = reader.channelIds.sith.commands_private;
-                var channelIdJedi = reader.channelIds.jedi.commands_private;
-                var chanSith = await _client.GetChannelAsync(channelIdSith);
-                var chanJedi = await _client.GetChannelAsync(channelIdJedi);
+                channelId = reader.channelIds.test;
+                guildId = await ClientManager.getGuildId(GuildSwitch.TJOM);
+            }
+            else
+            {
+                channelId = reader.channelIds.test;
+                guildId = await ClientManager.getGuildId(GuildSwitch.TSOM);
+            }
 
-                GuildSwitch resetGuildSwitch = ClientManager.guildSwitch;
+            await QueueHelper.AddTicketCheckToQueue(channelId, guildId, queueTime);
+        }
 
-                if (chanSith != null) 
-                {
-                    ClientManager.guildSwitch = GuildSwitch.TSOM;
-                    await TimedPromotionHelper.SyncPromotions(_client, i18n.i18n.data.commands.promotion.sync.complete);
-                }
+        public async Task SetFirstPromotionCheckCommandInQueue(bool runOnLaunch = false)
+        {
+            ConfigReader reader = new ConfigReader();
+            await reader.readConfig();
 
-                if(chanJedi != null)
-                {
-                    ClientManager.guildSwitch = GuildSwitch.TJOM;
-                    await TimedPromotionHelper.SyncPromotions(_client, i18n.i18n.data.commands.promotion.sync.complete);
-                }
+            DateTime now = DateTime.Now;
+            DateTime queueTime = new DateTime(now.Year, now.Month, now.Day, 20, 0, 0);
 
-                ClientManager.guildSwitch = resetGuildSwitch;
+            if (!runOnLaunch)
+            {
+                await QueueHelper.AddPromotionCheckToQueue(queueTime.AddMonths(1));
+            }
+            else
+            {
+                await QueueHelper.AddPromotionCheckToQueue(queueTime);
             }
         }
     }

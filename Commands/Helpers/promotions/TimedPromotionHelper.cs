@@ -10,7 +10,7 @@ namespace tsom_bot.Commands.Helpers.promotions
 {
     public static class TimedPromotionHelper
     {
-        public async static Task SyncPromotions(DiscordClient client, i18nStructurePromotionCommandSyncComplete completeMessage, InteractionContext? ctx = null)
+        public async static Task SyncPromotions(i18nStructurePromotionCommandSyncComplete completeMessage, InteractionContext? ctx = null, GuildSwitch? guildSwitch = null)
         {
             ConfigReader reader = new();
             await reader.readConfig();
@@ -25,8 +25,18 @@ namespace tsom_bot.Commands.Helpers.promotions
             List<DiscordMember> padawanPromoters = new List<DiscordMember>();
             List<DiscordMember> younglingPromoters = new List<DiscordMember>();
 
-            IReadOnlyDictionary<ulong, DiscordMember> allMembers = client.Guilds[reader.server_id].Members;
-            ulong roleId = ClientManager.guildSwitch == GuildSwitch.TSOM ? reader.clanrole_ids.sith : reader.clanrole_ids.jedi;
+            GuildSwitch currentSwitch;
+            if(guildSwitch.HasValue)
+            {
+                currentSwitch = (GuildSwitch)guildSwitch;
+            }
+            else
+            {
+                currentSwitch = ClientManager.guildSwitch;
+            }
+
+            IReadOnlyDictionary<ulong, DiscordMember> allMembers = ClientManager.client.Guilds[reader.server_id].Members;
+            ulong roleId = currentSwitch == GuildSwitch.TSOM ? reader.clanrole_ids.sith : reader.clanrole_ids.jedi;
 
             List<KeyValuePair<ulong, DiscordMember>> members = allMembers.Where((member) => member.Value.Roles.Where((role) => role.Id == roleId).Count() > 0).ToList();
 
@@ -48,7 +58,7 @@ namespace tsom_bot.Commands.Helpers.promotions
 
                     string? roleName = null;
                     Role? role = null;
-                    if (ClientManager.guildSwitch == GuildSwitch.TSOM)
+                    if (currentSwitch == GuildSwitch.TSOM)
                     {
                         if (totalDays >= reader.rolePromotionDays.sith.sithlord)
                         {
@@ -84,7 +94,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Acolyte, dcMember))
                             {
-                                await helper.GiveRole(client, role ?? Role.Acolyte, dcMember);
+                                await helper.GiveRole(role ?? Role.Acolyte, dcMember);
                                 switch (role)
                                 {
                                     case Role.Acolyte:
@@ -130,7 +140,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                         {
                             if (!await RoleHelper.hasRole(role ?? Role.Youngling, dcMember))
                             {
-                                await helper.GiveRole(client, role ?? Role.Youngling, dcMember);
+                                await helper.GiveRole(role ?? Role.Youngling, dcMember);
 
                                 switch (role)
                                 {
@@ -157,14 +167,14 @@ namespace tsom_bot.Commands.Helpers.promotions
                     Role role = convertStringToRole(result.Rows[0].Field<string>("role"));
                     if (!await RoleHelper.hasRole(role, dcMember))
                     {
-                        await helper.GiveRole(client, role, dcMember);
+                        await helper.GiveRole(role, dcMember);
                     }
                 }
             }
 
-            DiscordGuild guild = client.Guilds[reader.server_id];
+            DiscordGuild guild = ClientManager.client.Guilds[reader.server_id];
 
-            if (ClientManager.guildSwitch == GuildSwitch.TSOM)
+            if (currentSwitch == GuildSwitch.TSOM)
             {
                 if(
                     HasPromotions(acolytePromoters) ||
@@ -193,6 +203,13 @@ namespace tsom_bot.Commands.Helpers.promotions
                         DiscordWebhookBuilder tsomMessageB = new DiscordWebhookBuilder().WithContent(tsomMessage);
                         await ctx.EditResponseAsync(tsomMessageB);
                     }
+                    else
+                    {
+                        DiscordChannel channel = await ClientManager.client.GetChannelAsync(reader.channelIds.sith.promotions);
+                        await new DiscordMessageBuilder()
+                        .WithContent(tsomMessage)
+                        .SendAsync(channel);
+                    }
                 }
                 else
                 {
@@ -200,6 +217,13 @@ namespace tsom_bot.Commands.Helpers.promotions
                     {
                         DiscordWebhookBuilder tsomMessage = new DiscordWebhookBuilder().WithContent("No Promotions this month");
                         await ctx.EditResponseAsync(tsomMessage);
+                    }
+                    else
+                    {
+                        DiscordChannel channel = await ClientManager.client.GetChannelAsync(reader.channelIds.sith.promotions);
+                        await new DiscordMessageBuilder()
+                        .WithContent("No Promotions this month")
+                        .SendAsync(channel);
                     }
                 }
             }
@@ -232,6 +256,13 @@ namespace tsom_bot.Commands.Helpers.promotions
                         DiscordWebhookBuilder tjomMessageB = new DiscordWebhookBuilder().WithContent(tjomMessage);
                         await ctx.EditResponseAsync(tjomMessageB);
                     }
+                    else
+                    {
+                        DiscordChannel channel = await ClientManager.client.GetChannelAsync(reader.channelIds.jedi.promotions);
+                        await new DiscordMessageBuilder()
+                        .WithContent(tjomMessage)
+                        .SendAsync(channel);
+                    }
                 }
                 else
                 {
@@ -239,6 +270,13 @@ namespace tsom_bot.Commands.Helpers.promotions
                     {
                         DiscordWebhookBuilder tsomMessage = new DiscordWebhookBuilder().WithContent("No Promotions this month");
                         await ctx.EditResponseAsync(tsomMessage);
+                    }
+                    else
+                    {
+                        DiscordChannel channel = await ClientManager.client.GetChannelAsync(reader.channelIds.jedi.promotions);
+                        await new DiscordMessageBuilder()
+                        .WithContent("No Promotions this month")
+                        .SendAsync(channel);
                     }
                 }
             }

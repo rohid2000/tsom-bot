@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Linq;
 using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
@@ -18,6 +17,17 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             await Database.SendSqlSave(sql);
         }
 
+        public async static Task AddTicketCheckToQueue(ulong channelid, string guildId, DateTime sendDate)
+        {
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (3, 'channelid={channelid},guildid={guildId}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            await Database.SendSqlSave(sql);
+        }
+        public async static Task AddPromotionCheckToQueue(DateTime sendDate)
+        {
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (4, '', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            await Database.SendSqlSave(sql);
+        }
+
         public async static Task<DataTable> GetQueueItemWithTime(DateTime time)
         {
             return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate = '{ time.ToString("yyyy-MM-dd HH:mm") }'");
@@ -29,6 +39,28 @@ namespace tsom_bot.Commands.Helpers.EventQueue
 
         public async static Task SendQueueCommand(DataRow row)
         {
+            int commandIndex = row.Field<int>("eventid");
+            switch (commandIndex)
+            {
+                case 1:
+                    await QueueCommands.sendMessage(GetParameters(row));
+                    break;
+                case 2:
+                    await QueueCommands.defenseFallback(GetParameters(row));
+                    break;
+                case 3:
+                    await QueueCommands.checkTickets(GetParameters(row));
+                    break;
+                case 4:
+                    await QueueCommands.checkPromotions();
+                    break;
+            }
+
+            await RemoveQueuedItem(row);
+        }
+
+        private static Dictionary<string, string> GetParameters(DataRow row)
+        {
             string param = row.Field<string>("parameters");
             int commandIndex = row.Field<int>("eventid");
             string[] parameters = param.Split(",");
@@ -39,17 +71,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                 paramsDictionary.Add(textSplit[0], textSplit[1]);
             }
 
-            switch (commandIndex)
-            {
-                case 1:
-                    await QueueCommands.sendMessage(paramsDictionary);
-                    break;
-                case 2:
-                    await QueueCommands.defenseFallback(paramsDictionary);
-                    break;
-            }
-
-            await RemoveQueuedItem(row);
+            return paramsDictionary;
         }
     }
 }

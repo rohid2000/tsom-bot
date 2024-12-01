@@ -12,8 +12,20 @@ namespace tsom_bot.Commands
     public class TimeCommand : ApplicationCommandModule
     {
         [SlashCommandGroup("queue", "Set a time for a command to be executed")]
-        public class TimedMessagesContainer : ApplicationCommandModule
+        public class QueueContainer : ApplicationCommandModule
         {
+            [SlashCommandGroup("list", "Configure Raid messages automatic")]
+            public class QueueListContainer : ApplicationCommandModule
+            {
+                [SlashCommand("show", "show a list of all queue items")]
+                public async Task showQueueItems(InteractionContext ctx)
+                {
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+                    DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent("LIST");
+                    await ctx.EditResponseAsync(completeMessage);
+                }
+            }
             [SlashCommandGroup("event", "Configure Raid messages automatic")]
             public class GuildEventsContainer : ApplicationCommandModule
             {

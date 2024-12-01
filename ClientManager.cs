@@ -12,18 +12,32 @@ namespace tsom_bot
         public static bool launchTicketTrackerSwitchCommandJedi = false;
         public static DiscordClient client;
 
-        public static async Task<string> getGuildId()
+        public static async Task<string> getGuildId(GuildSwitch? guildSwitch = null)
         {
             ConfigReader reader = new ConfigReader();
             await reader.readConfig();
 
-            if(guildSwitch == GuildSwitch.TSOM) 
+            if(guildSwitch != null)
             {
-                return reader.guild_ids.sith;
+                if (guildSwitch == GuildSwitch.TSOM)
+                {
+                    return reader.guild_ids.sith;
+                }
+                else
+                {
+                    return reader.guild_ids.jedi;
+                }
             }
             else
             {
-                return reader.guild_ids.jedi;
+                if (ClientManager.guildSwitch == GuildSwitch.TSOM)
+                {
+                    return reader.guild_ids.sith;
+                }
+                else
+                {
+                    return reader.guild_ids.jedi;
+                }
             }
         }
 

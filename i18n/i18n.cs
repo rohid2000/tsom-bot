@@ -27,7 +27,6 @@ namespace tsom_bot.i18n
     public class i18nStructure
     {
         public i18nStructureCommands commands { get; set; }
-        public i18nRaidMessages raid { get; set; }
     }
 
     public class i18nStructureCommands
@@ -148,11 +147,5 @@ namespace tsom_bot.i18n
         {
             return result ? this.true_message : this.false_message;
         }
-    }
-
-    public class i18nRaidMessages
-    {
-        public string livePing { get; set; }
-        public string dayLeft { get; set; }
     }
 }

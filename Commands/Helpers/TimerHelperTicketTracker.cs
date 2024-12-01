@@ -44,7 +44,7 @@ namespace tsom_bot.Commands.Helpers
             {
                 foreach(DataRow row in result.Rows)
                 {
-                    await QueueHelper.SendQueueCommand(row.Field<int>("eventId"), row.Field<string>("parameters"));
+                    await QueueHelper.SendQueueCommand(row);
                 }
             }
         }

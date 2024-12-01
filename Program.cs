@@ -44,7 +44,7 @@ internal class Program
         slash.RegisterCommands<PromotionCommand>();
         slash.RegisterCommands<GuildSwitchCommand>();
         slash.RegisterCommands<DiscordNameSync>();
-        slash.RegisterCommands<QueueCommand>();
+        slash.RegisterCommands<TimeCommand>();
 
         commands = client.UseCommandsNext(commandsConfig);
 
@@ -60,6 +60,7 @@ internal class Program
         TimerHelper timer = new(client, 60);
         ClientManager.timerStartTime = DateTime.Now;
         i18n.load();
+        guildEvents.load();
         //Keep bot running
         await Task.Delay(-1);
     }

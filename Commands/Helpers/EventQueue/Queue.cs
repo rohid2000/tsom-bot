@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
@@ -28,6 +29,11 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             await Database.SendSqlSave(sql);
         }
 
+        public async static Task<DataTable> GetQueueItemToTime(DateTime time)
+        {
+            return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate <= '{time.ToString("yyyy-MM-dd HH:mm")}'");
+        }
+
         public async static Task<DataTable> GetQueueItemWithTime(DateTime time)
         {
             return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate = '{ time.ToString("yyyy-MM-dd HH:mm") }'");
@@ -35,6 +41,43 @@ namespace tsom_bot.Commands.Helpers.EventQueue
         public async static Task<DataTable> RemoveQueuedItem(DataRow row)
         {
             return await Database.SendSqlPull($"DELETE FROM queuedevents WHERE sendDate = '{row.Field<DateTime>("sendDate").ToString("yyyy-MM-dd HH:mm")}' AND parameters = '{row.Field<string>("parameters")}'");
+        }
+
+        public static string QueueItemToString(DataRow row)
+        {
+            StringBuilder sb = new StringBuilder();
+            int eventId = row.Field<int>("eventid");
+            DateTime time = row.Field<DateTime>("sendDate");
+            string timeString = "";
+            if(DateTime.Now.Day == time.Day && DateTime.Now.Month == time.Month)
+            {
+                double minutes = (time - DateTime.Now).TotalMinutes;
+                int hours = (int)Math.Floor(minutes / 60);
+                minutes -= hours * 60;
+                timeString = $" {hours}h <{Math.Ceiling(minutes)}m left until send";
+            }
+            else
+            {
+                timeString = $"for {time.ToString("yyyy-MM-dd HH:mm")}";
+            }
+            if(eventId == 1)
+            {
+                sb.AppendLine("Message queued" + timeString);
+            }
+            else if(eventId == 2)
+            {
+                sb.AppendLine($"Defense Configure Ping" + timeString);
+            }
+            else if(eventId == 3)
+            {
+                sb.AppendLine($"Ticket check queued" + timeString);
+            }
+            else if(eventId == 4)
+            {
+                sb.AppendLine($"Promotion check queued" + timeString);
+            }
+
+            return sb.ToString();
         }
 
         public async static Task SendQueueCommand(DataRow row)

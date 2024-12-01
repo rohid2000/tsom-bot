@@ -18,11 +18,30 @@ namespace tsom_bot.Commands
             public class QueueListContainer : ApplicationCommandModule
             {
                 [SlashCommand("show", "show a list of all queue items")]
-                public async Task showQueueItems(InteractionContext ctx)
+                public async Task showQueueItems(InteractionContext ctx, 
+                    [Choice("1 week", 0)]
+                    [Choice("1 month", 1)]
+                    [Option("time", "the max time to search to")] long time = 0)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+                    DateTime toTime = DateTime.Now;
+                    if(time == 0)
+                    {
+                        toTime = toTime.AddDays(7);
+                    }
+                    else
+                    {
+                        toTime = toTime.AddMonths(1);
+                    }
+                    DataTable result = await QueueHelper.GetQueueItemToTime(toTime);
 
-                    DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent("LIST");
+                    string message = $"Total off {result.Rows.Count} items in queue until {toTime.ToString("yyyy-MM-dd")}\n";
+                    foreach(DataRow row in result.Rows)
+                    {
+                        message += QueueHelper.QueueItemToString(row) + "\n";
+                    }
+
+                    DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(message);
                     await ctx.EditResponseAsync(completeMessage);
                 }
             }

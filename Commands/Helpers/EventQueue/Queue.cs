@@ -8,7 +8,8 @@ namespace tsom_bot.Commands.Helpers.EventQueue
     {
         public async static Task AddMessageToQueue(string message, ulong channelid, DateTime sendDate)
         {
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (1, 'message={message},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            string formattedMessage = message.Replace(",", "||@@");
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (1, 'message={formattedMessage},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
             await Database.SendSqlSave(sql);
         }
 

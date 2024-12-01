@@ -9,14 +9,15 @@ namespace tsom_bot.Commands.Helpers.EventQueue
     {
         public static async Task sendMessage(Dictionary<string, string> parameters)
         {
-            string messageString = parameters.GetValueOrDefault("message");
+            string formattedMessage = parameters.GetValueOrDefault("message");
             string channelIdString = parameters.GetValueOrDefault("channelid");
             var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
 
-            if(channel != null)
+            string convertedMessage = formattedMessage.Replace("||@@", ",");
+            if (channel != null)
             {
                 await new DiscordMessageBuilder()
-                .WithContent(messageString)
+                .WithContent(convertedMessage)
                 .SendAsync(channel);
             }
         }

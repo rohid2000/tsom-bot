@@ -36,10 +36,10 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                 DateTime fillerTime = defenseTime.AddHours(48);
 
                 await new DiscordMessageBuilder()
-                    .WithContent(guildEvents.data.tw.defensev1.xbanner)
+                    .WithContent(guildEvents.data.tw.defenseUnder20banners.timestamp1)
                     .SendAsync(channel);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev1.ybanner, reader.channelIds.test, ybannerTime);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev1.filler, reader.channelIds.test, fillerTime);
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime);
             }
         }
 

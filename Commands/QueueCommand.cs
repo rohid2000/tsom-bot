@@ -17,7 +17,7 @@ namespace tsom_bot.Commands
             [SlashCommandGroup("list", "Configure Raid messages automatic")]
             public class QueueListContainer : ApplicationCommandModule
             {
-                [SlashCommand("show", "show a list of all queue items")]
+                [SlashCommand("show", "shows a list of all items in queue")]
                 public async Task showQueueItems(InteractionContext ctx, 
                     [Choice("1 week", 0)]
                     [Choice("1 month", 1)]
@@ -78,8 +78,8 @@ namespace tsom_bot.Commands
                 }
                 [SlashCommand("setDefense", "set the defense phase for a tw")]
                 public async Task setdfPings(InteractionContext ctx,
-                    [Choice("V1", 0)]
-                    [Choice("V2", 1)]
+                    [Choice("defenseUnder20banners", 0)]
+                    [Choice("defenseOver20banners", 1)]
                     [Option("version", "Version of the defense")] long defenseVersion = 0)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
@@ -94,15 +94,15 @@ namespace tsom_bot.Commands
                         DateTime fillerTime = defenseTime.AddHours(48);
                         if (defenseVersion == 0)
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev1.xbanner, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev1.ybanner, reader.channelIds.test, ybannerTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev1.filler, reader.channelIds.test, fillerTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp1, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime);
                         }
                         else
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev2.xbanner, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev2.ybanner, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defensev2.filler, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp1, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp2, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.filler, reader.channelIds.test, defenseTime);
                         }
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Added defense pings!");

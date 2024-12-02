@@ -15,7 +15,6 @@ namespace tsom_bot.Commands
             {
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
-                await QueueHelper.AddMessageToQueue("test Message", reader.channelIds.test, DateTime.Now.AddMinutes(1));
 
                 ClientManager.guildSwitch = guild;
 

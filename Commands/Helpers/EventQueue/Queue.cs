@@ -6,27 +6,27 @@ namespace tsom_bot.Commands.Helpers.EventQueue
 {
     public static class QueueHelper
     {
-        public async static Task AddMessageToQueue(string message, ulong channelid, DateTime sendDate)
+        public async static Task AddMessageToQueue(string message, ulong channelid, DateTime sendDate, string description = null)
         {
             string formattedMessage = message.Replace(",", "||@@");
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (1, 'message={formattedMessage},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (1, 'message={formattedMessage},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
 
-        public async static Task AddTwDefenseToQueue(ulong channelid, DateTime sendDate)
+        public async static Task AddTwDefenseToQueue(ulong channelid, DateTime sendDate, string description = null)
         {
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (2, 'channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (2, 'channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
 
-        public async static Task AddTicketCheckToQueue(ulong channelid, string guildId, DateTime sendDate)
+        public async static Task AddTicketCheckToQueue(ulong channelid, string guildId, DateTime sendDate, string description = null)
         {
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (3, 'channelid={channelid},guildid={guildId}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (3, 'channelid={channelid},guildid={guildId}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
-        public async static Task AddPromotionCheckToQueue(DateTime sendDate)
+        public async static Task AddPromotionCheckToQueue(DateTime sendDate, string description = null)
         {
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate) VALUES (4, '', '{sendDate.ToString("yyyy-MM-dd HH:mm")}')";
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (4, '', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
 
@@ -47,10 +47,10 @@ namespace tsom_bot.Commands.Helpers.EventQueue
         public static string QueueItemToString(DataRow row)
         {
             StringBuilder sb = new StringBuilder();
-            int eventId = row.Field<int>("eventid");
             DateTime time = row.Field<DateTime>("sendDate");
+
             string timeString = "";
-            if(DateTime.Now.Day == time.Day && DateTime.Now.Month == time.Month)
+            if (DateTime.Now.Day == time.Day && DateTime.Now.Month == time.Month)
             {
                 double minutes = (time - DateTime.Now).TotalMinutes;
                 int hours = (int)Math.Floor(minutes / 60);
@@ -61,23 +61,17 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             {
                 timeString = $"for {time.ToString("yyyy-MM-dd HH:mm")}";
             }
-            if(eventId == 1)
-            {
-                sb.AppendLine("Message queued" + timeString);
-            }
-            else if(eventId == 2)
-            {
-                sb.AppendLine($"Defense Configure Ping" + timeString);
-            }
-            else if(eventId == 3)
-            {
-                sb.AppendLine($"Ticket check queued" + timeString);
-            }
-            else if(eventId == 4)
-            {
-                sb.AppendLine($"Promotion check queued" + timeString);
-            }
 
+            string? description = row.Field<string>("Description");
+            if (description != null)
+            {
+                sb.AppendLine(description + " | " + timeString);
+            }
+            else
+            {
+                int eventId = row.Field<int>("eventid");
+                sb.AppendLine(GetEventStringById(eventId) + " | " + timeString);
+            }
             return sb.ToString();
         }
 
@@ -103,7 +97,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             await RemoveQueuedItem(row);
         }
 
-        private static Dictionary<string, string> GetParameters(DataRow row)
+        public static Dictionary<string, string> GetParameters(DataRow row)
         {
             string param = row.Field<string>("parameters");
             int commandIndex = row.Field<int>("eventid");
@@ -116,6 +110,38 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             }
 
             return paramsDictionary;
+        }
+        private static string FormatDescription(string? description)
+        {
+            if (description != null)
+            {
+                return "'" + description?.Replace(",", "||@@") + "'";
+            }
+            else
+            {
+                return "NULL";
+            }
+        }
+
+        public static string GetEventStringById(int eventId)
+        {
+            if (eventId == 1)
+            {
+                return "Message";
+            }
+            else if (eventId == 2)
+            {
+                return "Defense Configure Ping";
+            }
+            else if (eventId == 3)
+            {
+                return "Ticket Check";
+            }
+            else if (eventId == 4)
+            {
+                return "Promotion Check";
+            }
+            return "NOT INMPLEMENTED";
         }
     }
 }

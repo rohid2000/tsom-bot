@@ -1,11 +1,14 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using tsom_bot.Commands.Helpers.EventQueue;
 using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace tsom_bot.Commands
 {
@@ -34,10 +37,11 @@ namespace tsom_bot.Commands
                         toTime = toTime.AddMonths(1);
                     }
                     DataTable result = await QueueHelper.GetQueueItemToTime(toTime);
-
                     string message = $"Total off {result.Rows.Count} items in queue until {toTime.ToString("yyyy-MM-dd")}\n";
-                    foreach(DataRow row in result.Rows)
+
+                    for(int i = 0; i < result.Rows.Count; i++)
                     {
+                        DataRow row = result.Rows[i];
                         message += QueueHelper.QueueItemToString(row) + "\n";
                     }
 
@@ -76,7 +80,8 @@ namespace tsom_bot.Commands
                         await ctx.EditResponseAsync(failMessage);
                     }
                 }
-                [SlashCommand("setDefense", "set the defense phase for a tw")]
+
+                [SlashCommand("setdefense", "set the defense phase for a tw")]
                 public async Task setdfPings(InteractionContext ctx,
                     [Choice("defenseUnder20banners", 0)]
                     [Choice("defenseOver20banners", 1)]
@@ -92,17 +97,22 @@ namespace tsom_bot.Commands
                         DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate");
                         DateTime ybannerTime = defenseTime.AddHours(24);
                         DateTime fillerTime = defenseTime.AddHours(48);
+
+                        string timestamp1Description = "TW Defense Ping 1";
+                        string timestamp2Description = "TW Defense Ping 2";
+                        string fillerDescription = "TW Defense Filler Ping";
+
                         if (defenseVersion == 0)
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp1, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime, timestamp2Description);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime, fillerDescription);
                         }
                         else
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp1, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp2, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.filler, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp2, reader.channelIds.test, defenseTime, timestamp2Description);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.filler, reader.channelIds.test, defenseTime, fillerDescription);
                         }
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Added defense pings!");
@@ -114,8 +124,9 @@ namespace tsom_bot.Commands
                         await ctx.EditResponseAsync(failMessage);
                     }
                 }
+
                 [SlashCommand("raid", "Add all pings for a specific raid")]
-                public async Task addRaidPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime)
+                public async Task addRaidPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime, [Option("raidType", "which raid is starting")] RaidType raidType)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
                     try
@@ -126,11 +137,13 @@ namespace tsom_bot.Commands
                         await reader.readConfig();
 
                         // First ping on start
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.live, reader.channelIds.test, dateTime);
+                        string liveDescription = $"{raidType} Raid - Live ping";
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.live, reader.channelIds.test, dateTime, liveDescription);
 
                         // Ping 24h before end
                         DateTime endTime = dateTime.AddHours(71 - 24);
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.dayLeft, reader.channelIds.test, endTime);
+                        string dayLeftDescription = $"{raidType} Raid - Day left ping";
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.dayLeft, reader.channelIds.test, endTime, dayLeftDescription);
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Messages added to the queue, Startdate is {dateTime.ToString()}");
                         await ctx.EditResponseAsync(completeMessage);

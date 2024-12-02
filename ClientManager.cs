@@ -62,4 +62,10 @@ namespace tsom_bot
         TSOM,
         TJOM
     }
+
+    public enum RaidType
+    {
+        Naboo,
+        Speederbike
+    }
 }

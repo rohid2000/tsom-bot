@@ -96,13 +96,13 @@ namespace tsom_bot.Commands
                         {
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp1, reader.channelIds.test, defenseTime);
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime);
                         }
                         else
                         {
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp1, reader.channelIds.test, defenseTime);
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp2, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.filler, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, defenseTime);
                         }
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Added defense pings!");

@@ -42,6 +42,7 @@ namespace tsom_bot.i18n
         public string signup;
         public guildEventsTWSDefensetructure defenseUnder20banners;
         public guildEventsTWSDefensetructure defenseOver20banners;
+        public string filler;
         public string attack;
     }
 
@@ -49,6 +50,5 @@ namespace tsom_bot.i18n
     {
         public string timestamp1;
         public string timestamp2;
-        public string filler;
     }
 }

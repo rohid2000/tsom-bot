@@ -40,7 +40,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                     .WithContent(guildEvents.data.tw.defenseUnder20banners.timestamp1)
                     .SendAsync(channel);
                 await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.filler, reader.channelIds.test, fillerTime);
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime);
             }
         }
 

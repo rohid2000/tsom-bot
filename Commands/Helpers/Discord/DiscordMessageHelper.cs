@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Text.RegularExpressions;
 using tsom_bot.i18n;
 
 namespace tsom_bot.Commands.Helpers.Discord
@@ -92,6 +93,43 @@ namespace tsom_bot.Commands.Helpers.Discord
                 await ctx.EditResponseAsync(failMessage);
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        public async static Task<string> FormatMessage(string message)
+        {
+            string formattedMessage;
+            formattedMessage = message.Replace("||@@", ",");
+
+            string pattern = @"@@(.*?)@@"; // Regex pattern to match text surrounded by @@
+            MatchCollection matches = Regex.Matches(formattedMessage, pattern);
+            Dictionary<string, string> replacements = new Dictionary<string, string>();
+
+            // Process each match asynchronously
+            foreach (Match match in matches)
+            {
+                string name = match.Groups[1].Value;
+                if (!replacements.ContainsKey(name))
+                {
+                    DiscordMember? discordMember = await DiscordUserHelper.GetDiscordMemberByDiscordName(name);
+                    if (discordMember != null)
+                    {
+                        replacements[name] = discordMember.Mention;
+                    }
+                    else
+                    {
+                        replacements[name] = name;
+                    }
+                }
+            }
+
+            // Replace matches in the input string
+            formattedMessage = Regex.Replace(formattedMessage, pattern, match =>
+            {
+                string name = match.Groups[1].Value;
+                return replacements[name];
+            });
+
+            return formattedMessage;
         }
     }
 }

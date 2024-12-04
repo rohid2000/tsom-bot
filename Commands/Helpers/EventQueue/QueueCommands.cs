@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using tsom_bot.Commands.Helpers.Discord;
 using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
 using tsom_bot.i18n;
@@ -13,7 +14,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             string channelIdString = parameters.GetValueOrDefault("channelid");
             var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
 
-            string convertedMessage = formattedMessage.Replace("||@@", ",");
+            string convertedMessage = await DiscordMessageHelper.FormatMessage(formattedMessage);
             if (channel != null)
             {
                 await new DiscordMessageBuilder()

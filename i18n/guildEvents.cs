@@ -39,6 +39,8 @@ namespace tsom_bot.i18n
 
     public class guildEventsTWStructure
     {
+        public string[] header;
+        public string[] footer;
         public string signup;
         public guildEventsTWSDefensetructure defenseUnder20zones;
         public guildEventsTWSDefensetructure defenseOver20zones;
@@ -48,6 +50,7 @@ namespace tsom_bot.i18n
 
     public class guildEventsTWSDefensetructure
     {
+        public string pingMessage;
         public string timestamp1;
         public string timestamp2;
     }

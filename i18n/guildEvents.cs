@@ -39,7 +39,6 @@ namespace tsom_bot.i18n
 
     public class guildEventsTWStructure
     {
-        public string[] header;
         public string[] footer;
         public string signup;
         public guildEventsTWSDefensetructure defenseUnder20zones;

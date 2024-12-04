@@ -94,14 +94,14 @@ namespace tsom_bot.Commands
                         DateTime fillerTime = defenseTime.AddHours(48);
                         if (defenseVersion == 0)
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp1, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20banners.timestamp2, reader.channelIds.test, ybannerTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp1, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, reader.channelIds.test, ybannerTime);
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime);
                         }
                         else
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp1, reader.channelIds.test, defenseTime);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20banners.timestamp2, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp1, reader.channelIds.test, defenseTime);
+                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp2, reader.channelIds.test, defenseTime);
                             await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, defenseTime);
                         }
 

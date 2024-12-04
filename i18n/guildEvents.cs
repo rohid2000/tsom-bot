@@ -40,8 +40,8 @@ namespace tsom_bot.i18n
     public class guildEventsTWStructure
     {
         public string signup;
-        public guildEventsTWSDefensetructure defenseUnder20banners;
-        public guildEventsTWSDefensetructure defenseOver20banners;
+        public guildEventsTWSDefensetructure defenseUnder20zones;
+        public guildEventsTWSDefensetructure defenseOver20zones;
         public string filler;
         public string attack;
     }

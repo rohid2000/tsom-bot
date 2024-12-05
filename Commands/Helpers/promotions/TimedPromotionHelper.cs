@@ -186,7 +186,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
                     tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-                    tsomMessage += completeMessage.sith.GetRandomFooter();
+                    tsomMessage += completeMessage.sith.GetRandomFooter() + "<:emoji_9~2:>";
 
                     if (ctx != null)
                     {
@@ -225,7 +225,7 @@ namespace tsom_bot.Commands.Helpers.promotions
                     tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
                     tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
 
-                    tjomMessage += completeMessage.jedi.GetRandomFooter();
+                    tjomMessage += completeMessage.jedi.GetRandomFooter() + "<:emoji_9~1:>";
 
                     if (ctx != null)
                     {

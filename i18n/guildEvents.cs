@@ -53,4 +53,21 @@ namespace tsom_bot.i18n
         public string timestamp1;
         public string timestamp2;
     }
+
+    public class guildEventsTBStructure
+    {
+        public string[] header;
+        public string[] phaseGenericFooter;
+        public string[] phaseSpecificFooter;
+        public guildEventsTBPhasePingStructure separatistMight;
+        public guildEventsTBPhasePingStructure republicOffense;
+    }
+
+    public class guildEventsTBPhasePingStructure
+    {
+        public string phase1pingMessage;
+        public string phase2pingMessage;
+        public string phase3pingMessage;
+        public string phase4pingMessage;
+    }
 }

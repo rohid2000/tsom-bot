@@ -58,7 +58,7 @@ namespace tsom_bot.i18n
     {
         public string[] header;
         public string[] phaseGenericFooter;
-        public string[] phaseSpecificFooter;
+        public string[] phase4Footer;
         public guildEventsTBPhasePingStructure separatistMight;
         public guildEventsTBPhasePingStructure republicOffense;
     }
@@ -69,5 +69,6 @@ namespace tsom_bot.i18n
         public string phase2pingMessage;
         public string phase3pingMessage;
         public string phase4pingMessage;
+        public string? specificFooter;
     }
 }

@@ -14,11 +14,13 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             string channelIdString = parameters.GetValueOrDefault("channelid");
             var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
 
-            string convertedMessage = await DiscordMessageHelper.FormatMessage(formattedMessage);
+            KeyValuePair<string, IEnumerable<IMention>> convertedMessageResult = await DiscordMessageHelper.FormatMessage(formattedMessage);
+
             if (channel != null)
             {
                 await new DiscordMessageBuilder()
-                .WithContent(convertedMessage)
+                .WithContent(convertedMessageResult.Key)
+                .WithAllowedMentions(convertedMessageResult.Value)
                 .SendAsync(channel);
             }
         }

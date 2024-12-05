@@ -1,6 +1,8 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Text.RegularExpressions;
+using tsom_bot.config;
 using tsom_bot.i18n;
 
 namespace tsom_bot.Commands.Helpers.Discord
@@ -95,7 +97,7 @@ namespace tsom_bot.Commands.Helpers.Discord
             }
         }
 
-        public async static Task<string> FormatMessage(string message)
+        public async static Task<KeyValuePair<string, IEnumerable<IMention>>> FormatMessage(string message)
         {
             string formattedMessage;
             formattedMessage = message.Replace("||@@", ",");
@@ -104,20 +106,40 @@ namespace tsom_bot.Commands.Helpers.Discord
             MatchCollection matches = Regex.Matches(formattedMessage, pattern);
             Dictionary<string, string> replacements = new Dictionary<string, string>();
 
+            IEnumerable<IMention> mentions = [];
+
             // Process each match asynchronously
             foreach (Match match in matches)
             {
                 string name = match.Groups[1].Value;
                 if (!replacements.ContainsKey(name))
                 {
-                    DiscordMember? discordMember = await DiscordUserHelper.GetDiscordMemberByDiscordName(name);
-                    if (discordMember != null)
+                    ConfigReader reader = new ConfigReader();
+                    await reader.readConfig();
+                    if (name == "tsom")
                     {
-                        replacements[name] = discordMember.Mention;
+                        DiscordRole tsomRole = ClientManager.client.Guilds[reader.server_id].Roles[reader.clanrole_ids.sith];
+                        replacements[name] = tsomRole.Mention;
+                        mentions.Append(new RoleMention(tsomRole));
+                    }
+                    else if(name == "tjom")
+                    {
+                        DiscordRole tjomRole = ClientManager.client.Guilds[reader.server_id].Roles[reader.clanrole_ids.jedi];
+                        replacements[name] = tjomRole.Mention;
+                        mentions.Append(new RoleMention(tjomRole));
                     }
                     else
                     {
-                        replacements[name] = name;
+                        DiscordMember? discordMember = await DiscordUserHelper.GetDiscordMemberByDiscordName(name);
+                        if (discordMember != null)
+                        {
+                            replacements[name] = discordMember.Mention;
+                            mentions.Append(new UserMention(discordMember));
+                        }
+                        else
+                        {
+                            replacements[name] = name;
+                        }
                     }
                 }
             }
@@ -129,7 +151,12 @@ namespace tsom_bot.Commands.Helpers.Discord
                 return replacements[name];
             });
 
-            return formattedMessage;
+            if(formattedMessage.Contains("@everyone"))
+            {
+                mentions.Append(new EveryoneMention());
+            }
+
+            return new KeyValuePair<string, IEnumerable<IMention>>(formattedMessage, mentions);
         }
     }
 }

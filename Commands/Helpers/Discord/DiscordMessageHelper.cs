@@ -1,7 +1,10 @@
-﻿using DSharpPlus;
+﻿using DocumentFormat.OpenXml.Office2019.Excel.ThreadedComments;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using tsom_bot.config;
 using tsom_bot.i18n;
 
@@ -125,60 +128,34 @@ namespace tsom_bot.Commands.Helpers.Discord
             string formattedMessage;
             formattedMessage = message.Replace("||@@", ",");
 
-            List<IMention> mentions = new List<IMention>();
-
-            KeyValuePair<string, List<IMention>> formatMentions = await FormatMentions(formattedMessage, mentions);
-            formattedMessage = formatMentions.Key;
-            mentions.AddRange(formatMentions.Value);
-            KeyValuePair<string, List<IMention>> formatChannels = await FormatChannels(formattedMessage, mentions);
-            formattedMessage = formatChannels.Key;
-            mentions.AddRange(formatChannels.Value);
-
-            if (formattedMessage.Contains("@everyone"))
-            {
-                mentions.Add(new EveryoneMention());
-            }
-
-            return new KeyValuePair<string, List<IMention>>(formattedMessage, mentions);
-        }
-
-        private async static Task<KeyValuePair<string, List<IMention>>> FormatMentions(string formattedMessage, List<IMention> mentions)
-        {
             string pattern = @"@@(.*?)@@"; // Regex pattern to match text surrounded by @@
             MatchCollection matches = Regex.Matches(formattedMessage, pattern);
             Dictionary<string, string> replacements = new Dictionary<string, string>();
-            // Process each match asynchronously
-            foreach (Match match in matches)
+
+            List<IMention> mentions = new List<IMention>();
+
+            foreach (Match match in matches) 
             {
                 string name = match.Groups[1].Value;
                 if (!replacements.ContainsKey(name))
                 {
-                    ConfigReader reader = new ConfigReader();
-                    await reader.readConfig();
-                    if (name == "tsom")
+                    string[] splitName = name.Split(":");
+                    string type = splitName[0];
+
+                    switch (type)
                     {
-                        DiscordRole tsomRole = ClientManager.client.Guilds[reader.server_id].Roles[reader.clanrole_ids.sith];
-                        replacements[name] = tsomRole.Mention;
-                        mentions.Add(new RoleMention(tsomRole));
-                    }
-                    else if (name == "tjom")
-                    {
-                        DiscordRole tjomRole = ClientManager.client.Guilds[reader.server_id].Roles[reader.clanrole_ids.jedi];
-                        replacements[name] = tjomRole.Mention;
-                        mentions.Add(new RoleMention(tjomRole));
-                    }
-                    else
-                    {
-                        DiscordMember? discordMember = await DiscordUserHelper.GetDiscordMemberByDiscordName(name);
-                        if (discordMember != null)
-                        {
-                            replacements[name] = discordMember.Mention;
-                            mentions.Add(new UserMention(discordMember));
-                        }
-                        else
-                        {
-                            replacements[name] = name;
-                        }
+                        case "user":
+                            await FormatUserMention(name, replacements, mentions);
+                            break;
+                        case "role":
+                            await FormatRoleMention(name, replacements, mentions);
+                            break;
+                        case "channel":
+                            await FormatChannel(name, replacements);
+                            break;
+                        case "emoji":
+                            await FormatEmojie(name, replacements);
+                            break;
                     }
                 }
             }
@@ -190,40 +167,70 @@ namespace tsom_bot.Commands.Helpers.Discord
                 return replacements[name];
             });
 
+            if (formattedMessage.Contains("@everyone"))
+            {
+                mentions.Add(new EveryoneMention());
+            }
+
             return new KeyValuePair<string, List<IMention>>(formattedString, mentions);
         }
 
-        private async static Task<KeyValuePair<string, List<IMention>>> FormatChannels(string formattedMessage, List<IMention> mentions)
+        private async static Task FormatUserMention(string value, Dictionary<string, string> replacements, List<IMention> mentions)
         {
-            string pattern = @"##(.*?)##"; // Regex pattern to match text surrounded by @@
-            MatchCollection matches = Regex.Matches(formattedMessage, pattern);
-            Dictionary<string, string> replacements = new Dictionary<string, string>();
-            // Process each match asynchronously
-            foreach (Match match in matches)
+            string name = value.Split(":")[1];
+            DiscordMember? discordMember = await DiscordUserHelper.GetDiscordMemberByDiscordName(name);
+            if (discordMember != null)
             {
-                string name = match.Groups[1].Value;
-                if (!replacements.ContainsKey(name))
-                {
-                    DiscordChannel? channel = await DiscordChannelHelper.GetChannelByName(name);
-                    if (channel != null)
-                    {
-                        replacements[name] = channel.Mention;
-                    }
-                    else
-                    {
-                        replacements[name] = name;
-                    }
-                }
+                replacements[value] = discordMember.Mention;
+                mentions.Add(new UserMention(discordMember));
             }
-
-            // Replace matches in the input string
-            string formattedString =  Regex.Replace(formattedMessage, pattern, match =>
+            else
             {
-                string name = match.Groups[1].Value;
-                return replacements[name];
-            });
+                replacements[value] = name;
+            }
+        }
 
-            return new KeyValuePair<string, List<IMention>>(formattedString, mentions);
+        private async static Task FormatRoleMention(string value, Dictionary<string, string> replacements, List<IMention> mentions)
+        {
+            string name = value.Split(":")[1];
+            DiscordRole? discordRole = await DiscordRoleHelper.GetRoleByName(name);
+            if (discordRole != null)
+            {
+                replacements[value] = discordRole.Mention;
+                mentions.Add(new RoleMention(discordRole));
+            }
+            else
+            {
+                replacements[value] = name;
+            }
+        }
+
+        private async static Task FormatChannel(string value, Dictionary<string, string> replacements)
+        {
+            string name = value.Split(":")[1];
+            DiscordChannel? discordChannel = await DiscordChannelHelper.GetChannelByName(name);
+            if (discordChannel != null)
+            {
+                replacements[value] = discordChannel.Mention;
+            }
+            else
+            {
+                replacements[value] = name;
+            }
+        }
+
+        private async static Task FormatEmojie(string value, Dictionary<string, string> replacements)
+        {
+            string name = value.Split(":")[1];
+            string emoji = await EmojieHelper.GetEmojieByName(name);
+            if (emoji != "")
+            {
+                replacements[value] = emoji;
+            }
+            else
+            {
+                replacements[value] = name;
+            }
         }
     }
 }

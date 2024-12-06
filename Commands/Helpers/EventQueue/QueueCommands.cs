@@ -1,7 +1,9 @@
 ﻿using DSharpPlus.Entities;
+using System.Data;
 using tsom_bot.Commands.Helpers.Discord;
 using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
+using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
@@ -25,25 +27,46 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             }
         }
 
-        public static async Task defenseFallback(Dictionary<string, string> parameters)
+        public static async Task defenseReminder(Dictionary<string, string> parameters)
         {
-            string channelIdString = parameters.GetValueOrDefault("channelid");
-            var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
+            string state = parameters.GetValueOrDefault("state");
 
-            if (channel != null)
+            if(state == "NORMAL")
             {
+                ulong pingChannelId = 1245125125151;
+                var channel = await ClientManager.client.GetChannelAsync(pingChannelId);
+                if (channel != null)
+                {
+                    await new DiscordMessageBuilder()
+                    .WithContent("@everyone Defense has begon and no version has been set, please set with /queue setdefense (version)")
+                    .WithAllowedMention(new EveryoneMention())
+                    .SendAsync(channel);
+                }
+            }
+            else if(state == "FINAL")
+            {
+                string channelIdString = parameters.GetValueOrDefault("channelid");
+
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
 
-                DateTime defenseTime = DateTime.Now;
-                DateTime ybannerTime = defenseTime.AddHours(24);
-                DateTime fillerTime = defenseTime.AddHours(48);
+                DataTable result = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventid = 2");
+                DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate");
+                DateTime ybannerTime = defenseTime.AddHours(6);
+                DateTime fillerTime = defenseTime.AddHours(12);
 
+                string timestamp1Description = "TW Defense Ping 1";
+                string timestamp2Description = "TW Defense Ping 2";
+                string fillerDescription = "TW Defense Filler Ping";
+
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, reader.channelIds.test, ybannerTime, timestamp2Description);
+                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime, fillerDescription);
+
+                var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
                 await new DiscordMessageBuilder()
-                    .WithContent(guildEvents.data.tw.defenseUnder20zones.timestamp1)
-                    .SendAsync(channel);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, reader.channelIds.test, ybannerTime);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime);
+                .WithContent("Defense bannners set!")
+                .SendAsync(channel);
             }
         }
 

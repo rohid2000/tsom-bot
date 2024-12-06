@@ -15,7 +15,12 @@ namespace tsom_bot.Commands.Helpers.EventQueue
 
         public async static Task AddTwDefenseToQueue(ulong channelid, DateTime sendDate, string description = null)
         {
-            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (2, 'channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (2, 'channelid={channelid},state=NORMAL', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
+            await Database.SendSqlSave(sql);
+        }
+        public async static Task AddFinalTwDefenseToQueue(ulong channelid, DateTime sendDate, string description = null)
+        {
+            string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (2, 'channelid={channelid},state=FINAL', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
 
@@ -84,7 +89,6 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                     await QueueCommands.sendMessage(GetParameters(row));
                     break;
                 case 2:
-                    await QueueCommands.defenseFallback(GetParameters(row));
                     break;
                 case 3:
                     await QueueCommands.checkTickets(GetParameters(row));

@@ -68,7 +68,7 @@ namespace tsom_bot.Commands
                         DateTime defenseTime = dateTime.AddHours(24);
                         await QueueHelper.AddTwDefenseToQueue(reader.channelIds.test, defenseTime);
 
-                        DateTime attackTime = dateTime.AddHours(72);
+                        DateTime attackTime = defenseTime.AddHours(23);
                         await QueueHelper.AddMessageToQueue(guildEvents.data.tw.attack, reader.channelIds.test, dateTime);
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Messages added to the queue, Startdate is {dateTime.ToString()}, attack Startdate is {attackTime.ToString()}");
@@ -95,8 +95,8 @@ namespace tsom_bot.Commands
 
                         DataTable result = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventid = 2");
                         DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate");
-                        DateTime ybannerTime = defenseTime.AddHours(24);
-                        DateTime fillerTime = defenseTime.AddHours(48);
+                        DateTime ybannerTime = defenseTime.AddHours(6);
+                        DateTime fillerTime = defenseTime.AddHours(12);
 
                         string timestamp1Description = "TW Defense Ping 1";
                         string timestamp2Description = "TW Defense Ping 2";

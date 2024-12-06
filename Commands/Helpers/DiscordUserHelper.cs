@@ -1,6 +1,7 @@
 ﻿using DSharpPlus.Entities;
 using MySqlX.XDevAPI.Common;
 using System.Data;
+using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers
@@ -14,6 +15,17 @@ namespace tsom_bot.Commands.Helpers
             if(result.Rows.Count == 0) { return null; }
             ulong discordId = (ulong)result.Rows[0].Field<Int64>("discordId");
             return dcMembers.Where(i => i.Value.Id == discordId).ToArray()[0].Value;
+        }
+
+        public async static Task<DiscordMember?> GetDiscordMemberByDiscordName(string discordName)
+        {
+            ConfigReader reader = new ConfigReader();
+            await reader.readConfig();
+            if(ClientManager.client.Guilds[reader.server_id].Members.Where((member) => member.Value.DisplayName.ToLower() == discordName.ToLower()).Any())
+            {
+                return ClientManager.client.Guilds[reader.server_id].Members.Where((member) => member.Value.DisplayName.ToLower() == discordName.ToLower()).First().Value;
+            }
+            return null;
         }
 
         public async static Task<DataTable> GetLinkedAccounts(DiscordMember member)

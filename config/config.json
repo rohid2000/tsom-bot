@@ -48,16 +48,16 @@
   },
   "rolePromotionDays": {
     "sith": {
-      "acolyte": 30,
-      "apprentice": 60,
-      "mandalorian": 90,
-      "sithlord": 120
+      "acolyte": 0,
+      "apprentice": 0,
+      "mandalorian": 0,
+      "sithlord": 0
     },
     "jedi": {
-      "youngling": 30,
-      "padawan": 60,
-      "jediKnight": 90,
-      "jediMaster": 120
+      "youngling": 0,
+      "padawan": 0,
+      "jediKnight": 0,
+      "jediMaster": 0
     }
   }
 }

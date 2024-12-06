@@ -6,12 +6,12 @@ namespace tsom_bot.Commands.Helpers.promotions
 {
     public class RolePromotionHelper
     {
-        public async Task GiveRole(DiscordClient client, Role role, DiscordMember dcMember)
+        public async Task GiveRole(Role role, DiscordMember dcMember)
         {
             ConfigReader reader = new();
             await reader.readConfig();;
 
-            DiscordGuild guild = client.Guilds[reader.server_id];
+            DiscordGuild guild = ClientManager.client.Guilds[reader.server_id];
             DiscordRole? dcRole = null;
 
             DiscordRole acolyteRole = guild.GetRole(reader.roleIds.sith.acolyte);

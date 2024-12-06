@@ -7,6 +7,12 @@ using tsom_bot.Commands.Helpers;
 using tsom_bot;
 using DSharpPlus.SlashCommands;
 using tsom_bot.i18n;
+using MySqlX.XDevAPI;
+using tsom_bot.Commands.Helpers.EventQueue;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using DSharpPlus.Entities;
+using System.Data;
+using DSharpPlus.EventArgs;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -43,6 +49,7 @@ internal class Program
         slash.RegisterCommands<PromotionCommand>();
         slash.RegisterCommands<GuildSwitchCommand>();
         slash.RegisterCommands<DiscordNameSync>();
+        slash.RegisterCommands<TimeCommand>();
 
         commands = client.UseCommandsNext(commandsConfig);
 
@@ -51,11 +58,13 @@ internal class Program
 
         //Make connection
         await client.ConnectAsync();
-
+        ClientManager.client = client;
         await Database.Init(configReader.connectionString);
+
         TimerHelper timer = new(client, 60);
         ClientManager.timerStartTime = DateTime.Now;
         i18n.load();
+        guildEvents.load();
         //Keep bot running
         await Task.Delay(-1);
     }

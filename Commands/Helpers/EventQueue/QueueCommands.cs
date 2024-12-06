@@ -14,7 +14,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             string channelIdString = parameters.GetValueOrDefault("channelid");
             var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
 
-            KeyValuePair<string, IEnumerable<IMention>> convertedMessageResult = await DiscordMessageHelper.FormatMessage(formattedMessage);
+            KeyValuePair<string, List<IMention>> convertedMessageResult = await DiscordMessageHelper.FormatMessage(formattedMessage);
 
             if (channel != null)
             {

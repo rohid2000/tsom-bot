@@ -2,6 +2,7 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Data;
+using System.Diagnostics;
 using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
@@ -186,7 +187,8 @@ namespace tsom_bot.Commands.Helpers.promotions
                     tsomMessage += GetRolePromotionsString(mandalorianPromoters, mandalorianRole);
                     tsomMessage += GetRolePromotionsString(sithlordPromoters, sithLordRole);
 
-                    tsomMessage += completeMessage.sith.GetRandomFooter() + "<:emoji_9~2:>";
+                    string sithEmoji = EmojieHelper.GetEmojiesById(EmojieHelper.Emojies.sithEmoji, guild);
+                    tsomMessage += completeMessage.sith.GetRandomFooter() + sithEmoji;
 
                     if (ctx != null)
                     {
@@ -225,7 +227,8 @@ namespace tsom_bot.Commands.Helpers.promotions
                     tjomMessage += GetRolePromotionsString(jediKnightPromoters, jediKnightRole);
                     tjomMessage += GetRolePromotionsString(jediMasterPromoters, jediMasterRole);
 
-                    tjomMessage += completeMessage.jedi.GetRandomFooter() + "<:emoji_9~1:>";
+                    string jediEmojie = EmojieHelper.GetEmojiesById(EmojieHelper.Emojies.jediEmoji, guild);
+                    tjomMessage += completeMessage.jedi.GetRandomFooter() + jediEmojie;
 
                     if (ctx != null)
                     {

@@ -8,7 +8,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
     {
         public async static Task AddMessageToQueue(string message, ulong channelid, DateTime sendDate, string description = null)
         {
-            string formattedMessage = message.Replace(",", "||@@");
+            string formattedMessage = message.Replace(",", "|||");
             string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (1, 'message={formattedMessage},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
@@ -35,9 +35,9 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             await Database.SendSqlSave(sql);
         }
 
-        public async static Task<DataTable> GetQueueItemToTime(DateTime time)
+        public async static Task<DataTable> GetQueueItemFromToTime(DateTime fromTime, DateTime toTime)
         {
-            return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate <= '{time.ToString("yyyy-MM-dd HH:mm")}'");
+            return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate BETWEEN '{fromTime.ToString("yyyy-MM-dd HH:mm")}' AND '{toTime.ToString("yyyy-MM-dd HH:mm")}' ORDER BY sendDate DESC");
         }
 
         public async static Task<DataTable> GetQueueItemWithTime(DateTime time)
@@ -60,11 +60,11 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                 double minutes = (time - DateTime.Now).TotalMinutes;
                 int hours = (int)Math.Floor(minutes / 60);
                 minutes -= hours * 60;
-                timeString = $" {hours}h <{Math.Ceiling(minutes)}m left until send";
+                timeString = $"*{hours}h <{Math.Ceiling(minutes)}m* left until send";
             }
             else
             {
-                timeString = $"for {time.ToString("yyyy-MM-dd HH:mm")}";
+                timeString = $"*{time.ToString("yyyy-MM-dd HH:mm")}*";
             }
 
             string? description = row.Field<string>("Description");
@@ -89,6 +89,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                     await QueueCommands.sendMessage(GetParameters(row));
                     break;
                 case 2:
+                    await QueueCommands.defenseReminder(GetParameters(row));
                     break;
                 case 3:
                     await QueueCommands.checkTickets(GetParameters(row));
@@ -119,7 +120,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
         {
             if (description != null)
             {
-                return "'" + description?.Replace(",", "||@@") + "'";
+                return "'" + description?.Replace(",", "|||") + "'";
             }
             else
             {

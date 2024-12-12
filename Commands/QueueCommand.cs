@@ -3,12 +3,13 @@ using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using tsom_bot.Commands.Helpers.EventQueue;
 using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace tsom_bot.Commands
 {
@@ -36,16 +37,19 @@ namespace tsom_bot.Commands
                     {
                         toTime = toTime.AddMonths(1);
                     }
-                    DataTable result = await QueueHelper.GetQueueItemToTime(toTime);
-                    string message = $"Total off {result.Rows.Count} items in queue until {toTime.ToString("yyyy-MM-dd")}\n";
+                    DataTable result = await QueueHelper.GetQueueItemFromToTime(DateTime.Now, toTime);
+
+                    StringBuilder message = new StringBuilder();
+                    message.AppendLine($"Total items: {result.Rows.Count}, in the queue");
+
 
                     for(int i = 0; i < result.Rows.Count; i++)
                     {
                         DataRow row = result.Rows[i];
-                        message += QueueHelper.QueueItemToString(row) + "\n";
+                        message.AppendLine(QueueHelper.QueueItemToString(row));
                     }
 
-                    DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(message);
+                    DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(message.ToString());
                     await ctx.EditResponseAsync(completeMessage);
                 }
             }
@@ -69,9 +73,16 @@ namespace tsom_bot.Commands
                         await QueueHelper.AddTwDefenseToQueue(reader.channelIds.test, defenseTime);
 
                         DateTime attackTime = defenseTime.AddHours(23);
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.tw.attack, reader.channelIds.test, dateTime);
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.tw.attack, reader.channelIds.test, attackTime);
 
-                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Messages added to the queue, Startdate is {dateTime.ToString()}, attack Startdate is {attackTime.ToString()}");
+
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine("**TW Pings configured**");
+                        stringBuilder.AppendLine("- Signup Ping for " + "*" +  dateTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- Defense Ping for " + "*" + defenseTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- Attack Ping for " + "*" + attackTime.ToString("MM-dd hh:mm") + "*");
+
+                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(stringBuilder.ToString());
                         await ctx.EditResponseAsync(completeMessage);
                     }
                     catch
@@ -94,33 +105,32 @@ namespace tsom_bot.Commands
                         await reader.readConfig();
 
                         DataTable result = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventid = 2");
-                        DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate");
-                        DateTime ybannerTime = defenseTime.AddHours(6);
-                        DateTime fillerTime = defenseTime.AddHours(12);
-
-                        string timestamp1Description = "TW Defense Ping 1";
-                        string timestamp2Description = "TW Defense Ping 2";
-                        string fillerDescription = "TW Defense Filler Ping";
-
-                        if (defenseVersion == 0)
+                        if (result.Rows.Count > 0) 
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, reader.channelIds.test, ybannerTime, timestamp2Description);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime, fillerDescription);
+                            string version = defenseVersion == 0 ? "defenseUnder20banners" : "defenseOver20banners";
+
+                            Dictionary<string, string> parameters = new Dictionary<string, string>()
+                            {
+                                { "state", "FINAL" },
+                                { "channelid", reader.channelIds.test.ToString() },
+                                { "version", defenseVersion.ToString() }
+                            };
+                            await QueueCommands.defenseReminder(parameters, ctx);
+                            await QueueHelper.RemoveQueuedItem(result.Rows[0]);
+
+                            DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Defense version set to **{version}** ping message send!");
+                            await ctx.EditResponseAsync(completeMessage);
                         }
                         else
                         {
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp2, reader.channelIds.test, defenseTime, timestamp2Description);
-                            await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, defenseTime, fillerDescription);
+                            DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent($"**could not find tw in queue!**, Please add a tw event before setting the defense fase!");
+                            await ctx.EditResponseAsync(failMessage);
                         }
-
-                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Added defense pings!");
-                        await ctx.EditResponseAsync(completeMessage);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent($"could not find tw in queue, Please add a tw event before setting the defense fase!");
+                        Debug.WriteLine(e);
+                        DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent($"**ERRROR** please contact developer");
                         await ctx.EditResponseAsync(failMessage);
                     }
                 }
@@ -145,7 +155,12 @@ namespace tsom_bot.Commands
                         string dayLeftDescription = $"{raidType} Raid - Day left ping";
                         await QueueHelper.AddMessageToQueue(guildEvents.data.raid.dayLeft, reader.channelIds.test, endTime, dayLeftDescription);
 
-                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent($"Messages added to the queue, Startdate is {dateTime.ToString()}");
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine($"*({raidType})* **Raid Pings configured**");
+                        stringBuilder.AppendLine("- Live Ping for " + "*" + dateTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- 1 Day Left Ping for " + "*" + endTime.ToString("MM-dd hh:mm") + "*");
+
+                        DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(stringBuilder.ToString());
                         await ctx.EditResponseAsync(completeMessage);
                     }
                     catch

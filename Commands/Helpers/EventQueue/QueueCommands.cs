@@ -1,10 +1,14 @@
 ﻿using DSharpPlus.Entities;
+using DSharpPlus.SlashCommands;
 using System.Data;
+using System.Text;
 using tsom_bot.Commands.Helpers.Discord;
 using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
+using ZstdSharp.Unsafe;
+using static System.Net.WebRequestMethods;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
 {
@@ -27,14 +31,15 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             }
         }
 
-        public static async Task defenseReminder(Dictionary<string, string> parameters)
+        public static async Task defenseReminder(Dictionary<string, string> parameters, InteractionContext ctx = null)
         {
             string state = parameters.GetValueOrDefault("state");
+            ulong channelid = ulong.Parse(parameters.GetValueOrDefault("channelid"));
 
-            if(state == "NORMAL")
+            if (state == "NORMAL")
             {
-                ulong pingChannelId = 1245125125151;
-                var channel = await ClientManager.client.GetChannelAsync(pingChannelId);
+                ulong adminChannelId = 1207774070985199636;
+                var channel = await ClientManager.client.GetChannelAsync(adminChannelId);
                 if (channel != null)
                 {
                     await new DiscordMessageBuilder()
@@ -42,30 +47,69 @@ namespace tsom_bot.Commands.Helpers.EventQueue
                     .WithAllowedMention(new EveryoneMention())
                     .SendAsync(channel);
                 }
+
+                await QueueHelper.AddFinalTwDefenseToQueue(channelid, DateTime.Now.AddMinutes(15), "Final Defense Ping");
             }
             else if(state == "FINAL")
             {
-                string channelIdString = parameters.GetValueOrDefault("channelid");
-
                 ConfigReader reader = new ConfigReader();
                 await reader.readConfig();
 
                 DataTable result = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventid = 2");
-                DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate");
-                DateTime ybannerTime = defenseTime.AddHours(6);
-                DateTime fillerTime = defenseTime.AddHours(12);
+                DateTime defenseTime = result.Rows[0].Field<DateTime>("sendDate").AddMinutes(-15);
+                DateTime timestamp1Time = defenseTime.AddHours(6);
+                DateTime timestamp2Time = defenseTime.AddHours(12);
+                DateTime fillerTime = defenseTime.AddHours(18);
 
                 string timestamp1Description = "TW Defense Ping 1";
                 string timestamp2Description = "TW Defense Ping 2";
                 string fillerDescription = "TW Defense Filler Ping";
 
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp1, reader.channelIds.test, defenseTime, timestamp1Description);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, reader.channelIds.test, ybannerTime, timestamp2Description);
-                await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, reader.channelIds.test, fillerTime, fillerDescription);
+                string version = parameters.GetValueOrDefault("version") ?? "0";
+                if (version == "0")
+                {
+                    Dictionary<string, string> messageParameters = new Dictionary<string, string>
+                {
+                    { "message", guildEvents.data.tw.defenseUnder20zones.pingMessage },
+                    { "channelid", channelid.ToString() }
+                };
+                    await sendMessage(messageParameters); // send ping message instant
 
-                var channel = await ClientManager.client.GetChannelAsync(ulong.Parse(channelIdString));
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp1, channelid, timestamp1Time, timestamp1Description);
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseUnder20zones.timestamp2, channelid, timestamp2Time, timestamp2Description);
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, channelid, fillerTime, fillerDescription);
+                }
+                else if(version == "1") 
+                {
+                    Dictionary<string, string> messageParameters = new Dictionary<string, string>
+                {
+                    { "message", guildEvents.data.tw.defenseOver20zones.pingMessage },
+                    { "channelid", channelid.ToString() }
+                };
+                    await sendMessage(messageParameters); // send ping message instant
+
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp1, channelid, timestamp1Time, timestamp1Description);
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.defenseOver20zones.timestamp2, channelid, timestamp2Time, timestamp2Description);
+                    await QueueHelper.AddMessageToQueue(guildEvents.data.tw.filler, channelid, fillerTime, fillerDescription);
+                }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine("**Defense Ping configured!**");
+                stringBuilder.AppendLine("- Added TimeStamp 1 ping for " + timestamp1Time.ToString("MM-dd hh:mm"));
+                stringBuilder.AppendLine("- Added TimeStamp 2 ping for " + timestamp2Time.ToString("MM-dd hh:mm"));
+                stringBuilder.AppendLine("- Added Filler ping for " + fillerTime.ToString("MM-dd hh:mm"));
+                
+                DiscordChannel channel; 
+                if (ctx != null) 
+                { 
+                    channel = ctx.Channel; 
+                } 
+                else 
+                { 
+                    channel = await ClientManager.client.GetChannelAsync(channelid);
+                }
                 await new DiscordMessageBuilder()
-                .WithContent("Defense bannners set!")
+                .WithContent(stringBuilder.ToString())
                 .SendAsync(channel);
             }
         }
@@ -93,7 +137,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             .SendAsync(channel);
 
             file.Close();
-            File.Delete(file.Name);
+            System.IO.File.Delete(file.Name);
         }
 
         public static async Task checkPromotions()

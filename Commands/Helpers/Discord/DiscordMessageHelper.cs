@@ -126,7 +126,7 @@ namespace tsom_bot.Commands.Helpers.Discord
         public async static Task<KeyValuePair<string, List<IMention>>> FormatMessage(string message)
         {
             string formattedMessage;
-            formattedMessage = message.Replace("||@@", ",");
+            formattedMessage = message.Replace("|||", ",");
 
             string pattern = @"@@(.*?)@@"; // Regex pattern to match text surrounded by @@
             MatchCollection matches = Regex.Matches(formattedMessage, pattern);

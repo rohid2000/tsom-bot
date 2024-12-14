@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text;
+using tsom_bot.Commands.Helpers.Discord;
 using tsom_bot.Fetcher.database;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
@@ -8,7 +9,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
     {
         public async static Task AddMessageToQueue(string message, ulong channelid, DateTime sendDate, string description = null)
         {
-            string formattedMessage = message.Replace(",", "|||");
+            string formattedMessage = DiscordMessageHelper.FormatForDatabase(message);
             string sql = $"INSERT INTO queuedevents (eventid, parameters, sendDate, description) VALUES (1, 'message={formattedMessage},channelid={channelid}', '{sendDate.ToString("yyyy-MM-dd HH:mm")}', {FormatDescription(description)})";
             await Database.SendSqlSave(sql);
         }
@@ -136,7 +137,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
             }
             else if (eventId == 2)
             {
-                return "Defense Configure Ping";
+                return "Terretory War Defense Configure Ping";
             }
             else if (eventId == 3)
             {

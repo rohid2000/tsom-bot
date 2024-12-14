@@ -127,6 +127,7 @@ namespace tsom_bot.Commands.Helpers.Discord
         {
             string formattedMessage;
             formattedMessage = message.Replace("|||", ",");
+            formattedMessage = formattedMessage.Replace("%%%", "'");
 
             string pattern = @"@@(.*?)@@"; // Regex pattern to match text surrounded by @@
             MatchCollection matches = Regex.Matches(formattedMessage, pattern);
@@ -231,6 +232,13 @@ namespace tsom_bot.Commands.Helpers.Discord
             {
                 replacements[value] = name;
             }
+        }
+
+        public static string FormatForDatabase(string value)
+        {
+            string formattedMessage = value.Replace(",", "|||");
+            formattedMessage = formattedMessage.Replace("'", "%%%");
+            return formattedMessage;
         }
     }
 }

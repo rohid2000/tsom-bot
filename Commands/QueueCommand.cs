@@ -1,4 +1,6 @@
-﻿using DSharpPlus;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Collections.Generic;
@@ -162,6 +164,97 @@ namespace tsom_bot.Commands
 
                         DiscordWebhookBuilder completeMessage = new DiscordWebhookBuilder().WithContent(stringBuilder.ToString());
                         await ctx.EditResponseAsync(completeMessage);
+                    }
+                    catch
+                    {
+                        DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent($"could not convert startTime please use the format: yyyy-MM-dd HH:mm");
+                        await ctx.EditResponseAsync(failMessage);
+                    }
+                }
+
+                [SlashCommand("tb", "Add all pings for a specific territory battle")]
+                public async Task addTbPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime, [Option("raidType", "which raid is starting")] TBType tbType, [Option("guild", "The selected guild")] GuildSwitch guild)
+                {
+                    await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+                    ConfigReader reader = new ConfigReader();
+                    await reader.readConfig();
+
+                    try
+                    {
+                        DateTime phase1SendTime = DateTime.ParseExact(raidStartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                        DateTime phase2SendTime = phase1SendTime.AddHours(6);
+                        DateTime phase3SendTime = phase2SendTime.AddHours(6);
+                        DateTime phase4SendTime = phase3SendTime.AddHours(6);
+
+                        string phase1PingMessage = guildEvents.data.tb.GetRandomHeader(1, tbType) + "\n\n";
+                        string phase2PingMessage = guildEvents.data.tb.GetRandomHeader(2, tbType) + "\n\n";
+                        string phase3PingMessage = guildEvents.data.tb.GetRandomHeader(3, tbType) + "\n\n";
+                        string phase4PingMessage = guildEvents.data.tb.GetRandomHeader(4, tbType) + "\n\n";
+
+                        if (tbType == TBType.RepublicOffense)
+                        {
+                            phase1PingMessage += guildEvents.data.tb.republicOffense.phase1pingMessage;
+                            phase2PingMessage += guildEvents.data.tb.republicOffense.phase2pingMessage;
+                            phase3PingMessage += guildEvents.data.tb.republicOffense.phase3pingMessage;
+                            phase4PingMessage += guildEvents.data.tb.republicOffense.phase4pingMessage;
+
+                            if (guildEvents.data.tb.republicOffense.specificFooter != null)
+                            {
+                                phase1PingMessage += "\n\n" + guildEvents.data.tb.republicOffense.specificFooter;
+                                phase2PingMessage += "\n\n" + guildEvents.data.tb.republicOffense.specificFooter;
+                                phase3PingMessage += "\n\n" + guildEvents.data.tb.republicOffense.specificFooter;
+                                phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
+                            }
+                            else
+                            {
+                                phase1PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase2PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase3PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
+                            }
+
+                            await QueueHelper.AddMessageToQueue(phase1PingMessage, reader.channelIds.test, phase1SendTime, "TB Phase 1 Ping (republicOffense)");
+                            await QueueHelper.AddMessageToQueue(phase2PingMessage, reader.channelIds.test, phase2SendTime, "TB Phase 2 Ping (republicOffense)");
+                            await QueueHelper.AddMessageToQueue(phase3PingMessage, reader.channelIds.test, phase3SendTime, "TB Phase 3 Ping (republicOffense)");
+                            await QueueHelper.AddMessageToQueue(phase4PingMessage, reader.channelIds.test, phase4SendTime, "TB Phase 4 Ping (republicOffense)");
+                        }
+                        else if (tbType == TBType.SeparatistMight)
+                        {
+                            phase1PingMessage += guildEvents.data.tb.separatistMight.phase1pingMessage;
+                            phase2PingMessage += guildEvents.data.tb.separatistMight.phase2pingMessage;
+                            phase3PingMessage += guildEvents.data.tb.separatistMight.phase3pingMessage;
+                            phase4PingMessage += guildEvents.data.tb.separatistMight.phase4pingMessage;
+
+                            if (guildEvents.data.tb.separatistMight.specificFooter != null)
+                            {
+                                phase1PingMessage += "\n\n" + guildEvents.data.tb.separatistMight.specificFooter;
+                                phase2PingMessage += "\n\n" + guildEvents.data.tb.separatistMight.specificFooter;
+                                phase3PingMessage += "\n\n" + guildEvents.data.tb.separatistMight.specificFooter;
+                                phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
+                            }
+                            else
+                            {
+                                phase1PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase2PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase3PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
+                                phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
+                            }
+
+                            await QueueHelper.AddMessageToQueue(phase1PingMessage, reader.channelIds.test, phase1SendTime, "TB Phase 1 Ping (separatistMight)");
+                            await QueueHelper.AddMessageToQueue(phase2PingMessage, reader.channelIds.test, phase2SendTime, "TB Phase 2 Ping (separatistMight)");
+                            await QueueHelper.AddMessageToQueue(phase3PingMessage, reader.channelIds.test, phase3SendTime, "TB Phase 3 Ping (separatistMight)");
+                            await QueueHelper.AddMessageToQueue(phase4PingMessage, reader.channelIds.test, phase4SendTime, "TB Phase 4 Ping (separatistMight)");
+                        }
+
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine($"*({tbType})* **TB Pings configured**");
+                        stringBuilder.AppendLine("- Phase 1 Ping for " + "*" + phase1SendTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- Phase 2 Ping for " + "*" + phase2SendTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- Phase 3 Ping for " + "*" + phase3SendTime.ToString("MM-dd hh:mm") + "*");
+                        stringBuilder.AppendLine("- Phase 4 Ping for " + "*" + phase4SendTime.ToString("MM-dd hh:mm") + "*");
+
+                        DiscordWebhookBuilder successMessage = new DiscordWebhookBuilder().WithContent(stringBuilder.ToString());
+                        await ctx.EditResponseAsync(successMessage);
                     }
                     catch
                     {

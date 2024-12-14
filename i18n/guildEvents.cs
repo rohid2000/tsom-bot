@@ -29,6 +29,7 @@ namespace tsom_bot.i18n
     {
         public guildEventsRaidStructure raid;
         public guildEventsTWStructure tw;
+        public guildEventsTBStructure tb;
     }
 
     public class guildEventsRaidStructure
@@ -61,6 +62,28 @@ namespace tsom_bot.i18n
         public string[] phase4Footer;
         public guildEventsTBPhasePingStructure separatistMight;
         public guildEventsTBPhasePingStructure republicOffense;
+
+        public string GetRandomFooter(GuildSwitch guild)
+        {
+            string footerString = phaseGenericFooter[phaseGenericFooter.Length - 1];
+            footerString = footerString.Replace("(guild)", guild.ToString());
+            return footerString;
+        }
+
+        public string GetRandomHeader(short phase, TBType type)
+        {
+            string headerString = header[header.Length - 1];
+            headerString = headerString.Replace("(phase)", $"Phase {phase}");
+            headerString = headerString.Replace("(type)", type.ToString());
+            return headerString;
+        }
+
+        public string GetRandomPhase4Footer(GuildSwitch guild)
+        {
+            string footerString = phase4Footer[phase4Footer.Length - 1];
+            footerString = footerString.Replace("(guild)", guild.ToString());
+            return footerString;
+        }
     }
 
     public class guildEventsTBPhasePingStructure

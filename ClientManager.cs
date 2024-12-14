@@ -72,4 +72,10 @@ namespace tsom_bot
         Naboo,
         Speederbike
     }
+
+    public enum TBType
+    {
+        SeparatistMight,
+        RepublicOffense
+    }
 }

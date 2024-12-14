@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Data;
 using System.Text;

@@ -10,9 +10,9 @@ namespace tsom_bot.Commands.Helpers.Discord
             ConfigReader reader = new ConfigReader();
             await reader.readConfig();
 
-            if(ClientManager.client.Guilds[reader.server_id].Channels.Where((channel) => channel.Value.Name.ToLower() == name).Any()) 
+            if(ClientManager.client.Guilds[reader.server_id].Channels.Where((channel) => channel.Value.Name.ToLower() == name.ToLower()).Any()) 
             {
-                return ClientManager.client.Guilds[reader.server_id].Channels.Where((channel) => channel.Value.Name.ToLower() == name).First().Value;
+                return ClientManager.client.Guilds[reader.server_id].Channels.Where((channel) => channel.Value.Name.ToLower() == name.ToLower()).First().Value;
             }
 
             return null;

@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using System.Data;
 using System.Text;
@@ -8,8 +7,6 @@ using tsom_bot.Commands.Helpers.promotions;
 using tsom_bot.config;
 using tsom_bot.Fetcher.database;
 using tsom_bot.i18n;
-using ZstdSharp.Unsafe;
-using static System.Net.WebRequestMethods;
 
 namespace tsom_bot.Commands.Helpers.EventQueue
 {

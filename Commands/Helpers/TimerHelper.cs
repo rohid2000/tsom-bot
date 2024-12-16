@@ -10,11 +10,9 @@ namespace tsom_bot.Commands.Helpers
     {
         private readonly Timer _timer;
         private readonly int _interval;
-        private readonly DiscordClient _client;
-        public TimerHelper(DiscordClient client, int intervalInSec)
+        public TimerHelper()
         {
-            _client = client;
-            _interval = intervalInSec * 1000;
+            _interval = 60 * 1000;
             _timer = new Timer(async _ =>
             {
                 ClientManager.time++;

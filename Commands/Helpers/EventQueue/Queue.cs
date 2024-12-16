@@ -38,7 +38,7 @@ namespace tsom_bot.Commands.Helpers.EventQueue
 
         public async static Task<DataTable> GetQueueItemFromToTime(DateTime fromTime, DateTime toTime)
         {
-            return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate BETWEEN '{fromTime.ToString("yyyy-MM-dd HH:mm")}' AND '{toTime.ToString("yyyy-MM-dd HH:mm")}' ORDER BY sendDate DESC");
+            return await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE sendDate BETWEEN '{fromTime.AddMinutes(-1).ToString("yyyy-MM-dd HH:mm")}' AND '{toTime.ToString("yyyy-MM-dd HH:mm")}' ORDER BY sendDate ASC");
         }
 
         public async static Task<DataTable> GetQueueItemWithTime(DateTime time)
@@ -106,7 +106,6 @@ namespace tsom_bot.Commands.Helpers.EventQueue
         public static Dictionary<string, string> GetParameters(DataRow row)
         {
             string param = row.Field<string>("parameters");
-            int commandIndex = row.Field<int>("eventid");
             string[] parameters = param.Split(",");
             Dictionary<string, string> paramsDictionary = new Dictionary<string, string>();
             foreach (string text in parameters)

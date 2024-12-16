@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace tsom_bot.i18n
 {
@@ -36,6 +31,16 @@ namespace tsom_bot.i18n
     {
         public string live;
         public string dayLeft;
+
+        public string GetFormattedLiveString(RaidType raidType)
+        {
+            return live.Replace("(raid)", raidType.ToString());
+        }
+
+        public string GetFormattedDayLeftString(RaidType raidType)
+        {
+            return dayLeft.Replace("(raid)", raidType.ToString());
+        }
     }
 
     public class guildEventsTWStructure
@@ -74,7 +79,7 @@ namespace tsom_bot.i18n
         {
             string headerString = header[header.Length - 1];
             headerString = headerString.Replace("(phase)", $"Phase {phase}");
-            headerString = headerString.Replace("(type)", type.ToString());
+            headerString = headerString.Replace("(type)", GetTBTypeString(type));
             return headerString;
         }
 
@@ -83,6 +88,19 @@ namespace tsom_bot.i18n
             string footerString = phase4Footer[phase4Footer.Length - 1];
             footerString = footerString.Replace("(guild)", guild.ToString());
             return footerString;
+        }
+
+        private string GetTBTypeString(TBType type) 
+        {
+            switch(type)
+            {
+                case TBType.RepublicOffense:
+                    return "Republic Offense TB";
+                case TBType.SeparatistMight:
+                    return "Separatist Might TB";
+                default:
+                    return "NOT IMPLEMENTED";
+            }
         }
     }
 

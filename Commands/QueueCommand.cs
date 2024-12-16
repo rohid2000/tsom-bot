@@ -1,11 +1,6 @@
-﻿using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DSharpPlus;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using tsom_bot.Commands.Helpers.EventQueue;
@@ -24,14 +19,19 @@ namespace tsom_bot.Commands
             public class QueueListContainer : ApplicationCommandModule
             {
                 [SlashCommand("show", "shows a list of all items in queue")]
-                public async Task showQueueItems(InteractionContext ctx, 
-                    [Choice("1 week", 0)]
-                    [Choice("1 month", 1)]
+                public async Task showQueueItems(InteractionContext ctx,
+                    [Choice("today", 0)]
+                    [Choice("1 week", 1)]
+                    [Choice("1 month", 2)]
                     [Option("time", "the max time to search to")] long time = 0)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
                     DateTime toTime = DateTime.Now;
                     if(time == 0)
+                    {
+                        toTime = new DateTime(toTime.Year, toTime.Month, toTime.Day, 23, 59, 59);
+                    }
+                    else if(time == 1)
                     {
                         toTime = toTime.AddDays(7);
                     }
@@ -55,13 +55,17 @@ namespace tsom_bot.Commands
                     await ctx.EditResponseAsync(completeMessage);
                 }
             }
-            [SlashCommandGroup("event", "Configure Raid messages automatic")]
+            [SlashCommandGroup("event", "Configure Event messages automatic")]
             public class GuildEventsContainer : ApplicationCommandModule
             {
                 [SlashCommand("tw", "add pings for a tw")]
                 public async Task addTwPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string twStartTime)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+                    DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent($"loading data for TW");
+                    await ctx.EditResponseAsync(loadingMessage);
+
                     try
                     {
                         DateTime dateTime = DateTime.ParseExact(twStartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
@@ -106,6 +110,9 @@ namespace tsom_bot.Commands
                         ConfigReader reader = new ConfigReader();
                         await reader.readConfig();
 
+                        DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent($"searching for Defense Ping");
+                        await ctx.EditResponseAsync(loadingMessage);
+
                         DataTable result = await Database.SendSqlPull($"SELECT * FROM queuedevents WHERE eventid = 2");
                         if (result.Rows.Count > 0) 
                         {
@@ -129,9 +136,8 @@ namespace tsom_bot.Commands
                             await ctx.EditResponseAsync(failMessage);
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Debug.WriteLine(e);
                         DiscordWebhookBuilder failMessage = new DiscordWebhookBuilder().WithContent($"**ERRROR** please contact developer");
                         await ctx.EditResponseAsync(failMessage);
                     }
@@ -141,6 +147,10 @@ namespace tsom_bot.Commands
                 public async Task addRaidPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime, [Option("raidType", "which raid is starting")] RaidType raidType)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+                    DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent($"loading data for Raid ({raidType}");
+                    await ctx.EditResponseAsync(loadingMessage);
+
                     try
                     {
                         DateTime dateTime = DateTime.ParseExact(raidStartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
@@ -150,12 +160,12 @@ namespace tsom_bot.Commands
 
                         // First ping on start
                         string liveDescription = $"{raidType} Raid - Live ping";
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.live, reader.channelIds.test, dateTime, liveDescription);
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedLiveString(raidType), reader.channelIds.test, dateTime, liveDescription);
 
                         // Ping 24h before end
                         DateTime endTime = dateTime.AddHours(71 - 24);
                         string dayLeftDescription = $"{raidType} Raid - Day left ping";
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.dayLeft, reader.channelIds.test, endTime, dayLeftDescription);
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedDayLeftString(raidType), reader.channelIds.test, endTime, dayLeftDescription);
 
                         StringBuilder stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine($"*({raidType})* **Raid Pings configured**");
@@ -173,18 +183,21 @@ namespace tsom_bot.Commands
                 }
 
                 [SlashCommand("tb", "Add all pings for a specific territory battle")]
-                public async Task addTbPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime, [Option("raidType", "which raid is starting")] TBType tbType, [Option("guild", "The selected guild")] GuildSwitch guild)
+                public async Task addTbPings(InteractionContext ctx, [Option("startTime", "Format: yyyy-MM-dd HH:mm")] string raidStartTime, [Option("TBtype", "which tb to start")] TBType tbType, [Option("guild", "The selected guild")] GuildSwitch guild)
                 {
                     await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
                     ConfigReader reader = new ConfigReader();
                     await reader.readConfig();
 
+                    DiscordWebhookBuilder loadingMessage = new DiscordWebhookBuilder().WithContent($"loading data for TB ({tbType}");
+                    await ctx.EditResponseAsync(loadingMessage);
+
                     try
                     {
                         DateTime phase1SendTime = DateTime.ParseExact(raidStartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                        DateTime phase2SendTime = phase1SendTime.AddHours(6);
-                        DateTime phase3SendTime = phase2SendTime.AddHours(6);
-                        DateTime phase4SendTime = phase3SendTime.AddHours(6);
+                        DateTime phase2SendTime = phase1SendTime.AddHours(36);
+                        DateTime phase3SendTime = phase2SendTime.AddHours(36);
+                        DateTime phase4SendTime = phase3SendTime.AddHours(36);
 
                         string phase1PingMessage = guildEvents.data.tb.GetRandomHeader(1, tbType) + "\n\n";
                         string phase2PingMessage = guildEvents.data.tb.GetRandomHeader(2, tbType) + "\n\n";
@@ -212,11 +225,6 @@ namespace tsom_bot.Commands
                                 phase3PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
                                 phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
                             }
-
-                            await QueueHelper.AddMessageToQueue(phase1PingMessage, reader.channelIds.test, phase1SendTime, "TB Phase 1 Ping (republicOffense)");
-                            await QueueHelper.AddMessageToQueue(phase2PingMessage, reader.channelIds.test, phase2SendTime, "TB Phase 2 Ping (republicOffense)");
-                            await QueueHelper.AddMessageToQueue(phase3PingMessage, reader.channelIds.test, phase3SendTime, "TB Phase 3 Ping (republicOffense)");
-                            await QueueHelper.AddMessageToQueue(phase4PingMessage, reader.channelIds.test, phase4SendTime, "TB Phase 4 Ping (republicOffense)");
                         }
                         else if (tbType == TBType.SeparatistMight)
                         {
@@ -239,12 +247,12 @@ namespace tsom_bot.Commands
                                 phase3PingMessage += "\n\n" + guildEvents.data.tb.GetRandomFooter(guild);
                                 phase4PingMessage += "\n\n" + guildEvents.data.tb.GetRandomPhase4Footer(guild);
                             }
-
-                            await QueueHelper.AddMessageToQueue(phase1PingMessage, reader.channelIds.test, phase1SendTime, "TB Phase 1 Ping (separatistMight)");
-                            await QueueHelper.AddMessageToQueue(phase2PingMessage, reader.channelIds.test, phase2SendTime, "TB Phase 2 Ping (separatistMight)");
-                            await QueueHelper.AddMessageToQueue(phase3PingMessage, reader.channelIds.test, phase3SendTime, "TB Phase 3 Ping (separatistMight)");
-                            await QueueHelper.AddMessageToQueue(phase4PingMessage, reader.channelIds.test, phase4SendTime, "TB Phase 4 Ping (separatistMight)");
                         }
+
+                        await QueueHelper.AddMessageToQueue(phase1PingMessage, reader.channelIds.test, phase1SendTime, $"TB Phase 1 Ping {tbType}");
+                        await QueueHelper.AddMessageToQueue(phase2PingMessage, reader.channelIds.test, phase2SendTime, $"TB Phase 2 Ping {tbType}");
+                        await QueueHelper.AddMessageToQueue(phase3PingMessage, reader.channelIds.test, phase3SendTime, $"TB Phase 3 Ping {tbType}");
+                        await QueueHelper.AddMessageToQueue(phase4PingMessage, reader.channelIds.test, phase4SendTime, $"TB Phase 4 Ping {tbType}");
 
                         StringBuilder stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine($"*({tbType})* **TB Pings configured**");

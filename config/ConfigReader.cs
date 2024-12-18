@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using tsom_bot.Fetcher.azure;
 
 namespace tsom_bot.config
 {
@@ -26,10 +27,10 @@ namespace tsom_bot.config
 
                 if (data != null)
                 {
-                    this.token = data.token;
+                    this.token = await FetchSecretHelper.FetchSecret("tsom-bot-token");
                     this.prefix = data.prefix;
                     this.server_id = data.server_id;
-                    this.connectionString = data.connectionString;
+                    this.connectionString = await FetchSecretHelper.FetchSecret("connectionString");
                     this.guild_ids = data.guild_ids;
                     this.clanrole_ids = data.clanrole_ids;
                     this.adminRoleIds = data.adminRoleIds;

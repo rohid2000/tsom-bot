@@ -7,6 +7,7 @@ using tsom_bot.Commands.Helpers;
 using tsom_bot;
 using DSharpPlus.SlashCommands;
 using tsom_bot.i18n;
+using tsom_bot.Fetcher.azure;
 internal class Program
 {
     private static DiscordClient client { get; set; }

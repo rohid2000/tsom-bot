@@ -1,0 +1,72 @@
+{
+  "token": "",
+  "prefix": "//",
+  "connectionString": "",
+  "server_id": 1207650356960698438,
+  "guild_ids": {
+    "jedi": "5hS55Y66T1uIRQyCvUntLA",
+    "sith": "l943tTO8QQ-_IwWHfwyJuQ"
+  },
+  "clanrole_ids": {
+    "jedi": 1264179472513372222,
+    "sith": 1264938516241186877
+  },
+  "adminRoleIds": [
+    1207651188917674035,
+    1231174023459766273,
+    1207651284791070790,
+    1260513191327301662
+  ],
+  "roleIds": {
+    "jedi": {
+      "youngling": 1268131747418079262,
+      "padawan": 1268132867020423198,
+      "jediKnight": 1268133195908513856,
+      "jediMaster": 1268133439953960980
+    },
+    "sith": {
+      "acolyte": 1231175862393503785,
+      "apprentice": 1231543281314435166,
+      "mandalorian": 1231176181391294526,
+      "sithlord": 1241332248578363463
+    }
+  },
+  "channelIds": {
+    "test": 1263079670245494804,
+    "jedi": {
+      "strikeList": 1263059271302779061,
+      "promotions": 1263079670245494804,
+      "commands_private": 1263059271302779061,
+      "commands_public": 1263059271302779061
+    },
+    "sith": {
+      "strikeList": 1263059271302779061,
+      "promotions": 1263079670245494804,
+      "commands_private": 1263059271302779061,
+      "commands_public": 1263059271302779061
+    }
+  },
+  "rolePromotionDays": {
+    "sith": {
+      "acolyte": 90,
+      "apprentice": 180,
+      "mandalorian": 270,
+      "sithlord": 360
+    },
+    "jedi": {
+      "youngling": 90,
+      "padawan": 180,
+      "jediKnight": 270,
+      "jediMaster": 360
+    }
+  },
+  "minimumTicketAmount": {
+    "ticketAmountSith": 400,
+    "ticketAmountJedi": 400
+  },
+  "strikeListSendTime": {
+    "hour": 18,
+    "minute": 28,
+    "second": 0
+  }
+}

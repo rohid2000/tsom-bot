@@ -1,0 +1,128 @@
+{
+  "commands": {
+    "sync": {
+      "name": {
+        "complete": "Synced your name",
+        "fail": "Could not sync name",
+        "already_linked": "Your name is already linked",
+        "loading": "Communicating with SWGOH...."
+      },
+      "test": {
+        "complete": "Correctly Linked &&p",
+        "fail": "Could not fetch data",
+        "no_link_self": "There is no name linked to &&p",
+        "no_link_name": "There are no accounts linked to this name",
+        "loading": "Communicating with Database..."
+      },
+      "nolist": {
+        "complete": "&&p does not have a name linked",
+        "fail": "Cannot load..",
+        "loading": "loading no name list.."
+      }
+    },
+    "promotion": {
+      "sync": {
+        "complete": {
+          "jedi": {
+            "header": [
+              "There is no ignorance, there is knowledge",
+              "There is no passion, there is serenity",
+              "There is no chaos, there is harmony",
+              "There is no death, there is the Force",
+              "Congratulations!"
+            ],
+            "footer": [
+              "We are all the Jedi!",
+              "You must unlearn what you have learned!",
+              "You must learn to let go!",
+              "We are keepers of the peace, not soldiers!",
+              "This is where the fun begins!"
+            ]
+          },
+          "sith": {
+            "header": [
+              "Through passion, we gain strength!",
+              "Through strength, we gain power!",
+              "Through power we gain victory!",
+              "Through victory, my chains are broken!",
+              "Congratulations!"
+            ],
+            "footer": [
+              "Nothing will stop the Sith from returning!",
+              "We are all the Sith!",
+              "Once more the Sith will rule the galaxy!",
+              "We shall have peace!",
+              "We have brought peace, freedom, justice and security to The Sith of Mandalore!"
+            ]
+          }
+        },
+        "fail": "Could not get data",
+        "loading": "Assigning roles..."
+      },
+      "override_M": {
+        "completed": "Synced your name",
+        "fail": "Could not sync name",
+        "loading": "Syncing name...."
+      }
+    },
+    "tickettracker": {
+      "sync": {
+        "go": {
+          "complete": "Successfully updated ticket data",
+          "fail": "Received an error while fetching ticket data",
+          "loading": "Fetching latest ticket data..."
+        },
+        "check": {
+          "complete": {
+            "true_message": "Check complete, Data was synced today",
+            "false_message": "Check complete, Data was not synced today"
+          },
+          "loading": "Checking if data was synced today..."
+        },
+        "excel": {
+          "complete": "Excel file created!",
+          "fail": "Could not create excel.",
+          "loading": "creating excel file.."
+        },
+        "cleanup": {
+          "complete": "Emptied ticketresults table for this month",
+          "fail": "Could not empty ticketresults table",
+          "loading": "Emptying ticketresults table..."
+        }
+      },
+      "get": {
+        "excel": {
+          "complete": "Here is your file.",
+          "fail": "Could not get file try /tickets sync excel",
+          "loading": "Loading excel file.."
+        },
+        "message": {
+          "fail": "Could not create message try /tickets sync go",
+          "loading": "Loading message.."
+        }
+      },
+      "exclude": {
+        "add": {
+          "complete": "&&p has been excluded from strike-list count", // a change that (for 10 days) gets added add the end
+          "fail": "Could not exclude user from strike-list count",
+          "loading": "Excluding user from strike-list count..."
+        },
+        "remove": {
+          "complete": "&&p has been added to the strike-list count",
+          "fail": "Could not add user to strike-list count",
+          "loading": "Adding user to strike-list count..."
+        },
+        "guildStrikeCount": {
+          "complete": "Strike count has been turned (state) for (guild)",
+          "fail": "Strike count for Guild could not be switched",
+          "loading": "Switching strike count for Guild..."
+        }
+      },
+      "remove": {
+        "complete": "Tickets have been removed for Member",
+        "fail": "Tickets could not be removed for Member",
+        "loading": "Tickets are being removed for Member..."
+      }
+    }
+  }
+}

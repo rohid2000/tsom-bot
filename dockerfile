@@ -1,4 +1,4 @@
-# Use the official .NET runtime image for running the appa
+# Use the official .NET runtime image for running the app
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 WORKDIR /app
 

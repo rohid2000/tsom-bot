@@ -8,6 +8,18 @@ namespace tsom_bot.i18n
 {
     public class joinMessages
     {
+        public static joinMessagesStructure data;
+    }
 
+    public class joinMessagesStructure
+    {
+        public joinMessagesRoleAssignMessagesStructure roleAssignMessages;
+    }
+
+    public class joinMessagesRoleAssignMessagesStructure
+    {
+        public string welcome;
+        public string namesNotLinked;
+        public string welcomeMessageGeneralChat;
     }
 }

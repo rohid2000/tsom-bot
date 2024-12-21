@@ -1,5 +1,5 @@
 {
-  "roleGiveAndMessages": {
+  "roleAssignMessages": {
     "welcome": "Welcome @@member:(newMember)@@ to TheClanOfMandalore!\n\n- You will be given a Role based on the Guild you joined ingame within our ClanOfMandalore, to be able to see it's corresponding channels!\n\n- Make sure to check **the rules and announcement channels** you see and hit up the Check Emojie reaction in the **rules channel**, to let us know you read it!\n\n- Also, make sure to link your DiscordId to your allycod with the C3PO BOT in the **bot-commands channel** you see with the '/allycode add' command, example:\n  - allycode: 123456789    - type: /allycode add -> click on it -> fill in 123456789 -> send message\n\n- If you would like to link your allycode with other BOTS in this server, be sure to check out @@channel:linking-allycode-with-bots@@!\n\nMay the Force be with you!",
     "namesNotLinked": "Welcome @@member:(newMember)@@ to TheClanOfMandalore!\n\nPlease make your Discord name in this server equal to your ingame name so that you can be given the right Role of the Guild you joined, so that you can see it's corresponding Channels!",
     "welcomeMessageGeneralChat": {

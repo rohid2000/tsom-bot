@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,20 @@ namespace tsom_bot.i18n
     public class joinMessages
     {
         public static joinMessagesStructure data;
+
+        public static async void load()
+        {
+            using (StreamReader reader = new StreamReader("joinMessages.json"))
+            {
+                string json = await reader.ReadToEndAsync();
+                joinMessagesStructure data = JsonConvert.DeserializeObject<joinMessagesStructure>(json);
+
+                if (data != null)
+                {
+                    joinMessages.data = data;
+                }
+            }
+        }
     }
 
     public class joinMessagesStructure

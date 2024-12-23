@@ -13,6 +13,13 @@ namespace tsom_bot.Commands
         [SlashCommandGroup("sync", "Syncs your discord account with your SWGOH account")]
         public class DiscordNameSyncContainer
         {
+            [SlashCommand("welcome", "Links your ingame name to your Discord account")]
+            public async Task WelcomeCommand(InteractionContext ctx, [Option("member", "Your ingame name")] DiscordUser member)
+            {
+                DiscordMember discordMember = member as DiscordMember;
+
+                await DiscordJoinHelper.JoinFunction(discordMember);
+            }
             [SlashCommand("name", "Links your ingame name to your Discord account")]
             public async Task NameSyncCommand(InteractionContext ctx, [Option("name", "Your ingame name")] string name)
             {

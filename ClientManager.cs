@@ -1,4 +1,5 @@
 ﻿using DSharpPlus;
+using DSharpPlus.EventArgs;
 using tsom_bot.config;
 
 namespace tsom_bot
@@ -11,6 +12,13 @@ namespace tsom_bot
         public static bool launchTicketTrackerSwitchCommandSith = true;
         public static bool launchTicketTrackerSwitchCommandJedi = false;
         public static DiscordClient client;
+
+        public static List<ulong> joinMessageIds = new List<ulong>();
+
+        public static bool IsJoinReactionTrigger(MessageReactionAddEventArgs e)
+        {
+            return joinMessageIds.Contains(e.Message.Id);
+        }
 
         public static async Task<string> getGuildId(GuildSwitch? guildSwitch = null)
         {

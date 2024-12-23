@@ -42,11 +42,17 @@ namespace tsom_bot.i18n
     {
         public joinMessagesWelcomeMessageGeneralChatHeaderAndFooter jedi { get; set; }
         public joinMessagesWelcomeMessageGeneralChatHeaderAndFooter sith { get; set; }
+        public string footer;
     }
 
     public class joinMessagesWelcomeMessageGeneralChatHeaderAndFooter
     {
         public string[] header { get; set; }
-        public string footer { get; set; }
+
+        public string GetRandomHeader()
+        {
+            Random rng = new();
+            return this.header[rng.Next(0, this.header.Length - 1)];
+        }
     }
 }

@@ -7,6 +7,10 @@ using tsom_bot.Commands.Helpers;
 using tsom_bot;
 using DSharpPlus.SlashCommands;
 using tsom_bot.i18n;
+using tsom_bot.Commands.Helpers.Discord;
+using DSharpPlus.EventArgs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using DSharpPlus.Entities;
 internal class Program
 {
     private static DiscordClient client { get; set; }
@@ -50,6 +54,19 @@ internal class Program
         //Initialize commands here
         commands.RegisterCommands<commandTemplate>();
 
+        //Initialize join listener
+        client.GuildMemberAdded += async (DiscordClient client, GuildMemberAddEventArgs e) =>
+        {
+            await DiscordJoinHelper.JoinFunction(e.Member);
+        };
+        client.MessageReactionAdded += async (DiscordClient client, MessageReactionAddEventArgs e) =>
+        {
+            if (ClientManager.IsJoinReactionTrigger(e))
+            {
+                await DiscordJoinHelper.JoinFunction(e.User as DiscordMember);
+            }
+        };
+
         //Make connection
         await client.ConnectAsync();
         ClientManager.client = client;
@@ -59,6 +76,7 @@ internal class Program
         ClientManager.timerStartTime = DateTime.Now;
         i18n.load();
         guildEvents.load();
+        joinMessages.load();
         //Keep bot running
         await Task.Delay(-1);
     }

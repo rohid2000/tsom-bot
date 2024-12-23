@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tsom_bot.i18n
 {
-    public class joinMessages
+    public static class joinMessages
     {
         public static joinMessagesStructure data;
 

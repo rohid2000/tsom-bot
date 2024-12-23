@@ -47,6 +47,6 @@ namespace tsom_bot.i18n
     public class joinMessagesWelcomeMessageGeneralChatHeaderAndFooter
     {
         public string[] header { get; set; }
-        public string footer;
+        public string footer { get; set; }
     }
 }

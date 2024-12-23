@@ -35,6 +35,18 @@ namespace tsom_bot.i18n
     {
         public string welcome;
         public string namesNotLinked;
-        public string welcomeMessageGeneralChat;
+        public joinMessagesWelcomeMessageGeneralChat welcomeMessageGeneralChat;
+    }
+
+    public class joinMessagesWelcomeMessageGeneralChat
+    {
+        public joinMessagesWelcomeMessageGeneralChatHeaderAndFooter jedi { get; set; }
+        public joinMessagesWelcomeMessageGeneralChatHeaderAndFooter sith { get; set; }
+    }
+
+    public class joinMessagesWelcomeMessageGeneralChatHeaderAndFooter
+    {
+        public string[] header { get; set; }
+        public string footer;
     }
 }

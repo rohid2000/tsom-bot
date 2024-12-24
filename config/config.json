@@ -34,12 +34,14 @@
   "channelIds": {
     "test": "",
     "jedi": {
+      "raids": "",
       "strikeList": "",
       "promotions": "",
       "commands_private": "",
       "commands_public": ""
     },
     "sith": {
+      "raids":  "",
       "strikeList": "",
       "promotions": "",
       "commands-private": "",

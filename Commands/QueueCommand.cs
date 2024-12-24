@@ -160,12 +160,12 @@ namespace tsom_bot.Commands
 
                         // First ping on start
                         string liveDescription = $"{raidType} Raid - Live ping";
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedLiveString(raidType), reader.channelIds.test, dateTime, liveDescription);
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedLiveString(raidType), reader.channelIds.sith.raids, dateTime, liveDescription);
 
                         // Ping 24h before end
                         DateTime endTime = dateTime.AddHours(71 - 24);
                         string dayLeftDescription = $"{raidType} Raid - Day left ping";
-                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedDayLeftString(raidType), reader.channelIds.test, endTime, dayLeftDescription);
+                        await QueueHelper.AddMessageToQueue(guildEvents.data.raid.GetFormattedDayLeftString(raidType), reader.channelIds.sith.raids, endTime, dayLeftDescription);
 
                         StringBuilder stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine($"*({raidType})* **Raid Pings configured**");

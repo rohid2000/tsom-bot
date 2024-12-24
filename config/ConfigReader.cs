@@ -68,6 +68,7 @@ namespace tsom_bot.config
 
     public class Channel
     {
+        public ulong raids { get; set; }
         public ulong strikeList { get; set; }
         public ulong promotions { get; set; }
         public ulong commands_private { get; set; }
